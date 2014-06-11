@@ -1,0 +1,183 @@
+/** 
+ * Copyright (C) 2011-2013 Flow86
+ * 
+ * AdditionalBuildcraftObjects is open-source.
+ *
+ * It is distributed under the terms of my Open Source License. 
+ * It grants rights to read, modify, compile or run the code. 
+ * It does *NOT* grant the right to redistribute this software or its 
+ * modifications in any form, binary or source, except if expressively
+ * granted by the copyright holder.
+ */
+
+package abo.pipes.items;
+
+import java.util.LinkedList;
+
+import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import abo.ABO;
+import abo.PipeIconProvider;
+
+import buildcraft.api.core.IIconProvider;
+import buildcraft.api.core.Position;
+import buildcraft.api.power.IPowerReceptor;
+import buildcraft.api.power.PowerHandler;
+import buildcraft.api.power.PowerHandler.PowerReceiver;
+import buildcraft.api.power.PowerHandler.Type;
+import buildcraft.api.transport.IPipeTile;
+import buildcraft.transport.BlockGenericPipe;
+import buildcraft.transport.IPipeTransportItemsHook;
+import buildcraft.transport.PipeConnectionBans;
+import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.PipeItemsWood;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+/**
+ * This pipe will always prefer to insert it's objects into another pipe over one that is not a pipe.
+ * 
+ * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
+ */
+public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor, IPipeTransportItemsHook {
+	private final int standardIconIndex = PipeIconProvider.PipeItemsExtraction;
+	private final int solidIconIndex = PipeIconProvider.PipeItemsExtractionSide;
+	
+	private PowerHandler powerHandler;
+	
+	private boolean powered;
+
+	public PipeItemsExtraction(Item itemID) {
+		super(itemID);
+
+		PipeConnectionBans.banConnection(PipeItemsExtraction.class, PipeItemsWood.class);
+
+		transport.allowBouncing = true;
+		
+		powerHandler = new PowerHandler(this, Type.PIPE);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IIconProvider getIconProvider() {
+		return ABO.instance.pipeIconProvider;
+	}
+	
+	
+
+	@Override
+	public void updateEntity() {
+		//updateRedstoneCurrent();
+		//useRedstoneAsPower();
+		super.updateEntity();
+	}
+	
+	public void updateRedstoneCurrent() {
+		boolean lastPowered = powered;
+
+		LinkedList<TileGenericPipe> neighbours = new LinkedList<TileGenericPipe>();
+		neighbours.add(this.container);
+
+		powered = false;
+		for (ForgeDirection o : ForgeDirection.VALID_DIRECTIONS) {
+			Position pos = new Position(container.xCoord, container.yCoord, container.zCoord, o);
+			pos.moveForwards(1.0);
+
+			TileEntity tile = container.getTile(o);
+
+			if (tile instanceof TileGenericPipe) {
+				TileGenericPipe pipe = (TileGenericPipe) tile;
+				if (BlockGenericPipe.isValid(pipe.pipe)) {
+					neighbours.add(pipe);
+					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0)
+						powered = true;
+				}
+			}
+		}
+
+		if (!powered)
+			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
+
+		if (lastPowered != powered) {
+			for (TileGenericPipe pipe : neighbours) {
+				pipe.scheduleNeighborChange();
+				pipe.updateEntity();
+			}
+		}
+	}
+
+	@Override
+	public void onNeighborBlockChange(int blockId) {
+		super.onNeighborBlockChange(blockId);
+		//updateRedstoneCurrent();
+	}
+	
+	private void useRedstoneAsPower()
+	{
+		if(powered)	mjStored++;
+	}
+	
+	public boolean isPowered() {
+		return powered;
+	}
+
+	@Override
+	public int getIconIndex(ForgeDirection direction) {
+		if (direction == ForgeDirection.UNKNOWN)
+			return standardIconIndex;
+		else {
+			int metadata = container.getBlockMetadata();
+
+			if (metadata == direction.ordinal())
+				return solidIconIndex;
+			else
+				return standardIconIndex;
+		}
+	}
+
+	@Override
+	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
+		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
+		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
+
+		item.blacklist.add(item.input.getOpposite());
+
+		for (ForgeDirection o : possibleOrientations) {
+			if (!item.blacklist.contains(o) && container.pipe.outputOpen(o)) {
+				if (transport.canReceivePipeObjects(o, item)) {
+
+					TileEntity entity = container.getTile(o);
+					if (entity instanceof IPipeTile)
+						pipesList.add(o);
+					else
+						nonPipesList.add(o);
+				}
+			}
+		}
+
+		if (!pipesList.isEmpty())
+			return pipesList;
+		else
+			return nonPipesList;
+	}
+
+	@Override
+	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
+	}
+
+	@Override
+	public void readjustSpeed(TravelingItem item) {
+		transport.defaultReajustSpeed(item);
+	}
+
+	@Override
+	public void doWork(PowerHandler arg0) {	}
+
+	@Override
+	public PowerReceiver getPowerReceiver(ForgeDirection arg0) {
+		return powerHandler.getPowerReceiver();
+	}
+}
