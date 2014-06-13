@@ -13,6 +13,8 @@
 ## License
 
    **AdditionalBuildcraftObjects is open-source.**
+   
+   The majority of this readme is outdated.
 
    It is distributed under the terms of my Open Source License.
 
