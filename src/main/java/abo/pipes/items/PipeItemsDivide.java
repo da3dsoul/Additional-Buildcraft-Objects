@@ -135,11 +135,12 @@ public void eventHandler(PipeEventItem.FindDest event) {
 		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
 		if (transport.canReceivePipeObjects(item.input, item))
+		{
 			list.add(item.input);
-		else
-			list = result;
+			result.clear();
+			result.addAll(list);
+		}
 
-		result.clear();
-		result.addAll(list);
+		
 	}
 }
