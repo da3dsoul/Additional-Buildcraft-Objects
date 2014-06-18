@@ -1,21 +1,16 @@
 package abo.energy;
 
+import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Random;
-
-import abo.ABO;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -68,6 +63,11 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 		}
 
 		if (tile instanceof TileWindmill) {
+			if(!world.isRemote)
+			{
+				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is " + new DecimalFormat("##0.0##").format(((TileWindmill)tile).currentOutput) + "MJ/t"));
+				player.addChatComponentMessage(new ChatComponentText("Target Output is " + new DecimalFormat("##0.0##").format(((TileWindmill)tile).TARGET_OUTPUT) + "MJ/t"));
+			}
 			return ((TileWindmill) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
 

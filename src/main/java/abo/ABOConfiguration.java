@@ -21,7 +21,7 @@ import net.minecraftforge.common.config.Property;
  * @author Flow86
  * 
  */
-public class ABOConfiguration extends net.minecraftforge.common.config.Configuration {
+public class ABOConfiguration extends Configuration {
 	public ABOConfiguration(File file) {
 		super(file);
 	}

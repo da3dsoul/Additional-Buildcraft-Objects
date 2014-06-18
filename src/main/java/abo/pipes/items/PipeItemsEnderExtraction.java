@@ -17,22 +17,17 @@ import io.netty.buffer.ByteBuf;
 import java.util.LinkedList;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import abo.ABO;
 import abo.PipeIconProvider;
 import abo.gui.ABOGuiIds;
-
-import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
 import buildcraft.api.mj.MjBattery;
@@ -40,26 +35,18 @@ import buildcraft.api.power.IPowerReceptor;
 import buildcraft.api.power.PowerHandler;
 import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.api.power.PowerHandler.Type;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.PipeManager;
-import buildcraft.core.GuiIds;
-import buildcraft.core.inventory.InvUtils;
-import buildcraft.core.inventory.InventoryWrapper;
 import buildcraft.core.inventory.SimpleInventory;
 import buildcraft.core.inventory.StackHelper;
 import buildcraft.core.network.IClientState;
 import buildcraft.core.network.IGuiReturnHandler;
 import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.IPipeTransportItemsHook;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeConnectionBans;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.pipes.PipeItemsWood;
-import buildcraft.transport.pipes.PipeLogicWood;
-import buildcraft.transport.pipes.PipeItemsEmerald.EmeraldPipeSettings;
 import buildcraft.transport.pipes.PipeItemsEmerald.FilterMode;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -69,7 +56,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
-public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IPipeTransportItemsHook, IClientState, IGuiReturnHandler {
+public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IClientState, IGuiReturnHandler {
 	private final int standardIconIndex = PipeIconProvider.PipeItemsEnderExtraction;
 	
 	private PowerHandler powerHandler;
@@ -110,6 +97,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 	private int currentFilter = 0;
 
+	@SuppressWarnings("unchecked")
 	public PipeItemsEnderExtraction(Item itemID) {
 		super(new PipeTransportItems(), itemID);
 
@@ -134,6 +122,8 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		//useRedstoneAsPower();
 		super.updateEntity();
 
+		if(!hasEnderChest()) return;
+		
 		if (container.getWorldObj().isRemote) {
 			return;
 		}
@@ -145,6 +135,21 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 			mjStored = 0;
 		}
+	}
+	
+	private boolean hasEnderChest()
+	{
+		TileEntity tile = null;
+		for(ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+		{
+			tile = getWorld().getTileEntity(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ);
+			if(tile != null && tile instanceof TileEntityEnderChest) break;
+		}
+		if(tile == null || !(tile instanceof TileEntityEnderChest))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
@@ -159,11 +164,18 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			return true;
 		}
 
-		if (!container.getWorldObj().isRemote) {
-			entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_ENDER_EXTRACTION, container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
-		}
-
-		return true;
+		if(hasEnderChest())
+		{
+		if (getWorld().isRemote)
+        {
+            return true;
+        }
+        else
+        {
+        	entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_ENDER_EXTRACTION, container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
+            return true;
+        }
+		}else return false;
 	}
 
 	public ItemStack[] checkExtract(IInventory inventory, boolean doRemove) {
@@ -274,6 +286,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		//updateRedstoneCurrent();
 	}
 	
+	@SuppressWarnings("unused")
 	private void useRedstoneAsPower()
 	{
 		if(powered)	mjStored++;
@@ -286,41 +299,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
 		return standardIconIndex;
-	}
-
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
-		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
-		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
-
-		item.blacklist.add(item.input.getOpposite());
-
-		for (ForgeDirection o : possibleOrientations) {
-			if (!item.blacklist.contains(o) && container.pipe.outputOpen(o)) {
-				if (transport.canReceivePipeObjects(o, item)) {
-
-					TileEntity entity = container.getTile(o);
-					if (entity instanceof IPipeTile)
-						pipesList.add(o);
-					else
-						nonPipesList.add(o);
-				}
-			}
-		}
-
-		if (!pipesList.isEmpty())
-			return pipesList;
-		else
-			return nonPipesList;
-	}
-
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
-	}
-
-	@Override
-	public void readjustSpeed(TravelingItem item) {
-		transport.defaultReajustSpeed(item);
 	}
 
 	@Override
@@ -354,9 +332,23 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		return tile instanceof TileGenericPipe;
+		if(tile instanceof TileEntityEnderChest) return true;
+		Pipe<PipeTransportItems> otherPipe;
+		if (tile instanceof TileGenericPipe && ((TileGenericPipe) tile).pipe.transport instanceof PipeTransportItems) {
+			otherPipe = ((TileGenericPipe) tile).pipe;
+			if (!BlockGenericPipe.isFullyDefined(otherPipe)) {
+				return false;
+			}
+
+			if (!PipeConnectionBans.canPipesConnect(getClass(), otherPipe.getClass())) {
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	protected TravelingItem makeItem(double x, double y, double z, ItemStack stack) {

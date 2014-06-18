@@ -13,14 +13,13 @@
 package abo.pipes.items;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import abo.ABO;
 import abo.PipeIconProvider;
-
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
 import buildcraft.api.power.IPowerReceptor;
@@ -29,11 +28,10 @@ import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.api.power.PowerHandler.Type;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.IPipeTransportItemsHook;
 import buildcraft.transport.PipeConnectionBans;
 import buildcraft.transport.TileGenericPipe;
-import buildcraft.transport.TravelingItem;
 import buildcraft.transport.pipes.PipeItemsWood;
+import buildcraft.transport.pipes.events.PipeEventItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -42,7 +40,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
-public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor, IPipeTransportItemsHook {
+public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor {
 	private final int standardIconIndex = PipeIconProvider.PipeItemsExtraction;
 	private final int solidIconIndex = PipeIconProvider.PipeItemsExtractionSide;
 	
@@ -50,6 +48,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 	
 	private boolean powered;
 
+	@SuppressWarnings("unchecked")
 	public PipeItemsExtraction(Item itemID) {
 		super(itemID);
 
@@ -115,6 +114,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 		//updateRedstoneCurrent();
 	}
 	
+	@SuppressWarnings("unused")
 	private void useRedstoneAsPower()
 	{
 		if(powered)	mjStored++;
@@ -138,39 +138,29 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 		}
 	}
 
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
+	public void eventHandler(PipeEventItem.FindDest event) {
 		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
 		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
+		
+		List<ForgeDirection> result = event.destinations;
 
-		item.blacklist.add(item.input.getOpposite());
-
-		for (ForgeDirection o : possibleOrientations) {
-			if (!item.blacklist.contains(o) && container.pipe.outputOpen(o)) {
-				if (transport.canReceivePipeObjects(o, item)) {
-
-					TileEntity entity = container.getTile(o);
+		for (ForgeDirection o : result) {
+				TileEntity entity = container.getTile(o);
 					if (entity instanceof IPipeTile)
 						pipesList.add(o);
 					else
 						nonPipesList.add(o);
-				}
-			}
 		}
 
 		if (!pipesList.isEmpty())
-			return pipesList;
-		else
-			return nonPipesList;
-	}
-
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
-	}
-
-	@Override
-	public void readjustSpeed(TravelingItem item) {
-		transport.defaultReajustSpeed(item);
+		{
+			result.clear();
+			result.addAll(pipesList);
+			return;
+		}
+		result.clear();
+		result.addAll(nonPipesList);
+		return;
 	}
 
 	@Override

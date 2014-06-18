@@ -21,24 +21,18 @@ import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryEnderChest;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.gen.structure.StructureVillagePieces.PieceWeight;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
 import abo.actions.ABOActionProvider;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
@@ -51,7 +45,6 @@ import abo.network.ABOPacketHandler;
 import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsDistribution;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
-import abo.pipes.fluids.PipeFluidsPump;
 import abo.pipes.fluids.PipeFluidsValve;
 import abo.pipes.items.PipeItemsCompactor;
 import abo.pipes.items.PipeItemsCrossover;
@@ -66,7 +59,6 @@ import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
 import abo.triggers.ABOTriggerProvider;
 import abo.triggers.TriggerEngineSafe;
-
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftEnergy;
 import buildcraft.BuildCraftTransport;
@@ -77,28 +69,18 @@ import buildcraft.api.gates.ActionManager;
 import buildcraft.api.gates.IAction;
 import buildcraft.api.gates.ITrigger;
 import buildcraft.core.CreativeTabBuildCraft;
-import buildcraft.core.DefaultProps;
 import buildcraft.core.InterModComms;
 import buildcraft.core.network.BuildCraftPacket;
-import buildcraft.core.network.PacketHandler;
-import buildcraft.core.proxy.CoreProxy;
-import buildcraft.energy.ItemEngine;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -107,6 +89,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 
 /**
  * @author Flow86
@@ -157,6 +140,8 @@ public class ABO {
 	public static Item pipePowerIron = null;
 
 	public static Item pipeDistributionConductive = null;
+	
+	public static Item bottle = null;
 
 	public static BlockWindmill windmillBlock;
 
@@ -239,6 +224,13 @@ public class ABO {
 					new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4), null);
 
 			windmillBlock = new BlockWindmill();
+			
+			bottle = new ItemBottle();
+			
+			GameRegistry.addShapedRecipe(new ItemStack(bottle, 3), new Object[] { " B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'), Blocks.planks });
+			GameRegistry.registerItem(bottle, "MobBottle");
+			LanguageRegistry.addName(bottle, "Mob Bottle");
+			
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock), new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem, Character.valueOf('B'), Items.iron_ingot });
 

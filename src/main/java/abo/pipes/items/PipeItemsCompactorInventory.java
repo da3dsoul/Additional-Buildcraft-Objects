@@ -11,6 +11,7 @@ import buildcraft.core.inventory.InvUtils;
 
 public class PipeItemsCompactorInventory {
 	private class InventorySlot {
+		@SuppressWarnings("deprecation")
 		private final SafeTimeTracker timeTracker = new SafeTimeTracker();
 		private final ItemStack itemStack;
 
@@ -24,6 +25,7 @@ public class PipeItemsCompactorInventory {
 				timeTracker.markTime(worldObj);
 		}
 
+		@SuppressWarnings("deprecation")
 		public boolean isNotModifiedSince(World worldObj, int unchangedSince) {
 			if (worldObj != null)
 				return timeTracker.markTimeIfDelay(worldObj, unchangedSince);

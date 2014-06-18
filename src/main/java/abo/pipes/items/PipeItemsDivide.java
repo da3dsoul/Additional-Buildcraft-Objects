@@ -14,38 +14,27 @@ package abo.pipes.items;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import abo.PipeIconProvider;
 import abo.pipes.ABOPipe;
-
-import buildcraft.api.core.Position;
-import buildcraft.api.gates.ITrigger;
-import buildcraft.api.gates.ITriggerParameter;
-import buildcraft.api.transport.IPipeConnection;
-import buildcraft.api.transport.IPipeTile.PipeType;
 import buildcraft.core.ItemWrench;
-import buildcraft.transport.IPipeTransportItemsHook;
-import buildcraft.transport.IPipeTrigger;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
  * @author Flow86
  * 
  */
-public class PipeItemsDivide extends ABOPipe<PipeTransportItems> implements IPipeTransportItemsHook {
+public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 
 	private byte desiredSize = 1;
 	
@@ -58,19 +47,19 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> implements IPip
 		return PipeIconProvider.PipeItemsDivide;
 	}
 
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
+	public void eventHandler(PipeEventItem.Entered event) {
+		TravelingItem item = event.item;
 		ItemStack stack = item.getItemStack();
 		while(stack.stackSize > desiredSize)
 		{
 			ItemStack newStack = stack.splitStack(desiredSize);
 			TravelingItem newItem = copyTravelingItem(item, newStack);
 			newItem.getExtraData().setBoolean("DONT MERGE ME", true);
-			if (transport.canReceivePipeObjects(orientation, newItem))
+			if (transport.canReceivePipeObjects(item.input, newItem))
 			{
 				newItem.input = newItem.output;
 			}
-			transport.injectItem(newItem, orientation);
+			transport.injectItem(newItem, item.input);
 			readjustSpeed(newItem, 5);
 		}
 		if(stack.stackSize < desiredSize && stack.stackSize > 0)
@@ -108,7 +97,7 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> implements IPip
 			try {
 				Field field = newItem.getClass().getDeclaredField("extraData");
 				field.setAccessible(true);
-				NBTTagCompound nbt = (NBTTagCompound) field.get(newItem);
+				//NBTTagCompound nbt = (NBTTagCompound) field.get(newItem);
 				field.set(newItem, item.getExtraData().copy());
 				field.setAccessible(false);
 			} catch (Exception e){}
@@ -134,27 +123,23 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> implements IPip
 		desiredSize++;
 		if(desiredSize > 8) desiredSize = 1;
 	}
-
-	@Override
-	public void readjustSpeed(TravelingItem item) {
-		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f, TransportConstants.PIPE_NORMAL_SPEED * 20F));
-	}
 	
 	public void readjustSpeed(TravelingItem item, int errorMargin) {
 		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f, TransportConstants.PIPE_NORMAL_SPEED * 20F) + (new Random().nextInt(errorMargin) / 1000) - (new Random().nextInt(errorMargin) / 1000));
 	}
 
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations,
-			Position pos, TravelingItem item) { 
-		LinkedList<ForgeDirection> list = new LinkedList<ForgeDirection>();
+public void eventHandler(PipeEventItem.FindDest event) {
+		
+		List<ForgeDirection> result = event.destinations;
+		TravelingItem item = event.item;
+		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		pos.moveForwards(1.0);
-		if (transport.canReceivePipeObjects(pos.orientation, item))
-			list.add(pos.orientation);
+		if (transport.canReceivePipeObjects(item.input, item))
+			list.add(item.input);
 		else
-			list = possibleOrientations;
+			list = result;
 
-		return list;
+		result.clear();
+		result.addAll(list);
 	}
 }

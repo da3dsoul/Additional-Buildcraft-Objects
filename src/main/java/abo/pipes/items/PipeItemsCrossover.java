@@ -13,22 +13,22 @@
 package abo.pipes.items;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIconProvider;
 import abo.pipes.ABOPipe;
-import buildcraft.api.core.Position;
-import buildcraft.transport.IPipeTransportItemsHook;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
  * This pipe will always prefer to use the opposite direction, so items will go "straight through"
  * 
  * @author blakmajik ported to BC > 2.2 by Flow86
  */
-public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> implements IPipeTransportItemsHook {
+public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> {
 
 	public PipeItemsCrossover(Item itemID) {
 		super(new PipeTransportItems(), itemID);
@@ -38,26 +38,21 @@ public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> implements I
 	public int getIconIndex(ForgeDirection direction) {
 		return PipeIconProvider.PipeItemsCrossover;
 	}
+	
+	
 
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
-		LinkedList<ForgeDirection> list = new LinkedList<ForgeDirection>();
+	public void eventHandler(PipeEventItem.FindDest event) {
+		
+		List<ForgeDirection> result = event.destinations;
+		TravelingItem item = event.item;
+		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		pos.moveForwards(1.0);
-		if (transport.canReceivePipeObjects(pos.orientation, item))
-			list.add(pos.orientation);
+		if (transport.canReceivePipeObjects(item.input, item))
+			list.add(item.input);
 		else
-			list = possibleOrientations;
+			list = result;
 
-		return list;
-	}
-
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
-	}
-
-	@Override
-	public void readjustSpeed(TravelingItem item) {
-		transport.defaultReajustSpeed(item);
+		result.clear();
+		result.addAll(list);
 	}
 }

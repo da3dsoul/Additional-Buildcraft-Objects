@@ -1,3 +1,20 @@
+#eclipse
+.project
+.classpath
+.metadata
+org.*
+bin
 
-*.bak
-/package.zip
+#idea
+*.iml
+*.ipr
+*.iws
+.idea
+out
+
+#gradle
+build
+.gradle
+
+#runtime
+run

@@ -36,23 +36,24 @@ import buildcraft.api.gates.IActionReceptor;
 import buildcraft.core.inventory.InvUtils;
 import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.IPipeTransportItemsHook;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
  * @author Flow86
  * 
  */
-public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements IPipeTransportItemsHook, IActionReceptor {
+public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements IActionReceptor {
 	private final int onTexture = PipeIconProvider.PipeItemsCompactorOn;
 	private final int offTexture = PipeIconProvider.PipeItemsCompactorOff;
 	private boolean powered = false;
 	private boolean toggled = false;
 	private boolean switched = false;
 	private final TreeMap<ForgeDirection, PipeItemsCompactorInventory> receivedStacks = new TreeMap<ForgeDirection, PipeItemsCompactorInventory>();
+	@SuppressWarnings("deprecation")
 	private final SafeTimeTracker timeTracker = new SafeTimeTracker();
 
 	/**
@@ -90,18 +91,14 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		super.dropContents();
 	}
 
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
+	
+	public void eventHandler(PipeEventItem.Entered event) {
+		TravelingItem item = event.item;
 		if (isPowered() && item.getItemStack().isStackable()) {
-			addItemToItemStack(orientation, item.getItemStack());
+			addItemToItemStack(item.output, item.getItemStack());
 			transport.items.scheduleRemoval(item);
 		} else
 			readjustSpeed(item);
-	}
-
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
-		return possibleOrientations;
 	}
 
 	@Override
@@ -261,6 +258,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
@@ -286,7 +284,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		}
 	}
 
-	@Override
+	
 	public void readjustSpeed(TravelingItem item) {
 		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f, TransportConstants.PIPE_NORMAL_SPEED * 20F));
 	}

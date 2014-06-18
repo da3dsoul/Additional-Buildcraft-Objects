@@ -13,22 +13,21 @@
 package abo.pipes.items;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIconProvider;
 import abo.pipes.ABOPipe;
-import buildcraft.api.core.Position;
-import buildcraft.transport.IPipeTransportItemsHook;
 import buildcraft.transport.PipeTransportItems;
-import buildcraft.transport.TravelingItem;
+import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
  * @author Flow86
  * 
  */
-public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> implements IPipeTransportItemsHook {
+public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> {
 	private int lastOrientation = 0;
 
 	public PipeItemsRoundRobin(Item itemID) {
@@ -54,25 +53,19 @@ public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> implements 
 		nbttagcompound.setInteger("lastOrientation", lastOrientation);
 	}
 
-	@Override
-	public LinkedList<ForgeDirection> filterPossibleMovements(LinkedList<ForgeDirection> possibleOrientations, Position pos, TravelingItem item) {
-		if (possibleOrientations.size() == 0) {
-			return new LinkedList();
+	public void eventHandler(PipeEventItem.FindDest event) {
+		List<ForgeDirection> result = event.destinations;
+		
+		if (result.size() == 0) {
+			return;
 		} else {
-			lastOrientation = (lastOrientation + 1) % possibleOrientations.size();
+			lastOrientation = (lastOrientation + 1) % result.size();
 
-			LinkedList<ForgeDirection> newPossibleOrientations = new LinkedList();
-			newPossibleOrientations.add(possibleOrientations.get(lastOrientation));
-			return newPossibleOrientations;
+			LinkedList<ForgeDirection> newPossibleOrientations = new LinkedList<ForgeDirection>();
+			newPossibleOrientations.add(result.get(lastOrientation));
+			result.clear();
+			result.addAll(newPossibleOrientations);
+			return;
 		}
-	}
-
-	@Override
-	public void entityEntered(TravelingItem item, ForgeDirection orientation) {
-	}
-
-	@Override
-	public void readjustSpeed(TravelingItem item) {
-		transport.defaultReajustSpeed(item);
 	}
 }
