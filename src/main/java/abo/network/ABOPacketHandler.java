@@ -15,13 +15,8 @@ package abo.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
-import buildcraft.core.network.BuildCraftPacket;
 import buildcraft.core.proxy.CoreProxy;
 
 import abo.ABO;

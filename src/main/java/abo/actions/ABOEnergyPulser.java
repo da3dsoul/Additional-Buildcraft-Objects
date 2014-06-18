@@ -13,10 +13,6 @@
 package abo.actions;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
-import buildcraft.api.mj.IBatteryObject;
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.api.power.PowerHandler.Type;
 
 /**
  * @author Flow86

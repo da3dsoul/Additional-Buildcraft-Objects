@@ -1,6 +1,5 @@
 package abo.energy;
 
-import abo.ABO;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -11,9 +10,6 @@ import buildcraft.api.power.IPowerReceptor;
 import buildcraft.api.power.PowerHandler;
 import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.IPipeTile.PipeType;
-import buildcraft.core.DefaultProps;
-import buildcraft.core.inventory.InvUtils;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
 

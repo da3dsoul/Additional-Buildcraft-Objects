@@ -14,14 +14,8 @@ package abo.pipes.fluids;
 
 import io.netty.buffer.ByteBuf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -37,7 +31,6 @@ import abo.pipes.ABOPipe;
 import buildcraft.core.IItemPipe;
 import buildcraft.core.network.IClientState;
 import buildcraft.core.utils.Utils;
-import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeTransportFluids;
 
 /**

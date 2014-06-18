@@ -27,14 +27,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import abo.network.PacketFluidSlotChange;
-import abo.pipes.fluids.PipeFluidsDistribution;
 import abo.proxy.ABOProxy;
 
 import buildcraft.core.gui.AdvancedSlot;
 import buildcraft.core.gui.GuiAdvancedInterface;
 import buildcraft.core.render.FluidRenderer;
-import buildcraft.core.utils.StringUtils;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.TileGenericPipe;
 
 public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {

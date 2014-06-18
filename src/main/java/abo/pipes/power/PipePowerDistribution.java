@@ -12,14 +12,8 @@
 
 package abo.pipes.power;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -29,8 +23,6 @@ import abo.gui.ABOGuiIds;
 import abo.network.IYesNoChange;
 import abo.pipes.ABOPipe;
 import buildcraft.core.IItemPipe;
-import buildcraft.core.network.IClientState;
-import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeTransportPower;
 
 public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implements IYesNoChange {

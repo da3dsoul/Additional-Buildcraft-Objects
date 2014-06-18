@@ -23,7 +23,6 @@ import abo.pipes.power.PipePowerDistribution;
 import abo.proxy.ABOProxy;
 import buildcraft.core.gui.AdvancedSlot;
 import buildcraft.core.gui.GuiAdvancedInterface;
-import buildcraft.core.utils.StringUtils;
 import buildcraft.transport.TileGenericPipe;
 
 public class GuiPipePowerDiamond extends GuiAdvancedInterface {

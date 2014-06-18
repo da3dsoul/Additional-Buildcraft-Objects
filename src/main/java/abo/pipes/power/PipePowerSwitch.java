@@ -30,12 +30,7 @@ import abo.pipes.ABOPipe;
 
 import buildcraft.api.core.Position;
 import buildcraft.api.gates.IAction;
-import buildcraft.api.gates.IActionReceptor;
-import buildcraft.api.transport.IPipeConnection;
-import buildcraft.api.transport.IPipeConnection.ConnectOverride;
-import buildcraft.api.transport.IPipeTile.PipeType;
 import buildcraft.transport.BlockGenericPipe;
-import buildcraft.transport.IPipeConnectionForced;
 import buildcraft.transport.IPipeTransportPowerHook;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeConnectionBans;

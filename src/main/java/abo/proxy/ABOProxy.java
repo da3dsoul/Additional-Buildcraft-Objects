@@ -15,7 +15,6 @@ package abo.proxy;
 import abo.energy.TileWindmill;
 import abo.network.ABOPacket;
 
-import buildcraft.core.network.PacketCoordinates;
 import net.minecraft.item.Item;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.registry.GameRegistry;

@@ -12,7 +12,6 @@
 
 package abo.actions;
 
-import buildcraft.api.gates.IAction;
 import abo.ItemIconProvider;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
