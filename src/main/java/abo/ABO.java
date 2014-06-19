@@ -140,8 +140,6 @@ public class ABO {
 	public static Item pipePowerIron = null;
 
 	public static Item pipeDistributionConductive = null;
-	
-	public static Item bottle = null;
 
 	public static BlockWindmill windmillBlock;
 
@@ -224,12 +222,6 @@ public class ABO {
 					new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4), null);
 
 			windmillBlock = new BlockWindmill();
-			
-			bottle = new ItemBottle();
-			
-			GameRegistry.addShapedRecipe(new ItemStack(bottle, 3), new Object[] { " B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'), Blocks.planks });
-			GameRegistry.registerItem(bottle, "MobBottle");
-			LanguageRegistry.addName(bottle, "Mob Bottle");
 			
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock), new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem, Character.valueOf('B'), Items.iron_ingot });
