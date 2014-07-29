@@ -4,6 +4,8 @@
 .metadata
 org.*
 bin
+buildcraft*
+.settings
 
 #idea
 *.iml

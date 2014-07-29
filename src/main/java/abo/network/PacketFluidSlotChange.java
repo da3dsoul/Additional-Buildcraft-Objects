@@ -18,7 +18,11 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTSizeTracker;
+import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import buildcraft.transport.TileGenericPipe;
@@ -49,9 +53,7 @@ public class PacketFluidSlotChange extends ABOPacket {
 			nbt.setString("FluidName", fluid.getName());
 
 			try {
-				byte[] compressed = CompressedStreamTools.compress(nbt);
-				data.writeShort(compressed.length);
-				data.writeBytes(compressed);
+				writeNBTTagCompoundToBuffer(nbt, data);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -72,7 +74,7 @@ public class PacketFluidSlotChange extends ABOPacket {
 			data.readBytes(compressed);
 			NBTTagCompound nbt;
 			try {
-				nbt = CompressedStreamTools.decompress(compressed);
+				nbt = readNBTTagCompoundFromBuffer(data);
 				fluid = FluidRegistry.getFluid(nbt.getString("FluidName"));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -81,6 +83,39 @@ public class PacketFluidSlotChange extends ABOPacket {
 			
 		}
 	}
+	
+	public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt, ByteBuf data) throws IOException
+    {
+        if (nbt == null)
+        {
+            data.writeShort(-1);
+        }
+        else
+        {
+            byte[] abyte = CompressedStreamTools.compress(nbt);
+            data.writeShort((short)abyte.length);
+            data.writeBytes(abyte);
+        }
+    }
+
+    /**
+     * Reads a compressed NBTTagCompound from this buffer
+     */
+    public NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf data) throws IOException
+    {
+        short short1 = data.readShort();
+
+        if (short1 < 0)
+        {
+            return null;
+        }
+        else
+        {
+            byte[] abyte = new byte[short1];
+            data.readBytes(abyte);
+            return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
+        }
+    }
 
 	public void update(EntityPlayer player) {
 		TileGenericPipe pipe = getPipe(player.worldObj, posX, posY, posZ);
