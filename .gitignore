@@ -17,7 +17,7 @@ out
 #gradle
 build
 .gradle
-*gradle.log
 
 #runtime
 run
+.gradle/gradle.log
