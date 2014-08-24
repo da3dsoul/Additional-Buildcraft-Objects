@@ -1,6 +1,8 @@
 # Additional Buildcraft Objects
 
    ![Additional Buildcraft Objects](http://ma.ra-doersch.de/abo-logo.png "Additional Buildcraft Objects")
+   
+   **The majority of this readme is outdated.**
 
    Minecraft Forum: http://www.minecraftforum.net/index.php?app=forums&module=forums&section=findpost&pid=8920844
 
@@ -13,8 +15,6 @@
 ## License
 
    **AdditionalBuildcraftObjects is open-source.**
-   
-   The majority of this readme is outdated.
 
    It is distributed under the terms of my Open Source License.
 
