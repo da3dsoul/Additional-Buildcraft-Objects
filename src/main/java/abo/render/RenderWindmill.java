@@ -34,7 +34,6 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 	private ModelRenderer Trunk;
 	
 	private ResourceLocation texture;
-	private ResourceLocation TrunkTexture;
   
   public RenderWindmill()
   {    

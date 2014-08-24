@@ -15,7 +15,6 @@ package abo;
 import java.io.File;
 
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 
 /**
  * @author Flow86
@@ -28,7 +27,7 @@ public class ABOConfiguration extends Configuration {
 
 	@Override
 	public void save() {
-		Property versionProp = null;
+		//Property versionProp = null;
 
 		get(CATEGORY_GENERAL, "version", ABO.VERSION);
 

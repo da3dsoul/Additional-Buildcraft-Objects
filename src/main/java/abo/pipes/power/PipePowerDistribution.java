@@ -33,7 +33,7 @@ public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implement
 	public PipePowerDistribution(Item itemID) {
 		super(new PipeTransportPower(), itemID);
 
-		transport.powerCapacities.put(PipePowerDistribution.class, 1024);
+		PipeTransportPower.powerCapacities.put(PipePowerDistribution.class, 1024);
 		transport.initFromPipe(getClass());
 	}
 

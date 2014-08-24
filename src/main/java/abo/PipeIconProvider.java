@@ -75,8 +75,9 @@ public class PipeIconProvider implements IIconProvider {
 	
 	public static int PipeItemsDivide = 36;
 	public static int PipeItemsEnderExtraction = 37;
+	public static final int PipePowerExtraction = 38;
 
-	public static final int MAX = 38;
+	public static final int MAX = 39;
 
 	@SideOnly(Side.CLIENT)
 	private IIcon[] _icons;
@@ -144,5 +145,6 @@ public class PipeIconProvider implements IIconProvider {
 		_icons[PipeItemsDivide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsDivide");
 		
 		_icons[PipeItemsEnderExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsEnderExtract");
+		_icons[PipePowerExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerExtraction");
 	}
 }

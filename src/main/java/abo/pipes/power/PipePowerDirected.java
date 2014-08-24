@@ -75,7 +75,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 	public PipePowerDirected(Item itemID) {
 		super(new PipeTransportPower(), itemID);
 
-		transport.powerCapacities.put(PipePowerDirected.class, 1024);
+		PipeTransportPower.powerCapacities.put(PipePowerDirected.class, 1024);
 		transport.initFromPipe(getClass());
 	}
 

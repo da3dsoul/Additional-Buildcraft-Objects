@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 public class EntityThrownBottle extends EntityPotion
@@ -38,12 +37,12 @@ public class EntityThrownBottle extends EntityPotion
 			{
 				if (!ItemBottle.hasCaptured(itemstack) && itemstack.stackSize == 1)
 				{
-					itemstack = ItemBottle.capture(itemstack, par1MovingObjectPosition.entityHit);					
+					itemstack = ItemBottle.capture(itemstack, this, par1MovingObjectPosition.entityHit);					
 				}
 			}
 		}else if(ItemBottle.hasCaptured(itemstack))
 		{
-			NBTTagCompound mob = itemstack.stackTagCompound.getCompoundTag("mob");
+			//NBTTagCompound mob = itemstack.stackTagCompound.getCompoundTag("mob");
 			int i = par1MovingObjectPosition.blockX;
 			int j = par1MovingObjectPosition.blockY;
 			int k = par1MovingObjectPosition.blockZ;
@@ -56,18 +55,14 @@ public class EntityThrownBottle extends EntityPotion
 	private void drop()
 	{
 		EntityItem item = new EntityItem(worldObj, posX, posY, posZ, itemstack);
-		item.motionX = worldObj.rand.nextFloat() * 0.5 - worldObj.rand.nextFloat() * 0.5;
-		item.motionZ = worldObj.rand.nextFloat() * 0.5 - worldObj.rand.nextFloat() * 0.5;
-		item.motionY = 0.4;
+		item.motionX = -motionX * 0.5D;
+		item.motionZ = -motionZ * 0.5D;
+		item.motionY = -motionY * 0.5D;
 		if (!worldObj.isRemote) worldObj.spawnEntityInWorld(item);
 		if (!this.worldObj.isRemote)
 		{
 			this.setDead();
 		}
-	}
-	private Vec3 vecScale(Vec3 vec, double m)
-	{
-		return Vec3.createVectorHelper(vec.xCoord * m, vec.yCoord * m, vec.zCoord * m);
 	}
 	
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)

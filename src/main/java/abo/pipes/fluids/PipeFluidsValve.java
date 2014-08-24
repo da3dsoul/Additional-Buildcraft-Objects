@@ -20,18 +20,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
-
 import abo.ABO;
 import abo.PipeIconProvider;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
-
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.NetworkData;
 import buildcraft.api.core.Position;
@@ -62,8 +59,6 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	private final int openTexture = PipeIconProvider.PipeLiquidsValveOpen;
 	private final int openTextureSide = PipeIconProvider.PipeLiquidsValveOpenSide;
 	
-	private long lastMining = 0;
-	private boolean lastPower = false;
 	@MjBattery(maxCapacity = 250, maxReceivedPerCycle = 100, minimumConsumption = 0)
 	private double mjStored = 0;
 
@@ -92,6 +87,8 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		transport.travelDelay = 2;
 
 	}
+	
+	
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -229,7 +226,6 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		}
 
 		if (mjStored >= 1) {
-			World w = container.getWorld();
 
 			if (meta > 5) {
 				return;
@@ -298,10 +294,10 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		return super.canPipeConnect(tile, side) && (container.getBlockMetadata() == side.getOpposite().ordinal() || container.getBlockMetadata() == side.ordinal())|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ).getMaterial() == Material.circuits;
+		return super.canPipeConnect(tile, side) && (container.getBlockMetadata() == side.getOpposite().ordinal() || container.getBlockMetadata() == side.ordinal());
 	}
 	
-	private ForgeDirection getDirectionToTile(TileEntity tile)
+	/*private ForgeDirection getDirectionToTile(TileEntity tile)
 	{
 		int x1 = container.xCoord;
 		int x2 = tile.xCoord;
@@ -326,7 +322,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		
 		// android.util.Log.wtf(msg);
 		return ForgeDirection.UNKNOWN;
-	}
+	}*/
 	
 	@Override
 	public boolean isSolidOnSide(ForgeDirection side) {

@@ -20,14 +20,12 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-
 import abo.ABO;
 import abo.PipeIconProvider;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
-
 import buildcraft.api.core.Position;
 import buildcraft.api.gates.IAction;
 import buildcraft.transport.BlockGenericPipe;
@@ -48,12 +46,13 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	private boolean switched;
 	private boolean toggled;
 
+	@SuppressWarnings("unchecked")
 	public PipePowerSwitch(Item itemID) {
 		super(new PipeTransportPower(), itemID);
 
 		PipeConnectionBans.banConnection(PipePowerSwitch.class, PipePowerSwitch.class);
 
-		transport.powerCapacities.put(PipePowerSwitch.class, 1024);
+		PipeTransportPower.powerCapacities.put(PipePowerSwitch.class, 1024);
 		transport.initFromPipe(getClass());
 	}
 

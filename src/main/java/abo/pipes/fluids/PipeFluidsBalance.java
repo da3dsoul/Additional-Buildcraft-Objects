@@ -93,7 +93,7 @@ class Neighbor {
  * 
  */
 public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
-	private final int blockTexture = 5 * 16 + 0;
+	//private final int blockTexture = 5 * 16 + 0;
 
 	public PipeFluidsBalance(Item itemID) {
 		super(new PipeTransportFluids(), itemID);

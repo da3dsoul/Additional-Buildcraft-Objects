@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
  */
 public class ABOEnergyPulser {
 
+	@SuppressWarnings("unused")
 	private double powerReceptor;
 
 	private boolean isActive = false;

@@ -11,7 +11,6 @@ package abo.pipes.items.gui;
 import org.lwjgl.opengl.GL11;
 
 import abo.pipes.items.PipeItemsEnderExtraction;
-
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import buildcraft.core.DefaultProps;
@@ -35,8 +34,8 @@ public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButto
 	private GuiImageButton blackListButton;
 	private GuiImageButton roundRobinButton;
 
-	private IInventory playerInventory;
-	private IInventory filterInventory;
+	//private IInventory playerInventory;
+	//private IInventory filterInventory;
 	private PipeItemsEnderExtraction pipe;
 
 	public GuiPipeItemsEnderExtraction(IInventory playerInventory, PipeItemsEnderExtraction pipe) {
@@ -44,13 +43,14 @@ public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButto
 
 		this.pipe = pipe;
 
-		this.playerInventory = playerInventory;
-		this.filterInventory = pipe.getFilters();
+		//this.playerInventory = playerInventory;
+		//this.filterInventory = pipe.getFilters();
 
 		xSize = 175;
 		ySize = 161;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initGui() {
 		super.initGui();

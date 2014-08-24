@@ -55,6 +55,7 @@ import abo.pipes.items.PipeItemsInsertion;
 import abo.pipes.items.PipeItemsRoundRobin;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerDistribution;
+import abo.pipes.power.PipePowerExtraction;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
 import abo.triggers.ABOTriggerProvider;
@@ -74,6 +75,7 @@ import buildcraft.core.network.BuildCraftPacket;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
+import buildcraft.transport.PipeTransportPower;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -86,7 +88,6 @@ import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
@@ -140,6 +141,8 @@ public class ABO {
 	public static Item pipePowerIron = null;
 
 	public static Item pipeDistributionConductive = null;
+	
+	public static Item pipePowerExtraction = null;
 	
 	public static Item bottle = null;
 
@@ -219,6 +222,9 @@ public class ABO {
 
 			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, "Distribution Conductive Pipe", 2, pipePowerIron, BuildCraftTransport.pipeItemsDiamond,
 					pipePowerIron);
+			PipeTransportPower.powerCapacities.put(PipePowerExtraction.class, 1024);
+			pipePowerExtraction = buildPipe(PipePowerExtraction.class, "Extraction Kinesis Pipe");
+			GameRegistry.addShapedRecipe(new ItemStack(pipePowerExtraction), new Object[] { "AA", "AA", Character.valueOf('A'), BuildCraftTransport.pipePowerWood});
 
 			itemGateSettingsDuplicator = createItem(ItemGateSettingsDuplicator.class, "Gate Settings Duplicator", BuildCraftCore.wrenchItem,
 					new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4), null);
@@ -229,7 +235,6 @@ public class ABO {
 			
 			GameRegistry.addShapedRecipe(new ItemStack(bottle, 3), new Object[] { " B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'), Blocks.planks });
 			GameRegistry.registerItem(bottle, "MobBottle");
-			LanguageRegistry.addName(bottle, "Mob Bottle");
 			
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock), new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem, Character.valueOf('B'), Items.iron_ingot });
@@ -344,7 +349,7 @@ public class ABO {
 	private static LinkedList<ABORecipe> aboRecipes = new LinkedList<ABORecipe>();
 
 	private static Item createItem(Class<? extends ABOItem> clazz, String descr, Object ingredient1, Object ingredient2, Object ingredient3) {
-		String name = Character.toLowerCase(clazz.getSimpleName().charAt(0)) + clazz.getSimpleName().substring(1);
+		//String name = Character.toLowerCase(clazz.getSimpleName().charAt(0)) + clazz.getSimpleName().substring(1);
 
 		Item item = null;
 		try {
@@ -358,7 +363,6 @@ public class ABO {
 
 		item.setUnlocalizedName(clazz.getSimpleName());
 		GameRegistry.registerItem(item, item.getUnlocalizedName().replace("item.", ""));
-		LanguageRegistry.addName(item, descr);
 
 		addRecipe(item, 1, ingredient1, ingredient2, ingredient3);
 
@@ -407,12 +411,11 @@ public class ABO {
 		return res;
 	}
 
-	private static ItemPipe createPipe(Class<? extends Pipe> clazz, String descr) {
-		String name = Character.toLowerCase(clazz.getSimpleName().charAt(0)) + clazz.getSimpleName().substring(1);
+	/*private static ItemPipe createPipe(Class<? extends Pipe> clazz, String descr) {
+		//String name = Character.toLowerCase(clazz.getSimpleName().charAt(0)) + clazz.getSimpleName().substring(1);
 
 		ItemPipe pipe = BlockGenericPipe.registerPipe(clazz, CreativeTabBuildCraft.PIPES);
 		pipe.setUnlocalizedName(clazz.getSimpleName());
-		LanguageRegistry.addName(pipe, descr);
 		GameRegistry.registerItem(pipe, pipe.getUnlocalizedName().replace("item.", ""));
 
 		return pipe;
@@ -432,7 +435,7 @@ public class ABO {
 		addRecipe(pipe, count, ingredient1, ingredient2, ingredient3);
 
 		return pipe;
-	}
+	}*/
 
 	public void loadRecipes() {
 		// Add pipe recipes

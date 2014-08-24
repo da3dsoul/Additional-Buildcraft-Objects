@@ -18,11 +18,8 @@ import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTSizeTracker;
-import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import buildcraft.transport.TileGenericPipe;
