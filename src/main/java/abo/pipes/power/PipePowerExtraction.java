@@ -7,11 +7,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import abo.PipeIconProvider;
 import buildcraft.api.core.IIconProvider;
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.transport.IPipeTransportPowerHook;
 import buildcraft.transport.pipes.PipePowerWood;
 
-public class PipePowerExtraction extends PipePowerWood implements IPowerReceptor, IPipeTransportPowerHook {
+public class PipePowerExtraction extends PipePowerWood {
 
 
 	public PipePowerExtraction(Item item) {

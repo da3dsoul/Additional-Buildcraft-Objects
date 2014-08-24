@@ -24,60 +24,55 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 public class PipeIconProvider implements IIconProvider {
 
-	public static final int PipeItemsBounceClosed = 0;
-	public static final int PipeItemsBounce = 1;
+	public static final int PipeItemsCrossover = 0;
 
-	public static final int PipeItemsCrossover = 2;
+	public static final int PipeItemsExtraction = 1;
+	public static final int PipeItemsExtractionSide = 2;
 
-	public static final int PipeItemsExtraction = 3;
-	public static final int PipeItemsExtractionSide = 4;
+	public static final int PipeItemsInsertion = 3;
+	public static final int PipeItemsRoundRobin = 4;
 
-	public static final int PipeItemsInsertion = 5;
-	public static final int PipeItemsRoundRobin = 6;
-	public static final int PipeItemsStripes = 7;
+	public static final int PipeLiquidsBalance = 5;
 
-	public static final int PipeLiquidsBalance = 8;
+	public static final int PipeLiquidsDiamondCenter = 6;
+	public static final int PipeLiquidsDiamondDown = 7;
+	public static final int PipeLiquidsDiamondUp = 8;
+	public static final int PipeLiquidsDiamondNorth = 9;
+	public static final int PipeLiquidsDiamondSouth = 10;
+	public static final int PipeLiquidsDiamondWest = 11;
+	public static final int PipeLiquidsDiamondEast = 12;
 
-	public static final int PipeLiquidsDiamondCenter = 9;
-	public static final int PipeLiquidsDiamondDown = 10;
-	public static final int PipeLiquidsDiamondUp = 11;
-	public static final int PipeLiquidsDiamondNorth = 12;
-	public static final int PipeLiquidsDiamondSouth = 13;
-	public static final int PipeLiquidsDiamondWest = 14;
-	public static final int PipeLiquidsDiamondEast = 15;
+	public static final int PipeLiquidsGoldenIron = 13;
+	public static final int PipeLiquidsGoldenIronSide = 14;
 
-	public static final int PipeLiquidsGoldenIron = 16;
-	public static final int PipeLiquidsGoldenIronSide = 17;
+	public static final int PipeLiquidsValveClosed = 15;
+	public static final int PipeLiquidsValveClosedSide = 16;
+	public static final int PipeLiquidsValveOpen = 17;
+	public static final int PipeLiquidsValveOpenSide = 18;
 
-	public static final int PipeLiquidsValveClosed = 18;
-	public static final int PipeLiquidsValveClosedSide = 19;
-	public static final int PipeLiquidsValveOpen = 20;
-	public static final int PipeLiquidsValveOpenSide = 21;
+	public static final int PipePowerSwitchPowered = 19;
+	public static final int PipePowerSwitchUnpowered = 20;
 
-	public static final int PipePowerSwitchPowered = 22;
-	public static final int PipePowerSwitchUnpowered = 23;
+	public static final int PipePowerDiamondCenter = 21;
+	public static final int PipePowerDiamondDown = 22;
+	public static final int PipePowerDiamondUp = 23;
+	public static final int PipePowerDiamondNorth = 24;
+	public static final int PipePowerDiamondSouth = 25;
+	public static final int PipePowerDiamondWest = 26;
+	public static final int PipePowerDiamondEast = 27;
 
-	public static final int PipePowerDiamondCenter = 24;
-	public static final int PipePowerDiamondDown = 25;
-	public static final int PipePowerDiamondUp = 26;
-	public static final int PipePowerDiamondNorth = 27;
-	public static final int PipePowerDiamondSouth = 28;
-	public static final int PipePowerDiamondWest = 29;
-	public static final int PipePowerDiamondEast = 30;
+	public static final int PipePowerIron = 28;
+	public static final int PipePowerIronSide = 29;
 
-	public static final int PipePowerIron = 31;
-	public static final int PipePowerIronSide = 32;
 
-	public static final int PipeLiquidsPump = 33;
-
-	public static int PipeItemsCompactorOn = 34;
-	public static int PipeItemsCompactorOff = 35;
+	public static final int PipeItemsCompactorOn = 30;
+	public static final int PipeItemsCompactorOff = 31;
 	
-	public static int PipeItemsDivide = 36;
-	public static int PipeItemsEnderExtraction = 37;
-	public static final int PipePowerExtraction = 38;
+	public static final int PipeItemsDivide = 32;
+	public static final int PipeItemsEnderExtraction = 33;
+	public static final int PipePowerExtraction = 34;
 
-	public static final int MAX = 39;
+	public static final int MAX = 35;
 
 	@SideOnly(Side.CLIENT)
 	private IIcon[] _icons;
@@ -93,9 +88,6 @@ public class PipeIconProvider implements IIconProvider {
 	public void registerIcons(IIconRegister iconRegister) {
 		_icons = new IIcon[MAX];
 
-		_icons[PipeItemsBounceClosed] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsBounceClosed");
-		_icons[PipeItemsBounce] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsBounce");
-
 		_icons[PipeItemsCrossover] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCrossover");
 
 		_icons[PipeItemsExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsExtract");
@@ -103,7 +95,6 @@ public class PipeIconProvider implements IIconProvider {
 
 		_icons[PipeItemsInsertion] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsInsert");
 		_icons[PipeItemsRoundRobin] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsRoundRobin");
-		_icons[PipeItemsStripes] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsStripes");
 
 		_icons[PipeLiquidsBalance] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsBalance");
 
@@ -137,7 +128,6 @@ public class PipeIconProvider implements IIconProvider {
 		_icons[PipePowerIron] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIron");
 		_icons[PipePowerIronSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIronSide");
 
-		_icons[PipeLiquidsPump] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsPump");
 
 		_icons[PipeItemsCompactorOn] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOn");
 		_icons[PipeItemsCompactorOff] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOff");

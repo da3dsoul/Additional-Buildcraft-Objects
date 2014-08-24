@@ -14,6 +14,7 @@ package abo;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import abo.actions.ABOActionProvider;
 import abo.actions.ActionSwitchOnPipe;
@@ -96,13 +98,13 @@ import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
  * @author Flow86
  * 
  */
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "@ABO_VERSION@", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon")
 public class ABO {
-	public static final String VERSION = "2.0.2";
+	public static final String VERSION = "2.0.2+";
 
-	public static final String MINECRAFT_VERSION = "1.7.2";
+	public static final String MINECRAFT_VERSION = "1.7.10";
 
-	public static final String BUILDCRAFT_VERSION = "6.0.15";
+	public static final String BUILDCRAFT_VERSION = "6.0.17";
 
 	public static final String FORGE_VERSION = "10.12.1.1085";
 
@@ -210,7 +212,15 @@ public class ABO {
 
 			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, "Insertion Pipe", 1, BuildCraftTransport.pipeItemsIron, new ItemStack(Items.dye, 1, 2), null);
 
-			pipeItemsExtraction = buildPipe(PipeItemsExtraction.class, "Extraction Transport Pipe", 1, BuildCraftTransport.pipeItemsWood, Blocks.planks, null);
+			ArrayList<ItemStack> list = OreDictionary.getOres("plankWood");
+			if(list.size() >= 1)
+			{
+				for(ItemStack item : list)
+				{
+					pipeItemsExtraction = buildPipe(PipeItemsExtraction.class, "Extraction Transport Pipe", 1, BuildCraftTransport.pipeItemsWood, item, null);
+				}
+			}
+			
 			pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, "Ender Extraction Transport Pipe", 1, ABO.pipeItemsExtraction, Items.ender_pearl, null);
 
 			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, "Crossover Transport Pipe", 1, BuildCraftTransport.pipeItemsStone, BuildCraftTransport.pipeItemsIron, null);
@@ -223,8 +233,7 @@ public class ABO {
 			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, "Distribution Conductive Pipe", 2, pipePowerIron, BuildCraftTransport.pipeItemsDiamond,
 					pipePowerIron);
 			PipeTransportPower.powerCapacities.put(PipePowerExtraction.class, 1024);
-			pipePowerExtraction = buildPipe(PipePowerExtraction.class, "Extraction Kinesis Pipe");
-			GameRegistry.addShapedRecipe(new ItemStack(pipePowerExtraction), new Object[] { "AA", "AA", Character.valueOf('A'), BuildCraftTransport.pipePowerWood});
+			pipePowerExtraction = buildPipe(PipePowerExtraction.class, "Extraction Kinesis Pipe", 1, false, new Object[] { "AA", "AA", Character.valueOf('A'), BuildCraftTransport.pipePowerWood});
 
 			itemGateSettingsDuplicator = createItem(ItemGateSettingsDuplicator.class, "Gate Settings Duplicator", BuildCraftCore.wrenchItem,
 					new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4), null);
