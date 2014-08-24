@@ -409,6 +409,17 @@ public class ABO {
 
 		return res;
 	}
+	
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas,
+			String descr, int count, boolean isShapelessRecipe, Object... ingredients) {
+		//String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) + clas.getSimpleName().substring(1);
+
+		ItemPipe res = buildPipe(clas, descr);
+
+		addRecipe(res, count, isShapelessRecipe, ingredients);
+
+		return res;
+	}
 
 	public static ItemPipe buildPipe(Class<? extends Pipe> clas,
 			String descr) {
