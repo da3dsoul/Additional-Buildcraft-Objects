@@ -20,7 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.IFluidHandler;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.BuildCraftTransport;
 import buildcraft.api.gates.IAction;
@@ -38,8 +38,8 @@ import buildcraft.transport.triggers.ActionPipeDirection;
  */
 public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 
-	private final int standardIconIndex = PipeIconProvider.PipeLiquidsGoldenIron;
-	private final int solidIconIndex = PipeIconProvider.PipeLiquidsGoldenIronSide;
+	private final int standardIconIndex = PipeIcons.PipeLiquidsGoldenIron.ordinal();
+	private final int solidIconIndex = PipeIcons.PipeLiquidsGoldenIronSide.ordinal();
 
 	private final PipeLogicIron logic = new PipeLogicIron(this) {
 		@Override

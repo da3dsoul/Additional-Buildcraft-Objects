@@ -13,7 +13,6 @@
 package abo.pipes.fluids;
 
 import io.netty.buffer.ByteBuf;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,13 +20,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidTankInfo;
-
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.gui.ABOGuiIds;
 import abo.network.IFluidSlotChange;
 import abo.pipes.ABOPipe;
-
 import buildcraft.core.IItemPipe;
 import buildcraft.core.network.IClientState;
 import buildcraft.core.utils.Utils;
@@ -67,19 +64,19 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 	public int getIconIndex(ForgeDirection direction) {
 		switch (direction) {
 		case UNKNOWN:
-			return PipeIconProvider.PipeLiquidsDiamondCenter;
+			return PipeIcons.PipeLiquidsDiamondCenter.ordinal();
 		case DOWN:
-			return PipeIconProvider.PipeLiquidsDiamondDown;
+			return PipeIcons.PipeLiquidsDiamondDown.ordinal();
 		case UP:
-			return PipeIconProvider.PipeLiquidsDiamondUp;
+			return PipeIcons.PipeLiquidsDiamondUp.ordinal();
 		case NORTH:
-			return PipeIconProvider.PipeLiquidsDiamondNorth;
+			return PipeIcons.PipeLiquidsDiamondNorth.ordinal();
 		case SOUTH:
-			return PipeIconProvider.PipeLiquidsDiamondSouth;
+			return PipeIcons.PipeLiquidsDiamondSouth.ordinal();
 		case WEST:
-			return PipeIconProvider.PipeLiquidsDiamondWest;
+			return PipeIcons.PipeLiquidsDiamondWest.ordinal();
 		case EAST:
-			return PipeIconProvider.PipeLiquidsDiamondEast;
+			return PipeIcons.PipeLiquidsDiamondEast.ordinal();
 		default:
 			throw new IllegalArgumentException("direction out of bounds");
 		}
@@ -98,8 +95,8 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 
 		Fluid fluidInTank = tanks[0].fluid.getFluid();
 
-		boolean[] validDirections = new boolean[ForgeDirection.values().length];
-		boolean[] filteredDirections = new boolean[ForgeDirection.values().length];
+		boolean[] validDirections = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
+		boolean[] filteredDirections = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 		boolean filterForLiquid = false;
 
 		// check every direction

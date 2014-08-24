@@ -26,7 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.gui.ABOGuiIds;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
@@ -57,7 +57,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
 public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IClientState, IGuiReturnHandler {
-	private final int standardIconIndex = PipeIconProvider.PipeItemsEnderExtraction;
+	private final int standardIconIndex = PipeIcons.PipeItemsEnderExtraction.ordinal();
 	
 	private PowerHandler powerHandler;
 	

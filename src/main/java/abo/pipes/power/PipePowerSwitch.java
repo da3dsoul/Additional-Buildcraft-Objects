@@ -21,7 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
@@ -40,8 +40,8 @@ import buildcraft.transport.TileGenericPipe;
  * 
  */
 public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook, ISolidSideTile {
-	private final int unpoweredTexture = PipeIconProvider.PipePowerSwitchUnpowered;
-	private final int poweredTexture = PipeIconProvider.PipePowerSwitchPowered;
+	private final int unpoweredTexture = PipeIcons.PipePowerSwitchUnpowered.ordinal();
+	private final int poweredTexture = PipeIcons.PipePowerSwitchPowered.ordinal();
 	private boolean powered;
 	private boolean switched;
 	private boolean toggled;

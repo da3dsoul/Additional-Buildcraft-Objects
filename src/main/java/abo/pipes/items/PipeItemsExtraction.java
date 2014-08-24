@@ -19,7 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
 import buildcraft.api.power.IPowerReceptor;
@@ -41,8 +41,8 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
 public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor {
-	private final int standardIconIndex = PipeIconProvider.PipeItemsExtraction;
-	private final int solidIconIndex = PipeIconProvider.PipeItemsExtractionSide;
+	private final int standardIconIndex = PipeIcons.PipeItemsExtraction.ordinal();
+	private final int solidIconIndex = PipeIcons.PipeItemsExtractionSide.ordinal();
 	
 	private PowerHandler powerHandler;
 	

@@ -18,7 +18,7 @@ import java.util.List;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.pipes.events.PipeEventItem;
@@ -36,7 +36,7 @@ public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
-		return PipeIconProvider.PipeItemsRoundRobin;
+		return PipeIcons.PipeItemsRoundRobin.ordinal();
 	}
 
 	@Override

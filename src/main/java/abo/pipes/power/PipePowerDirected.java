@@ -16,7 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.api.power.IPowerReceptor;
 import buildcraft.transport.IPipeTransportPowerHook;
@@ -29,8 +29,8 @@ import buildcraft.transport.pipes.PipeStructureCobblestone;
 
 public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook {
 
-	private final int baseTexture = PipeIconProvider.PipePowerIron;
-	private final int sideTexture = PipeIconProvider.PipePowerIronSide;
+	private final int baseTexture = PipeIcons.PipePowerIron.ordinal();
+	private final int sideTexture = PipeIcons.PipePowerIronSide.ordinal();
 
 	private final PipeLogicIron logic = new PipeLogicIron(this) {
 		@Override

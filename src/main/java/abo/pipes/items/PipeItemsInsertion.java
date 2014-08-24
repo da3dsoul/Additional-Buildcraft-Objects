@@ -24,7 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.inventory.InvUtils;
@@ -51,7 +51,7 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
-		return PipeIconProvider.PipeItemsInsertion;
+		return PipeIcons.PipeItemsInsertion.ordinal();
 	}
 
 	@Override

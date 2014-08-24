@@ -18,7 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.gui.ABOGuiIds;
 import abo.network.IYesNoChange;
 import abo.pipes.ABOPipe;
@@ -78,19 +78,19 @@ public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implement
 	public int getIconIndex(ForgeDirection direction) {
 		switch (direction) {
 		case UNKNOWN:
-			return PipeIconProvider.PipePowerDiamondCenter;
+			return PipeIcons.PipePowerDiamondCenter.ordinal();
 		case DOWN:
-			return PipeIconProvider.PipePowerDiamondDown;
+			return PipeIcons.PipePowerDiamondDown.ordinal();
 		case UP:
-			return PipeIconProvider.PipePowerDiamondUp;
+			return PipeIcons.PipePowerDiamondUp.ordinal();
 		case NORTH:
-			return PipeIconProvider.PipePowerDiamondNorth;
+			return PipeIcons.PipePowerDiamondNorth.ordinal();
 		case SOUTH:
-			return PipeIconProvider.PipePowerDiamondSouth;
+			return PipeIcons.PipePowerDiamondSouth.ordinal();
 		case WEST:
-			return PipeIconProvider.PipePowerDiamondWest;
+			return PipeIcons.PipePowerDiamondWest.ordinal();
 		case EAST:
-			return PipeIconProvider.PipePowerDiamondEast;
+			return PipeIcons.PipePowerDiamondEast.ordinal();
 		default:
 			throw new IllegalArgumentException("direction out of bounds");
 		}

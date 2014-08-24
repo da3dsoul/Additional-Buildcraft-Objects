@@ -25,7 +25,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
@@ -54,10 +54,10 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	@NetworkData
 	public int liquidToExtract;
 
-	private final int closedTexture = PipeIconProvider.PipeLiquidsValveClosed;
-	private final int closedTextureSide = PipeIconProvider.PipeLiquidsValveClosedSide;
-	private final int openTexture = PipeIconProvider.PipeLiquidsValveOpen;
-	private final int openTextureSide = PipeIconProvider.PipeLiquidsValveOpenSide;
+	private final int closedTexture = PipeIcons.PipeLiquidsValveClosed.ordinal();
+	private final int closedTextureSide = PipeIcons.PipeLiquidsValveClosedSide.ordinal();
+	private final int openTexture = PipeIcons.PipeLiquidsValveOpen.ordinal();
+	private final int openTextureSide = PipeIcons.PipeLiquidsValveOpenSide.ordinal();
 	
 	@MjBattery(maxCapacity = 250, maxReceivedPerCycle = 100, minimumConsumption = 0)
 	private double mjStored = 0;

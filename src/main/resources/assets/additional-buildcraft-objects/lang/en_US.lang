@@ -4,6 +4,7 @@ item.PipeFluidsValve.name=Valve Pipe
 item.PipeFluidsGoldenIron.name=Golden Iron Fluid Pipe
 item.PipeFluidsBalance.name=Balancing Fluid Pipe
 item.PipeFluidsDistribution.name=Diamond Fluid Pipe
+item.PipeFluidsInsertion.name=Insertion Fluid Pipe
 item.PipeItemsRoundRobin.name=Round-Robin Transport Pipe
 item.PipeItemsInsertion.name=Insertion Transport Pipe
 item.PipeItemsDivide.name=Division Transport Pipe

@@ -22,57 +22,8 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author Flow86
  * 
  */
+
 public class PipeIconProvider implements IIconProvider {
-
-	public static final int PipeItemsCrossover = 0;
-
-	public static final int PipeItemsExtraction = 1;
-	public static final int PipeItemsExtractionSide = 2;
-
-	public static final int PipeItemsInsertion = 3;
-	public static final int PipeItemsRoundRobin = 4;
-
-	public static final int PipeLiquidsBalance = 5;
-
-	public static final int PipeLiquidsDiamondCenter = 6;
-	public static final int PipeLiquidsDiamondDown = 7;
-	public static final int PipeLiquidsDiamondUp = 8;
-	public static final int PipeLiquidsDiamondNorth = 9;
-	public static final int PipeLiquidsDiamondSouth = 10;
-	public static final int PipeLiquidsDiamondWest = 11;
-	public static final int PipeLiquidsDiamondEast = 12;
-
-	public static final int PipeLiquidsGoldenIron = 13;
-	public static final int PipeLiquidsGoldenIronSide = 14;
-
-	public static final int PipeLiquidsValveClosed = 15;
-	public static final int PipeLiquidsValveClosedSide = 16;
-	public static final int PipeLiquidsValveOpen = 17;
-	public static final int PipeLiquidsValveOpenSide = 18;
-
-	public static final int PipePowerSwitchPowered = 19;
-	public static final int PipePowerSwitchUnpowered = 20;
-
-	public static final int PipePowerDiamondCenter = 21;
-	public static final int PipePowerDiamondDown = 22;
-	public static final int PipePowerDiamondUp = 23;
-	public static final int PipePowerDiamondNorth = 24;
-	public static final int PipePowerDiamondSouth = 25;
-	public static final int PipePowerDiamondWest = 26;
-	public static final int PipePowerDiamondEast = 27;
-
-	public static final int PipePowerIron = 28;
-	public static final int PipePowerIronSide = 29;
-
-
-	public static final int PipeItemsCompactorOn = 30;
-	public static final int PipeItemsCompactorOff = 31;
-	
-	public static final int PipeItemsDivide = 32;
-	public static final int PipeItemsEnderExtraction = 33;
-	public static final int PipePowerExtraction = 34;
-
-	public static final int MAX = 35;
 
 	@SideOnly(Side.CLIENT)
 	private IIcon[] _icons;
@@ -86,55 +37,57 @@ public class PipeIconProvider implements IIconProvider {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister iconRegister) {
-		_icons = new IIcon[MAX];
+		_icons = new IIcon[PipeIcons.MAX.ordinal()];
 
-		_icons[PipeItemsCrossover] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCrossover");
+		_icons[PipeIcons.PipeItemsCrossover.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCrossover");
 
-		_icons[PipeItemsExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsExtract");
-		_icons[PipeItemsExtractionSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsExtractSide");
+		_icons[PipeIcons.PipeItemsExtraction.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsExtract");
+		_icons[PipeIcons.PipeItemsExtractionSide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsExtractSide");
 
-		_icons[PipeItemsInsertion] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsInsert");
-		_icons[PipeItemsRoundRobin] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsRoundRobin");
+		_icons[PipeIcons.PipeItemsInsertion.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsInsert");
+		_icons[PipeIcons.PipeItemsRoundRobin.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsRoundRobin");
 
-		_icons[PipeLiquidsBalance] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsBalance");
+		_icons[PipeIcons.PipeLiquidsBalance.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsBalance");
 
-		_icons[PipeLiquidsDiamondCenter] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondCenter");
-		_icons[PipeLiquidsDiamondDown] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondDown");
-		_icons[PipeLiquidsDiamondUp] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondUp");
-		_icons[PipeLiquidsDiamondNorth] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondNorth");
-		_icons[PipeLiquidsDiamondSouth] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondSouth");
-		_icons[PipeLiquidsDiamondWest] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondWest");
-		_icons[PipeLiquidsDiamondEast] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondEast");
+		_icons[PipeIcons.PipeLiquidsDiamondCenter.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondCenter");
+		_icons[PipeIcons.PipeLiquidsDiamondDown.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondDown");
+		_icons[PipeIcons.PipeLiquidsDiamondUp.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondUp");
+		_icons[PipeIcons.PipeLiquidsDiamondNorth.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondNorth");
+		_icons[PipeIcons.PipeLiquidsDiamondSouth.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondSouth");
+		_icons[PipeIcons.PipeLiquidsDiamondWest.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondWest");
+		_icons[PipeIcons.PipeLiquidsDiamondEast.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsDiamondEast");
 
-		_icons[PipeLiquidsGoldenIron] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIron");
-		_icons[PipeLiquidsGoldenIronSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIronSide");
+		_icons[PipeIcons.PipeLiquidsGoldenIron.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIron");
+		_icons[PipeIcons.PipeLiquidsGoldenIronSide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIronSide");
 
-		_icons[PipeLiquidsValveClosed] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveClosed");
-		_icons[PipeLiquidsValveClosedSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveClosedSide");
-		_icons[PipeLiquidsValveOpen] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveOpen");
-		_icons[PipeLiquidsValveOpenSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveOpenSide");
+		_icons[PipeIcons.PipeLiquidsValveClosed.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveClosed");
+		_icons[PipeIcons.PipeLiquidsValveClosedSide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveClosedSide");
+		_icons[PipeIcons.PipeLiquidsValveOpen.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveOpen");
+		_icons[PipeIcons.PipeLiquidsValveOpenSide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsValveOpenSide");
 
-		_icons[PipePowerSwitchPowered] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerSwitchPowered");
-		_icons[PipePowerSwitchUnpowered] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerSwitchUnpowered");
+		_icons[PipeIcons.PipePowerSwitchPowered.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerSwitchPowered");
+		_icons[PipeIcons.PipePowerSwitchUnpowered.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerSwitchUnpowered");
 
-		_icons[PipePowerDiamondCenter] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondCenter");
-		_icons[PipePowerDiamondDown] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondDown");
-		_icons[PipePowerDiamondUp] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondUp");
-		_icons[PipePowerDiamondNorth] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondNorth");
-		_icons[PipePowerDiamondSouth] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondSouth");
-		_icons[PipePowerDiamondWest] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondWest");
-		_icons[PipePowerDiamondEast] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondEast");
+		_icons[PipeIcons.PipePowerDiamondCenter.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondCenter");
+		_icons[PipeIcons.PipePowerDiamondDown.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondDown");
+		_icons[PipeIcons.PipePowerDiamondUp.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondUp");
+		_icons[PipeIcons.PipePowerDiamondNorth.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondNorth");
+		_icons[PipeIcons.PipePowerDiamondSouth.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondSouth");
+		_icons[PipeIcons.PipePowerDiamondWest.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondWest");
+		_icons[PipeIcons.PipePowerDiamondEast.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerDiamondEast");
 
-		_icons[PipePowerIron] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIron");
-		_icons[PipePowerIronSide] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIronSide");
+		_icons[PipeIcons.PipePowerIron.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIron");
+		_icons[PipeIcons.PipePowerIronSide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerIronSide");
 
 
-		_icons[PipeItemsCompactorOn] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOn");
-		_icons[PipeItemsCompactorOff] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOff");
+		_icons[PipeIcons.PipeItemsCompactorOn.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOn");
+		_icons[PipeIcons.PipeItemsCompactorOff.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsCompactorOff");
 		
-		_icons[PipeItemsDivide] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsDivide");
+		_icons[PipeIcons.PipeItemsDivide.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsDivide");
 		
-		_icons[PipeItemsEnderExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsEnderExtract");
-		_icons[PipePowerExtraction] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerExtraction");
+		_icons[PipeIcons.PipeLiquidsInsertion.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeLiquidsInsertion");
+		
+		_icons[PipeIcons.PipeItemsEnderExtraction.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipeItemsEnderExtract");
+		_icons[PipeIcons.PipePowerExtraction.ordinal()] = iconRegister.registerIcon("additional-buildcraft-objects:PipePowerExtraction");
 	}
 }

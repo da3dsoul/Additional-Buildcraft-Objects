@@ -22,7 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.ForgeDirection;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.core.ItemWrench;
 import buildcraft.transport.PipeTransportItems;
@@ -44,7 +44,7 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
-		return PipeIconProvider.PipeItemsDivide;
+		return PipeIcons.PipeItemsDivide.ordinal();
 	}
 
 	public void eventHandler(PipeEventItem.Entered event) {

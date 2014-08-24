@@ -17,7 +17,7 @@ import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
@@ -36,7 +36,7 @@ public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
-		return PipeIconProvider.PipeItemsCrossover;
+		return PipeIcons.PipeItemsCrossover.ordinal();
 	}
 	
 	

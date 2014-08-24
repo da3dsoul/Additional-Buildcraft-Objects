@@ -46,6 +46,7 @@ import abo.items.ItemGateSettingsDuplicator;
 import abo.network.ABOPacketHandler;
 import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsDistribution;
+import abo.pipes.fluids.PipeFluidsInsertion;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
 import abo.pipes.fluids.PipeFluidsValve;
 import abo.pipes.items.PipeItemsCompactor;
@@ -119,6 +120,8 @@ public class ABO {
 	public static Item pipeFluidsValve = null;
 
 	public static Item pipeFluidsGoldenIron = null;
+	
+	public static Item pipeFluidsInsertion = null;
 
 	public static Item pipeFluidsBalance = null;
 
@@ -211,13 +214,16 @@ public class ABO {
 			pipeItemsCompactor = buildPipe(PipeItemsCompactor.class, "Compactor Pipe", 1, BuildCraftTransport.pipeItemsStone, Blocks.piston, null);
 
 			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, "Insertion Pipe", 1, BuildCraftTransport.pipeItemsIron, new ItemStack(Items.dye, 1, 2), null);
+			
+			pipeFluidsInsertion = buildPipe(PipeFluidsInsertion.class, "Insertion Fluid Pipe", 1, BuildCraftTransport.pipeFluidsIron, new ItemStack(Items.dye, 1, 2), null);
 
+			pipeItemsExtraction = buildPipe(PipeItemsExtraction.class, "Extraction Transport Pipe");
 			ArrayList<ItemStack> list = OreDictionary.getOres("plankWood");
 			if(list.size() >= 1)
 			{
 				for(ItemStack item : list)
 				{
-					pipeItemsExtraction = buildPipe(PipeItemsExtraction.class, "Extraction Transport Pipe", 1, BuildCraftTransport.pipeItemsWood, item, null);
+					addRecipe(pipeItemsExtraction, 1, BuildCraftTransport.pipeItemsWood, item, null);
 				}
 			}
 			

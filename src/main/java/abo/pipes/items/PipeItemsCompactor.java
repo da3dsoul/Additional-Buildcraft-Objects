@@ -24,7 +24,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import abo.PipeIconProvider;
+import abo.PipeIcons;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
@@ -47,8 +47,8 @@ import buildcraft.transport.pipes.events.PipeEventItem;
  * 
  */
 public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements IActionReceptor {
-	private final int onTexture = PipeIconProvider.PipeItemsCompactorOn;
-	private final int offTexture = PipeIconProvider.PipeItemsCompactorOff;
+	private final int onTexture = PipeIcons.PipeItemsCompactorOn.ordinal();
+	private final int offTexture = PipeIcons.PipeItemsCompactorOff.ordinal();
 	private boolean powered = false;
 	private boolean toggled = false;
 	private boolean switched = false;
