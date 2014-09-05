@@ -36,7 +36,7 @@ import buildcraft.transport.PipeTransportFluids;
  */
 public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> implements IFluidSlotChange, IClientState {
 
-	public final Fluid[]	fluids	= new Fluid[6 * 9];
+	public final Fluid[] fluids = new Fluid[6 * 9];
 
 	public PipeFluidsDistribution(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
@@ -47,14 +47,15 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
-		if (entityplayer.getCurrentEquippedItem() != null
-				&& entityplayer.getCurrentEquippedItem().getItem() instanceof IItemPipe) { return false; }
+		if (entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().getItem() instanceof IItemPipe) {
+				return false;
+		}
 
-		if (super.blockActivated(entityplayer)) return true;
+		if (super.blockActivated(entityplayer))
+			return true;
 
 		if (!container.getWorldObj().isRemote)
-			entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_DIAMOND_LIQUIDS, container.getWorldObj(),
-					container.xCoord, container.yCoord, container.zCoord);
+			entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_DIAMOND_LIQUIDS, container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
 
 		return true;
 	}
@@ -62,33 +63,35 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
 		switch (direction) {
-			case UNKNOWN:
-				return PipeIcons.PipeLiquidsDiamondCenter.ordinal();
-			case DOWN:
-				return PipeIcons.PipeLiquidsDiamondDown.ordinal();
-			case UP:
-				return PipeIcons.PipeLiquidsDiamondUp.ordinal();
-			case NORTH:
-				return PipeIcons.PipeLiquidsDiamondNorth.ordinal();
-			case SOUTH:
-				return PipeIcons.PipeLiquidsDiamondSouth.ordinal();
-			case WEST:
-				return PipeIcons.PipeLiquidsDiamondWest.ordinal();
-			case EAST:
-				return PipeIcons.PipeLiquidsDiamondEast.ordinal();
-			default:
-				throw new IllegalArgumentException("direction out of bounds");
+		case UNKNOWN:
+			return PipeIcons.PipeLiquidsDiamondCenter.ordinal();
+		case DOWN:
+			return PipeIcons.PipeLiquidsDiamondDown.ordinal();
+		case UP:
+			return PipeIcons.PipeLiquidsDiamondUp.ordinal();
+		case NORTH:
+			return PipeIcons.PipeLiquidsDiamondNorth.ordinal();
+		case SOUTH:
+			return PipeIcons.PipeLiquidsDiamondSouth.ordinal();
+		case WEST:
+			return PipeIcons.PipeLiquidsDiamondWest.ordinal();
+		case EAST:
+			return PipeIcons.PipeLiquidsDiamondEast.ordinal();
+		default:
+			throw new IllegalArgumentException("direction out of bounds");
 		}
 	}
 
 	@Override
 	public boolean outputOpen(ForgeDirection to) {
-		if (!super.outputOpen(to)) return false;
+		if (!super.outputOpen(to))
+			return false;
 
 		FluidTankInfo[] tanks = transport.getTankInfo(ForgeDirection.UNKNOWN);
 
 		// center tank
-		if (tanks == null || tanks[0] == null || tanks[0].fluid == null || tanks[0].fluid.amount == 0) return true;
+		if (tanks == null || tanks[0] == null || tanks[0].fluid == null || tanks[0].fluid.amount == 0)
+			return true;
 
 		Fluid fluidInTank = tanks[0].fluid.getFluid();
 
@@ -119,10 +122,12 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 		}
 
 		// the direction is filtered and liquids match
-		if (filteredDirections[to.ordinal()] && validDirections[to.ordinal()]) return true;
+		if (filteredDirections[to.ordinal()] && validDirections[to.ordinal()])
+			return true;
 
 		// we havent found a filter for this liquid and the direction is free
-		if (!filterForLiquid && !filteredDirections[to.ordinal()]) return true;
+		if (!filterForLiquid && !filteredDirections[to.ordinal()])
+			return true;
 
 		// we have a filter for the liquid, but not a valid Direction :/
 		return false;
@@ -130,8 +135,7 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 
 	@Override
 	public void update(int slot, Fluid fluid) {
-		// System.out.println("update: " + worldObj.isRemote + " - " + slot +
-		// " to " + stack);
+		// System.out.println("update: " + worldObj.isRemote + " - " + slot + " to " + stack);
 
 		if (fluid != fluids[slot]) {
 			fluids[slot] = fluid;
@@ -141,19 +145,20 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		if (!nbt.hasKey("fluids")) return;
+		if(!nbt.hasKey("fluids")) return;
 		NBTTagCompound nbt1 = nbt.getCompoundTag("fluids");
-		for (int i = 0; i < fluids.length; i++) {
-			String name = nbt1.getString("slot:" + i);
-			if (name.equals("empty")) {
+		for(int i = 0; i < fluids.length; i++)
+		{
+			String name = nbt1.getString("slot:"+i);
+			if(name.equals("empty"))
+			{
 				fluids[i] = null;
-			} else {
-				try {
+			}else
+			{
+				try
+				{
 					fluids[i] = FluidRegistry.getFluid(name);
-				} catch (Exception e) {
-					fluids[i] = null;
-					ABO.aboLog.error("Liquid does not exist. Did you remove a mod?");
-				}
+				}catch(Exception e) { fluids[i] = null; ABO.aboLog.error("Liquid does not exist. Did you remove a mod?"); }
 			}
 		}
 	}
@@ -162,15 +167,18 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		NBTTagCompound nbt1 = new NBTTagCompound();
-		for (int i = 0; i < fluids.length; i++) {
+		for(int i = 0; i < fluids.length; i++)
+		{
 			Fluid fluid = fluids[i];
 			String name;
-			if (fluid != null) {
+			if(fluid != null)
+			{
 				name = fluid.getName();
-			} else {
+			}else
+			{
 				name = "empty";
 			}
-			nbt1.setString("slot:" + i, name);
+			nbt1.setString("slot:"+i, name);
 		}
 		nbt.setTag("fluids", nbt1);
 	}
@@ -188,5 +196,6 @@ public class PipeFluidsDistribution extends ABOPipe<PipeTransportFluids> impleme
 		NBTTagCompound nbt = Utils.readNBT(data);
 		readFromNBT(nbt);
 	}
-
+	
+	
 }

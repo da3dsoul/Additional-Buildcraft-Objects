@@ -34,9 +34,7 @@ public abstract class ABOAction extends BCAction {
 	public IIcon getIcon() {
 		return ABO.instance.itemIconProvider.getIcon(getIconIndex());
 	}
-
+	
 	@Override
-	public IAction rotateLeft() {
-		return this;
-	}
+	public IAction rotateLeft() { return this; }
 }

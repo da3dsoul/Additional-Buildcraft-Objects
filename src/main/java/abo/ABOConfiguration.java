@@ -27,7 +27,7 @@ public class ABOConfiguration extends Configuration {
 
 	@Override
 	public void save() {
-		// Property versionProp = null;
+		//Property versionProp = null;
 
 		get(CATEGORY_GENERAL, "version", ABO.VERSION);
 

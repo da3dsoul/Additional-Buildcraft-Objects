@@ -21,8 +21,8 @@ import buildcraft.transport.TileGenericPipe;
 
 public class ContainerPipePowerDiamond extends BuildCraftContainer {
 
-	public final PipePowerDistribution	pipe;
-	private final boolean[]				connectionMatrix	= new boolean[6];
+	public final PipePowerDistribution pipe;
+	private final boolean[] connectionMatrix = new boolean[6];
 
 	public ContainerPipePowerDiamond(InventoryPlayer inventory, TileGenericPipe tile) {
 		super(0);
@@ -46,8 +46,7 @@ public class ContainerPipePowerDiamond extends BuildCraftContainer {
 		for (Object crafter : crafters) {
 			for (int i = 0; i < 6; ++i) {
 				if (connectionMatrix[i] != pipe.connectionMatrix[i]) {
-					// System.out.println("detectAndSendChanges: " + i + " to "
-					// + logic.connectionMatrix[i]);
+					// System.out.println("detectAndSendChanges: " + i + " to " + logic.connectionMatrix[i]);
 					((ICrafting) crafter).sendProgressBarUpdate(this, i, (pipe.connectionMatrix[i] ? 1 : 0));
 					connectionMatrix[i] = pipe.connectionMatrix[i];
 				}

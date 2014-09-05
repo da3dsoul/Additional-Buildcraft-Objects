@@ -52,25 +52,23 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * This pipe will always prefer to insert it's objects into another pipe over
- * one that is not a pipe.
+ * This pipe will always prefer to insert it's objects into another pipe over one that is not a pipe.
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
-public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IClientState,
-		IGuiReturnHandler {
-	private final int		standardIconIndex	= PipeIcons.PipeItemsEnderExtraction.ordinal();
-
-	private PowerHandler	powerHandler;
-
-	@MjBattery(maxCapacity = 64, maxReceivedPerCycle = 64, minimumConsumption = 1)
-	public double			mjStored			= 0;
-
-	private boolean			powered;
-
+public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IClientState, IGuiReturnHandler {
+	private final int standardIconIndex = PipeIcons.PipeItemsEnderExtraction.ordinal();
+	
+	private PowerHandler powerHandler;
+	
+	@MjBattery (maxCapacity = 64, maxReceivedPerCycle = 64, minimumConsumption = 1)
+	public double mjStored = 0;
+	
+	private boolean powered;
+	
 	public class EmeraldPipeSettings {
 
-		private FilterMode	filterMode;
+		private FilterMode filterMode;
 
 		public EmeraldPipeSettings() {
 			filterMode = FilterMode.WHITE_LIST;
@@ -93,11 +91,11 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		}
 	}
 
-	private EmeraldPipeSettings		settings		= new EmeraldPipeSettings();
+	private EmeraldPipeSettings settings = new EmeraldPipeSettings();
 
-	private final SimpleInventory	filters			= new SimpleInventory(9, "Filters", 1);
+	private final SimpleInventory filters = new SimpleInventory(9, "Filters", 1);
 
-	private int						currentFilter	= 0;
+	private int currentFilter = 0;
 
 	@SuppressWarnings("unchecked")
 	public PipeItemsEnderExtraction(Item itemID) {
@@ -106,7 +104,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		PipeConnectionBans.banConnection(PipeItemsEnderExtraction.class, PipeItemsWood.class);
 
 		transport.allowBouncing = true;
-
+		
 		powerHandler = new PowerHandler(this, Type.PIPE);
 	}
 
@@ -115,16 +113,20 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	public IIconProvider getIconProvider() {
 		return ABO.instance.pipeIconProvider;
 	}
+	
+	
 
 	@Override
 	public void updateEntity() {
-		// updateRedstoneCurrent();
-		// useRedstoneAsPower();
+		//updateRedstoneCurrent();
+		//useRedstoneAsPower();
 		super.updateEntity();
 
-		if (!hasEnderChest()) return;
-
-		if (container.getWorldObj().isRemote) { return; }
+		if(!hasEnderChest()) return;
+		
+		if (container.getWorldObj().isRemote) {
+			return;
+		}
 
 		if (mjStored > 0) {
 			if (transport.getNumberOfStacks() < PipeTransportItems.MAX_PIPE_STACKS) {
@@ -134,48 +136,62 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			mjStored = 0;
 		}
 	}
-
-	private boolean hasEnderChest() {
+	
+	private boolean hasEnderChest()
+	{
 		TileEntity tile = null;
-		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
-			tile = getWorld().getTileEntity(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
-					container.zCoord + side.offsetZ);
-			if (tile != null && tile instanceof TileEntityEnderChest) break;
+		for(ForgeDirection side : ForgeDirection.VALID_DIRECTIONS)
+		{
+			tile = getWorld().getTileEntity(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ);
+			if(tile != null && tile instanceof TileEntityEnderChest) break;
 		}
-		if (tile == null || !(tile instanceof TileEntityEnderChest)) { return false; }
+		if(tile == null || !(tile instanceof TileEntityEnderChest))
+		{
+			return false;
+		}
 		return true;
 	}
-
+	
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
 		if (entityplayer.getCurrentEquippedItem() != null) {
-			if (Block.getBlockFromItem(entityplayer.getCurrentEquippedItem().getItem()) instanceof BlockGenericPipe) { return false; }
+			if (Block.getBlockFromItem(entityplayer.getCurrentEquippedItem().getItem()) instanceof BlockGenericPipe) {
+				return false;
+			}
 		}
 
-		if (super.blockActivated(entityplayer)) { return true; }
+		if (super.blockActivated(entityplayer)) {
+			return true;
+		}
 
-		if (hasEnderChest()) {
-			if (getWorld().isRemote) {
-				return true;
-			} else {
-				entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_ENDER_EXTRACTION, container.getWorldObj(),
-						container.xCoord, container.yCoord, container.zCoord);
-				return true;
-			}
-		} else
-			return false;
+		if(hasEnderChest())
+		{
+		if (getWorld().isRemote)
+        {
+            return true;
+        }
+        else
+        {
+        	entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_ENDER_EXTRACTION, container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
+            return true;
+        }
+		}else return false;
 	}
 
 	public ItemStack[] checkExtract(IInventory inventory, boolean doRemove) {
-		if (inventory == null) { return null; }
-
-		if (settings.getFilterMode() == FilterMode.ROUND_ROBIN) { return checkExtractRoundRobin(inventory, doRemove); }
+		if (inventory == null) {
+			return null;
+		}
+		
+		if (settings.getFilterMode() == FilterMode.ROUND_ROBIN) {
+			return checkExtractRoundRobin(inventory, doRemove);
+		}
 
 		return checkExtractFiltered(inventory, doRemove);
 	}
 
 	private ItemStack[] checkExtractFiltered(IInventory inventory, boolean doRemove) {
-		for (int k = 0; k < inventory.getSizeInventory(); k++) {
+		for (int k  = 0; k < inventory.getSizeInventory(); k++) {
 			ItemStack stack = inventory.getStackInSlot(k);
 
 			if (stack == null || stack.stackSize <= 0) {
@@ -190,45 +206,46 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			}
 
 			if (doRemove) {
-				double energyUsed = mjStored > stack.stackSize ? stack.stackSize : mjStored;
+				double energyUsed =  mjStored > stack.stackSize ? stack.stackSize : mjStored;
 				mjStored -= energyUsed;
 
 				stack = inventory.decrStackSize(k, (int) Math.floor(energyUsed));
 			}
 
-			return new ItemStack[] { stack };
+			return new ItemStack[] {stack};
 		}
 
 		return null;
 	}
-
+	
 	private ItemStack[] checkExtractRoundRobin(IInventory inventory, boolean doRemove) {
-		for (int i = 0; i < inventory.getSizeInventory(); i++) {
+		for (int i  = 0; i < inventory.getSizeInventory(); i++) {
 			ItemStack stack = inventory.getStackInSlot(i);
 
 			if (stack != null && stack.stackSize > 0) {
 				ItemStack filter = getCurrentFilter();
 
-				if (filter == null) { return null; }
+				if (filter == null) {
+					return null;
+				}
 
 				if (!StackHelper.isMatchingItem(filter, stack, true, false)) {
 					continue;
 				}
 
 				if (doRemove) {
-					// In Round Robin mode, extract only 1 item regardless of
-					// power level.
+					// In Round Robin mode, extract only 1 item regardless of power level.
 					stack = inventory.decrStackSize(i, 1);
 					incrementFilter();
 				}
 
-				return new ItemStack[] { stack };
+				return new ItemStack[]{ stack };
 			}
 		}
 
 		return null;
 	}
-
+	
 	public void updateRedstoneCurrent() {
 		boolean lastPowered = powered;
 
@@ -246,14 +263,14 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0)
+						powered = true;
 				}
 			}
 		}
 
 		if (!powered)
-			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
-					container.zCoord);
+			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
 
 		if (lastPowered != powered) {
 			for (TileGenericPipe pipe : neighbours) {
@@ -266,14 +283,15 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	@Override
 	public void onNeighborBlockChange(int blockId) {
 		super.onNeighborBlockChange(blockId);
-		// updateRedstoneCurrent();
+		//updateRedstoneCurrent();
 	}
-
+	
 	@SuppressWarnings("unused")
-	private void useRedstoneAsPower() {
-		if (powered) mjStored++;
+	private void useRedstoneAsPower()
+	{
+		if(powered)	mjStored++;
 	}
-
+	
 	public boolean isPowered() {
 		return powered;
 	}
@@ -284,18 +302,20 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	}
 
 	@Override
-	public void doWork(PowerHandler arg0) {}
+	public void doWork(PowerHandler arg0) {	}
 
 	@Override
 	public PowerReceiver getPowerReceiver(ForgeDirection arg0) {
 		return powerHandler.getPowerReceiver();
 	}
-
+	
 	private void extractItems() {
-
+		
 		IInventory inventory = ABO.instance.getInventoryEnderChest();
 		ItemStack[] extracted = checkExtract(inventory, true);
-		if (extracted == null) { return; }
+		if (extracted == null) {
+			return;
+		}
 
 		for (ItemStack stack : extracted) {
 			if (stack == null || stack.stackSize == 0) {
@@ -304,30 +324,33 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 				continue;
 			}
 
-			Position entityPos = new Position(container.xCoord + 0.5, container.yCoord + 0.5, container.zCoord + 0.5,
-					ForgeDirection.UNKNOWN);
+			Position entityPos = new Position(container.xCoord + 0.5, container.yCoord + 0.5, container.zCoord + 0.5, ForgeDirection.UNKNOWN);
 
 			TravelingItem entity = makeItem(entityPos.x, entityPos.y, entityPos.z, stack);
 
 			transport.injectItem(entity, entityPos.orientation);
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		if (tile instanceof TileEntityEnderChest) return true;
+		if(tile instanceof TileEntityEnderChest) return true;
 		Pipe<PipeTransportItems> otherPipe;
 		if (tile instanceof TileGenericPipe && ((TileGenericPipe) tile).pipe.transport instanceof PipeTransportItems) {
 			otherPipe = ((TileGenericPipe) tile).pipe;
-			if (!BlockGenericPipe.isFullyDefined(otherPipe)) { return false; }
+			if (!BlockGenericPipe.isFullyDefined(otherPipe)) {
+				return false;
+			}
 
-			if (!PipeConnectionBans.canPipesConnect(getClass(), otherPipe.getClass())) { return false; }
+			if (!PipeConnectionBans.canPipesConnect(getClass(), otherPipe.getClass())) {
+				return false;
+			}
 			return true;
 		}
 		return false;
 	}
-
+	
 	protected TravelingItem makeItem(double x, double y, double z, ItemStack stack) {
 		return TravelingItem.make(x, y, z, stack);
 	}
@@ -337,24 +360,27 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	 * inventory, null if none. On certain cases, the extractable slot depends
 	 * on the position of the pipe.
 	 */
-	/*
-	 * public ItemStack[] checkExtract(IInventory inventory, boolean doRemove) {
-	 * ItemStack result = checkExtractGeneric(inventory, doRemove);
-	 * 
-	 * if (result != null) { return new ItemStack[]{result}; }
-	 * 
-	 * return null; }
-	 */
+	/*public ItemStack[] checkExtract(IInventory inventory, boolean doRemove) {
+		ItemStack result = checkExtractGeneric(inventory, doRemove);
+
+		if (result != null) {
+			return new ItemStack[]{result};
+		}
+
+		return null;
+	}*/
 
 	public ItemStack checkExtractGeneric(IInventory inventory, boolean doRemove) {
-		if (inventory == null) { return null; }
+		if (inventory == null) {
+			return null;
+		}
 
-		for (int k = 0; k < inventory.getSizeInventory(); k++) {
+		for (int k  = 0; k < inventory.getSizeInventory(); k++) {
 			ItemStack slot = inventory.getStackInSlot(k);
 
 			if (slot != null && slot.stackSize > 0) {
 				if (doRemove) {
-					double energyUsed = mjStored > slot.stackSize ? slot.stackSize : mjStored;
+					double energyUsed =  mjStored > slot.stackSize ? slot.stackSize : mjStored;
 					mjStored -= energyUsed;
 
 					return inventory.decrStackSize(k, (int) energyUsed);
@@ -366,14 +392,18 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 		return null;
 	}
-
+	
 	private boolean isFiltered(ItemStack stack) {
 		for (int i = 0; i < filters.getSizeInventory(); i++) {
 			ItemStack filter = filters.getStackInSlot(i);
 
-			if (filter == null) { return false; }
+			if (filter == null) {
+				return false;
+			}
 
-			if (StackHelper.isMatchingItem(filter, stack, true, false)) { return true; }
+			if (StackHelper.isMatchingItem(filter, stack, true, false)) {
+				return true;
+			}
 		}
 
 		return false;
@@ -382,8 +412,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	private void incrementFilter() {
 		currentFilter++;
 		int count = 0;
-		while (filters.getStackInSlot(currentFilter % filters.getSizeInventory()) == null
-				&& count < filters.getSizeInventory()) {
+		while (filters.getStackInSlot(currentFilter % filters.getSizeInventory()) == null && count < filters.getSizeInventory()) {
 			currentFilter++;
 			count++;
 		}

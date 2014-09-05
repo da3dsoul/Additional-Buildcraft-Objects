@@ -21,16 +21,17 @@ import net.minecraft.nbt.NBTTagCompound;
 public class ABOEnergyPulser {
 
 	@SuppressWarnings("unused")
-	private double	powerReceptor;
+	private double powerReceptor;
 
-	private boolean	isActive	= false;
+	private boolean isActive = false;
 
 	public ABOEnergyPulser(double receptor) {
 		powerReceptor = receptor;
 	}
 
 	public void update() {
-		if (isActive) powerReceptor += 1.0D;
+		if (isActive)
+			powerReceptor += 1.0D;
 	}
 
 	public void enablePulse() {

@@ -24,8 +24,7 @@ import buildcraft.transport.TravelingItem;
 import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
- * This pipe will always prefer to use the opposite direction, so items will go
- * "straight through"
+ * This pipe will always prefer to use the opposite direction, so items will go "straight through"
  * 
  * @author blakmajik ported to BC > 2.2 by Flow86
  */
@@ -39,14 +38,17 @@ public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> {
 	public int getIconIndex(ForgeDirection direction) {
 		return PipeIcons.PipeItemsCrossover.ordinal();
 	}
+	
+	
 
 	public void eventHandler(PipeEventItem.FindDest event) {
-
+		
 		List<ForgeDirection> result = event.destinations;
 		TravelingItem item = event.item;
 		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		if (transport.canReceivePipeObjects(item.input, item)) {
+		if (transport.canReceivePipeObjects(item.input, item))
+		{
 			list.add(item.input);
 			result.clear();
 			result.addAll(list);

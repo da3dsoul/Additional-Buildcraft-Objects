@@ -26,18 +26,17 @@ import buildcraft.transport.pipes.PipePowerWood;
 
 public class PipePowerExtraction extends Pipe<PipeTransportPower> implements IPowerReceptor, IPipeTransportPowerHook {
 
-	public final boolean[]			powerSources		= new boolean[6];
+	public final boolean[] powerSources = new boolean[6];
 
-	protected int					standardIconIndex	= PipeIconProvider.TYPE.PipePowerWood_Standard.ordinal();
-	protected int					solidIconIndex		= PipeIconProvider.TYPE.PipeAllWood_Solid.ordinal();
+	protected int standardIconIndex = PipeIconProvider.TYPE.PipePowerWood_Standard.ordinal();
+	protected int solidIconIndex = PipeIconProvider.TYPE.PipeAllWood_Solid.ordinal();
 
-	@MjBattery(maxCapacity = 1024, maxReceivedPerCycle = 1024, minimumConsumption = 0)
-	private double					mjStored			= 0;
-	@SuppressWarnings("unused")
-	private final SafeTimeTracker	sourcesTracker		= new SafeTimeTracker(1);
-	private boolean					full;
+	@MjBattery(maxCapacity = 16384, maxReceivedPerCycle = 1024, minimumConsumption = 0)
+	private double mjStored = 0;
+	private final SafeTimeTracker sourcesTracker = new SafeTimeTracker(1);
+	private boolean full;
 
-	private MjAPILegacy				powerHandler;
+	private MjAPILegacy powerHandler;
 
 	@SuppressWarnings("unchecked")
 	public PipePowerExtraction(Item item) {
@@ -51,7 +50,9 @@ public class PipePowerExtraction extends Pipe<PipeTransportPower> implements IPo
 	public void updateEntity() {
 		super.updateEntity();
 
-		if (container.getWorldObj().isRemote) { return; }
+		if (container.getWorldObj().isRemote) {
+			return;
+		}
 
 		if (mjStored > 0) {
 			int sources = 0;
@@ -104,7 +105,7 @@ public class PipePowerExtraction extends Pipe<PipeTransportPower> implements IPo
 
 	public boolean requestsPower() {
 		if (full) {
-			boolean request = mjStored < 1024 / 2;
+			boolean request = mjStored < 16384 / 2;
 
 			if (request) {
 				full = false;
@@ -113,7 +114,7 @@ public class PipePowerExtraction extends Pipe<PipeTransportPower> implements IPo
 			return request;
 		}
 
-		full = mjStored >= 1024 - 10;
+		full = mjStored >= 16384 - 10;
 
 		return !full;
 	}
@@ -169,12 +170,12 @@ public class PipePowerExtraction extends Pipe<PipeTransportPower> implements IPo
 	public void doWork(PowerHandler workProvider) {
 
 	}
-
+	
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
 		return PipeIcons.PipePowerExtraction.ordinal();
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIconProvider getIconProvider() {

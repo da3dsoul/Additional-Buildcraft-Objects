@@ -27,12 +27,11 @@ import buildcraft.core.IItemPipe;
 
 public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 
-	private static final AxisAlignedBB[]	boxes	= {
-			AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625),
-			AxisAlignedBB.getBoundingBox(0, 0.25, 0.25, 0.375, 0.75, 0.75),
-			AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) };
+	private static final AxisAlignedBB[] boxes = {
+		AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625), AxisAlignedBB.getBoundingBox(0, 0.25, 0.25, 0.375, 0.75, 0.75), AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375)	
+	};
 
-	private static IIcon					texture;
+	private static IIcon texture;
 
 	public BlockWindmill() {
 		super(Material.iron);
@@ -44,30 +43,30 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	public boolean isOpaqueCube() {
 		return false;
 	}
-
+	
 	@Override
-	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer player, int side, float par7,
-			float par8, float par9) {
+	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer player, int side, float par7, float par8, float par9) {
 
 		TileEntity tile = world.getTileEntity(i, j, k);
 
 		// REMOVED DUE TO CREATIVE ENGINE REQUIREMENTS - dmillerw
 		// Drop through if the player is sneaking
-		// if (player.isSneaking()) {
-		// return false;
-		// }
+//		if (player.isSneaking()) {
+//			return false;
+//		}
 
 		// Do not open guis when having a pipe in hand
 		if (player.getCurrentEquippedItem() != null) {
-			if (player.getCurrentEquippedItem().getItem() instanceof IItemPipe) { return false; }
+			if (player.getCurrentEquippedItem().getItem() instanceof IItemPipe) {
+				return false;
+			}
 		}
 
 		if (tile instanceof TileWindmill) {
-			if (!world.isRemote) {
-				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).currentOutput) + "MJ/t"));
-				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT) + "MJ/t"));
+			if(!world.isRemote)
+			{
+				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is " + new DecimalFormat("##0.0##").format(((TileWindmill)tile).currentOutput) + "MJ/t"));
+				player.addChatComponentMessage(new ChatComponentText("Target Output is " + new DecimalFormat("##0.0##").format(((TileWindmill)tile).TARGET_OUTPUT) + "MJ/t"));
 			}
 			return ((TileWindmill) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
@@ -157,20 +156,14 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if (!checkBBClear(world, x, y, z)) { world.func_147480_a(x, y, z, true); return;}
-		try {
-			TileWindmill tile = (TileWindmill) world.getTileEntity(x, y, z);
-			tile.onNeighborBlockChange(world, x, y, z, block);
-
-		} catch (Exception e) {};
+		if(!checkBBClear(world, x, y, z)) world.func_147480_a(x, y, z, true);
 	}
-
-	private boolean checkBBClear(World world, int x, int y, int z) {
-		if (world.getBlock(x, y - 1, z) != Blocks.fence && world.getBlock(x, y - 1, z) != Blocks.nether_brick_fence)
-			return false;
-		if (world.getBlock(x, y - 2, z) != Blocks.fence && world.getBlock(x, y - 2, z) != Blocks.nether_brick_fence)
-			return false;
-		if (world.getBlock(x, y + 1, z) != Blocks.air) return false;
+	
+	private boolean checkBBClear(World world, int x, int y, int z)
+	{
+		if(world.getBlock(x, y - 1, z) != Blocks.fence && world.getBlock(x, y - 1, z) != Blocks.nether_brick_fence) return false;
+		if(world.getBlock(x, y - 2, z) != Blocks.fence && world.getBlock(x, y - 2, z) != Blocks.nether_brick_fence) return false;		
+		if(world.getBlock(x, y + 1, z) != Blocks.air) return false;
 		return true;
 	}
 
@@ -189,7 +182,5 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return null;
 	}
-	
-	
 
 }

@@ -23,41 +23,43 @@ import buildcraft.BuildCraftCore.RenderMode;
 import buildcraft.core.IInventoryRenderer;
 import buildcraft.energy.TileEngine;
 
-public class RenderWindmill extends TileEntitySpecialRenderer implements IInventoryRenderer {
-	// fields
-	private ModelBase			Windmill	= new ModelBase() {};
-
-	private ModelRenderer		Stand;
-	private ModelRenderer		WingsY;
-	private ModelRenderer		WingsZ;
-	private ModelRenderer		Trunk;
-
-	private ResourceLocation	texture;
-
-	public RenderWindmill() {
-		Stand = new ModelRenderer(Windmill, 0, 0);
-		Stand.addBox(-2F, -13F, -2F, 4, 13, 4);
-		Stand.setRotationPoint(0F, 24F, 0F);
-		Stand.setTextureSize(64, 32);
-		Trunk = new ModelRenderer(Windmill, 0, 0);
-		Trunk.addBox(2F, -12F, -4F, 6, 8, 8);
-		Trunk.setRotationPoint(0F, 24F, 0F);
-		Trunk.setTextureSize(64, 32);
-		WingsY = new ModelRenderer(Windmill, 16, 0);
-		WingsY.addBox(-2, 0, -1, 2, 7, 1);
-		WingsY.addBox(-2, -7, 0, 2, 7, 1);
-		WingsY.setRotationPoint(-2F, 13F, 0F);
-		WingsY.setTextureSize(64, 32);
-		WingsZ = new ModelRenderer(Windmill, 22, 0);
-		WingsZ.addBox(-2, 0, 0, 2, 1, 7);
-		WingsZ.addBox(-2, -1, -7, 2, 1, 7);
-		WingsZ.setRotationPoint(-2F, 13F, 0F);
-		WingsZ.setTextureSize(64, 32);
-		field_147501_a = TileEntityRendererDispatcher.instance;
-		texture = new ResourceLocation("additional-buildcraft-objects:textures/blocks/windmill.png");
-	}
-
-	@Override
+public class RenderWindmill extends TileEntitySpecialRenderer implements IInventoryRenderer
+{
+  //fields
+    private ModelBase Windmill = new ModelBase(){};
+    
+    private ModelRenderer Stand;
+	private ModelRenderer WingsY;
+	private ModelRenderer WingsZ;
+	private ModelRenderer Trunk;
+	
+	private ResourceLocation texture;
+  
+  public RenderWindmill()
+  {    
+      Stand = new ModelRenderer(Windmill, 0, 0);
+      Stand.addBox(-2F, -13F, -2F, 4, 13, 4);
+      Stand.setRotationPoint(0F, 24F, 0F);
+      Stand.setTextureSize(64, 32);
+      Trunk = new ModelRenderer(Windmill, 0, 0);
+      Trunk.addBox(2F, -12F, -4F, 6, 8, 8);
+      Trunk.setRotationPoint(0F, 24F, 0F);
+      Trunk.setTextureSize(64, 32);
+      WingsY = new ModelRenderer(Windmill, 16, 0);
+      WingsY.addBox(-2, 0, -1, 2, 7, 1);
+      WingsY.addBox(-2, -7, 0, 2, 7, 1);
+      WingsY.setRotationPoint(-2F, 13F, 0F);
+      WingsY.setTextureSize(64, 32);
+      WingsZ = new ModelRenderer(Windmill, 22, 0);
+      WingsZ.addBox(-2, 0, 0, 2, 1, 7);
+      WingsZ.addBox(-2, -1, -7, 2, 1, 7);
+      WingsZ.setRotationPoint(-2F, 13F, 0F);
+      WingsZ.setTextureSize(64, 32);
+      field_147501_a = TileEntityRendererDispatcher.instance;
+      texture = new ResourceLocation("additional-buildcraft-objects:textures/blocks/windmill.png");
+  }
+  
+  @Override
 	public void inventoryRender(double x, double y, double z, float f, float f1) {
 		render(0.25F, x, y, z, TileWindmill.TRUNK_BLUE_TEXTURE, -1, -1, -1);
 	}
@@ -68,15 +70,15 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		TileEngine engine = (TileEngine) tileentity;
 
 		if (engine != null) {
-			render(engine.progress, x, y, z, engine.getTrunkTexture(engine.getEnergyStage()), tileentity.xCoord,
-					tileentity.yCoord, tileentity.zCoord);
+			render(engine.progress, x, y, z, engine.getTrunkTexture(engine.getEnergyStage()), tileentity.xCoord, tileentity.yCoord, tileentity.zCoord);
 		}
 	}
 
-	private void render(float progress, double x, double y, double z, ResourceLocation TrunkTexture, int xCoord,
-			int yCoord, int zCoord) {
+	private void render(float progress, double x, double y, double z, ResourceLocation TrunkTexture, int xCoord, int yCoord, int zCoord) {
 
-		if (BuildCraftCore.render == RenderMode.NoDynamic) { return; }
+		if (BuildCraftCore.render == RenderMode.NoDynamic) {
+			return;
+		}
 
 		GL11.glPushMatrix();
 		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
@@ -88,52 +90,53 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		GL11.glTranslatef((float) x + 0.5F, (float) y + 1.5F, (float) z + 0.5F);
 
 		float factor = (float) (0.0625);
-
-		Stand.rotateAngleX = 0; // (float) -Math.PI;
+		
+		Stand.rotateAngleX = 0; //(float) -Math.PI;
 		Stand.rotateAngleY = 0;
-		Stand.rotateAngleZ = 0;// (float) -Math.PI;
-
-		WingsY.rotateAngleX = 0; // (float) -Math.PI;
+		Stand.rotateAngleZ = 0;//(float) -Math.PI;
+		
+		WingsY.rotateAngleX = 0; //(float) -Math.PI;
 		WingsY.rotateAngleY = 0;
-		WingsY.rotateAngleZ = 0;// (float) -Math.PI;
-
-		WingsZ.rotateAngleX = 0; // (float) -Math.PI;
+		WingsY.rotateAngleZ = 0;//(float) -Math.PI;
+		
+		WingsZ.rotateAngleX = 0; //(float) -Math.PI;
 		WingsZ.rotateAngleY = 0;
-		WingsZ.rotateAngleZ = 0;// (float) -Math.PI;
+		WingsZ.rotateAngleZ = 0;//(float) -Math.PI;
 
+		
 		GL11.glPushMatrix();
-		GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
+        GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
 
-		bindTexture(texture);
+        bindTexture(texture);
 		Stand.render(factor);
-
+		
 		boolean inDist = true;
-		try {
-			if (!(xCoord == -1 && yCoord == -1 && zCoord == -1)) {
+		try
+		{
+			if(!(xCoord == -1 && yCoord == -1 && zCoord == -1))
+			{
 				EntityClientPlayerMP player = FMLClientHandler.instance().getClientPlayerEntity();
-				double dist = Math.sqrt((xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
-						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ));
-				if (dist > ABO.windmillAnimDist) inDist = false;
+				double dist = Math.sqrt((xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY) * (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ));
+				if(dist > ABO.windmillAnimDist) inDist = false;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		if (ABO.windmillAnimations && inDist) {
+		}catch(Exception e) {e.printStackTrace();}
+		
+		if(ABO.windmillAnimations && inDist)
+		{
 			float step = (float) Math.toRadians(progress * 90);
 			WingsY.rotateAngleX = step;
 			WingsZ.rotateAngleX = step;
 		}
-
+		
 		WingsY.render(factor);
 		WingsZ.render(factor);
-
+		
 		bindTexture(TrunkTexture);
 		Trunk.rotateAngleX = 0;
 		Trunk.rotateAngleY = 0;
 		Trunk.rotateAngleZ = 0;
 		Trunk.render(factor);
-
+		
 		GL11.glPopMatrix();
 
 		GL11.glPopAttrib();

@@ -27,7 +27,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 public class ABOItem extends ItemBuildCraft {
 
-	private String	iconName;
+	private String iconName;
 
 	public ABOItem() {
 		super(CreativeTabBuildCraft.ITEMS);

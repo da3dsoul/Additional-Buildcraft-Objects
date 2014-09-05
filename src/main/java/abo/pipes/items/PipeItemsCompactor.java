@@ -47,16 +47,14 @@ import buildcraft.transport.pipes.events.PipeEventItem;
  * 
  */
 public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements IActionReceptor {
-	private final int													onTexture		= PipeIcons.PipeItemsCompactorOn
-																								.ordinal();
-	private final int													offTexture		= PipeIcons.PipeItemsCompactorOff
-																								.ordinal();
-	private boolean														powered			= false;
-	private boolean														toggled			= false;
-	private boolean														switched		= false;
-	private final TreeMap<ForgeDirection, PipeItemsCompactorInventory>	receivedStacks	= new TreeMap<ForgeDirection, PipeItemsCompactorInventory>();
+	private final int onTexture = PipeIcons.PipeItemsCompactorOn.ordinal();
+	private final int offTexture = PipeIcons.PipeItemsCompactorOff.ordinal();
+	private boolean powered = false;
+	private boolean toggled = false;
+	private boolean switched = false;
+	private final TreeMap<ForgeDirection, PipeItemsCompactorInventory> receivedStacks = new TreeMap<ForgeDirection, PipeItemsCompactorInventory>();
 	@SuppressWarnings("deprecation")
-	private final SafeTimeTracker										timeTracker		= new SafeTimeTracker();
+	private final SafeTimeTracker timeTracker = new SafeTimeTracker();
 
 	/**
 	 * @param itemID
@@ -86,14 +84,14 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		switched = false;
 
 		for (Entry<ForgeDirection, PipeItemsCompactorInventory> receivedStack : receivedStacks.entrySet()) {
-			receivedStack.getValue().dropContents(container.getWorldObj(), container.xCoord, container.yCoord,
-					container.zCoord);
+			receivedStack.getValue().dropContents(container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
 		}
 		receivedStacks.clear();
 
 		super.dropContents();
 	}
 
+	
 	public void eventHandler(PipeEventItem.Entered event) {
 		TravelingItem item = event.item;
 		if (isPowered() && item.getItemStack().isStackable()) {
@@ -182,14 +180,14 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0)
+						powered = true;
 				}
 			}
 		}
 
 		if (!powered)
-			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
-					container.zCoord);
+			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
 
 		if (lastPowered != powered) {
 			for (TileGenericPipe pipe : neighbours) {
@@ -235,7 +233,8 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 			}
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
-			if (lastSwitched != switched && !switched) toggled = false;
+			if (lastSwitched != switched && !switched)
+				toggled = false;
 		}
 	}
 
@@ -254,7 +253,8 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		}
 
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
-			if (lastSwitched != switched && !switched) toggled = false;
+			if (lastSwitched != switched && !switched)
+				toggled = false;
 		}
 	}
 
@@ -270,16 +270,13 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 				if (stack != null) {
 					// System.out.println("out: Stack " + stack.toString());
 
-					stack.stackSize -= Utils.addToRandomPipeAround(container.getWorldObj(), container.xCoord,
-							container.yCoord, container.zCoord, receivedStack.getKey(), stack);
+					stack.stackSize -= Utils.addToRandomPipeAround(container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord, receivedStack.getKey(), stack);
 					if (stack.stackSize > 0) {
-						Position destPos = new Position(container.xCoord, container.yCoord, container.zCoord,
-								receivedStack.getKey());
+						Position destPos = new Position(container.xCoord, container.yCoord, container.zCoord, receivedStack.getKey());
 
 						destPos.moveForwards(0.3);
 
-						InvUtils.dropItems(container.getWorldObj(), stack, (int) destPos.x, (int) destPos.y,
-								(int) destPos.z);
+						InvUtils.dropItems(container.getWorldObj(), stack, (int) destPos.x, (int) destPos.y, (int) destPos.z);
 					}
 
 				}
@@ -287,14 +284,15 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 		}
 	}
 
+	
 	public void readjustSpeed(TravelingItem item) {
-		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f,
-				TransportConstants.PIPE_NORMAL_SPEED * 20F));
+		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f, TransportConstants.PIPE_NORMAL_SPEED * 20F));
 	}
 
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
-		if (container != null && container.getWorldObj() != null) return (isPowered() ? onTexture : offTexture);
+		if (container != null && container.getWorldObj() != null)
+			return (isPowered() ? onTexture : offTexture);
 		return offTexture;
 	}
 }

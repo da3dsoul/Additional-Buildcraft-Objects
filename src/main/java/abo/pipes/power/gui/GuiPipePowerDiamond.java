@@ -26,13 +26,12 @@ import buildcraft.core.gui.GuiAdvancedInterface;
 import buildcraft.transport.TileGenericPipe;
 
 public class GuiPipePowerDiamond extends GuiAdvancedInterface {
-	private static final ResourceLocation	TEXTURE	= new ResourceLocation("additional-buildcraft-objects",
-															"textures/gui/pipePowerDiamond.png");
+	private static final ResourceLocation TEXTURE = new ResourceLocation("additional-buildcraft-objects", "textures/gui/pipePowerDiamond.png");
 
 	class YesNoSlot extends AdvancedSlot {
 
-		private final int					nr;
-		private final PipePowerDistribution	pipe;
+		private final int nr;
+		private final PipePowerDistribution pipe;
 
 		public YesNoSlot(GuiAdvancedInterface gui, int nr, int x, int y, TileGenericPipe tile) {
 			super(gui, x, y);
@@ -49,7 +48,7 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 		}
 	}
 
-	private final ContainerPipePowerDiamond	guiContainer;
+	private final ContainerPipePowerDiamond guiContainer;
 
 	public GuiPipePowerDiamond(InventoryPlayer player, TileGenericPipe tile) {
 		super(new ContainerPipePowerDiamond(player, tile), null, TEXTURE);
@@ -110,7 +109,8 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 
 		AdvancedSlot slot = null;
 
-		if (position < 0) return;
+		if (position < 0)
+			return;
 
 		slot = slots[position];
 
@@ -122,8 +122,7 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 			guiContainer.detectAndSendChanges();
 
 			if (s.pipe.container.getWorldObj().isRemote) {
-				PacketYesNoChange packet = new PacketYesNoChange(s.pipe.container.xCoord, s.pipe.container.yCoord,
-						s.pipe.container.zCoord, s.nr, s.isYes());
+				PacketYesNoChange packet = new PacketYesNoChange(s.pipe.container.xCoord, s.pipe.container.yCoord, s.pipe.container.zCoord, s.nr, s.isYes());
 				ABOProxy.proxy.sendToServer(packet);
 			}
 		}

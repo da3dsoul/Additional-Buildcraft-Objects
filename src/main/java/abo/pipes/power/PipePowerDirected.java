@@ -29,25 +29,25 @@ import buildcraft.transport.pipes.PipeStructureCobblestone;
 
 public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook {
 
-	private final int			baseTexture	= PipeIcons.PipePowerIron.ordinal();
-	private final int			sideTexture	= PipeIcons.PipePowerIronSide.ordinal();
+	private final int baseTexture = PipeIcons.PipePowerIron.ordinal();
+	private final int sideTexture = PipeIcons.PipePowerIronSide.ordinal();
 
-	private final PipeLogicIron	logic		= new PipeLogicIron(this) {
-												@Override
-												protected boolean isValidConnectingTile(TileEntity tile) {
-													if (tile instanceof TileGenericPipe) {
-														Pipe otherPipe = ((TileGenericPipe) tile).pipe;
-														if (otherPipe instanceof PipePowerWood
-																|| otherPipe instanceof PipeStructureCobblestone)
-															return false;
-														if (otherPipe.transport instanceof PipeTransportPower)
-															return true;
-														return false;
-													}
-													if (tile instanceof IPowerReceptor) return true;
-													return false;
-												}
-											};
+	private final PipeLogicIron logic = new PipeLogicIron(this) {
+		@Override
+		protected boolean isValidConnectingTile(TileEntity tile) {
+			if (tile instanceof TileGenericPipe) {
+				Pipe otherPipe = ((TileGenericPipe) tile).pipe;
+				if (otherPipe instanceof PipePowerWood || otherPipe instanceof PipeStructureCobblestone)
+					return false;
+				if (otherPipe.transport instanceof PipeTransportPower)
+					return true;
+				return false;
+			}
+			if (tile instanceof IPowerReceptor)
+				return true;
+			return false;
+		}
+	};
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
@@ -112,7 +112,9 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 	public double requestEnergy(ForgeDirection from, double amount) {
 		int metadata = container.getBlockMetadata();
 
-		if (metadata == from.ordinal()) { return amount; }
+		if (metadata == from.ordinal()) {
+			return amount;
+		}
 		return 0;
 	}
 }

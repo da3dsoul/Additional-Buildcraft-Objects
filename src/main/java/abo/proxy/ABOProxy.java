@@ -26,17 +26,16 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class ABOProxy {
 
 	@SidedProxy(clientSide = "abo.proxy.ABOProxyClient", serverSide = "abo.proxy.ABOProxy")
-	public static ABOProxy	proxy;
+	public static ABOProxy proxy;
 
 	public void registerPipe(Item itemID) {}
 
 	public void sendToServer(ABOPacket packet) {}
-
+	
 	public void registerBlockRenderers() {}
-
+	
 	public void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileWindmill.class, "net.minecraft.src.abo.energy.TileWindmill");
-		// GameRegistry.registerTileEntity(TileSolarPanel.class,
-		// "net.minecraft.src.abo.energy.TileSolarPanel");
+		//GameRegistry.registerTileEntity(TileSolarPanel.class, "net.minecraft.src.abo.energy.TileSolarPanel");
 	}
 }

@@ -36,8 +36,8 @@ import buildcraft.transport.pipes.events.PipeEventItem;
  */
 public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 
-	private byte	desiredSize	= 1;
-
+	private byte desiredSize = 1;
+	
 	public PipeItemsDivide(Item itemID) {
 		super(new PipeTransportItems(), itemID);
 	}
@@ -50,33 +50,38 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 	public void eventHandler(PipeEventItem.Entered event) {
 		TravelingItem item = event.item;
 		ItemStack stack = item.getItemStack();
-		while (stack.stackSize > desiredSize) {
+		while(stack.stackSize > desiredSize)
+		{
 			ItemStack newStack = stack.splitStack(desiredSize);
 			TravelingItem newItem = copyTravelingItem(item, newStack);
 			newItem.getExtraData().setBoolean("DONT MERGE ME", true);
-			if (transport.canReceivePipeObjects(item.input, newItem)) {
+			if (transport.canReceivePipeObjects(item.input, newItem))
+			{
 				newItem.input = newItem.output;
 			}
 			transport.injectItem(newItem, item.input);
 			readjustSpeed(newItem, 5);
 		}
-		if (stack.stackSize < desiredSize && stack.stackSize > 0) {
+		if(stack.stackSize < desiredSize && stack.stackSize > 0)
+		{
 			item.blacklist.add(item.input);
 			item.toCenter = true;
 			item.input = transport.resolveDestination(item);
-
+			
 			if (!container.getWorldObj().isRemote) {
 				item.output = item.input.getOpposite();
 			}
 			transport.items.unscheduleRemoval(item);
-		} else if (stack.stackSize <= 0) {
+		}else if(stack.stackSize <= 0)
+		{
 			transport.items.scheduleRemoval(item);
 			return;
 		}
 		readjustSpeed(item, 5);
 	}
-
-	private TravelingItem copyTravelingItem(TravelingItem item, ItemStack newStack) {
+	
+	private TravelingItem copyTravelingItem(TravelingItem item, ItemStack newStack)
+	{
 		TravelingItem newItem = TravelingItem.make();
 		newItem.xCoord = item.xCoord;
 		newItem.yCoord = item.yCoord;
@@ -87,15 +92,16 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 		newItem.output = item.output;
 		newItem.color = item.color == null ? null : item.color;
 
-		if (item.hasExtraData()) {
+		if(item.hasExtraData())
+		{
 			try {
 				Field field = newItem.getClass().getDeclaredField("extraData");
 				field.setAccessible(true);
-				// NBTTagCompound nbt = (NBTTagCompound) field.get(newItem);
+				//NBTTagCompound nbt = (NBTTagCompound) field.get(newItem);
 				field.set(newItem, item.getExtraData().copy());
 				field.setAccessible(false);
-			} catch (Exception e) {}
-
+			} catch (Exception e){}
+			
 		}
 		newItem.setItemStack(newStack);
 		return newItem;
@@ -103,40 +109,38 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
-		if (entityplayer.getCurrentEquippedItem() != null
-				&& entityplayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
+		if(entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().getItem() instanceof ItemWrench)
+		{
 			incrementMeta();
-			if (!container.getWorldObj().isRemote)
-				entityplayer.addChatComponentMessage(new ChatComponentText("Set the desired stack size to "
-						+ desiredSize + "."));
+			if(!container.getWorldObj().isRemote) entityplayer.addChatComponentMessage(new ChatComponentText("Set the desired stack size to "+desiredSize+"."));
 			return true;
 		}
 		return false;
 	}
-
-	private void incrementMeta() {
+	
+	private void incrementMeta()
+	{
 		desiredSize++;
-		if (desiredSize > 8) desiredSize = 1;
+		if(desiredSize > 8) desiredSize = 1;
 	}
-
+	
 	public void readjustSpeed(TravelingItem item, int errorMargin) {
-		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f,
-				TransportConstants.PIPE_NORMAL_SPEED * 20F)
-				+ (new Random().nextInt(errorMargin) / 1000)
-				- (new Random().nextInt(errorMargin) / 1000));
+		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f, TransportConstants.PIPE_NORMAL_SPEED * 20F) + (new Random().nextInt(errorMargin) / 1000) - (new Random().nextInt(errorMargin) / 1000));
 	}
 
-	public void eventHandler(PipeEventItem.FindDest event) {
-
+public void eventHandler(PipeEventItem.FindDest event) {
+		
 		List<ForgeDirection> result = event.destinations;
 		TravelingItem item = event.item;
 		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		if (transport.canReceivePipeObjects(item.input, item)) {
+		if (transport.canReceivePipeObjects(item.input, item))
+		{
 			list.add(item.input);
 			result.clear();
 			result.addAll(list);
 		}
 
+		
 	}
 }

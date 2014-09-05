@@ -27,7 +27,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 public class ABOItemPipe extends ItemPipe {
 
-	private String	iconName;
+	private String iconName;
 
 	public ABOItemPipe() {
 		super(CreativeTabBuildCraft.PIPES);

@@ -1,35 +1,57 @@
 package abo;
 
-public enum PipeIcons {
+public enum PipeIcons
+{
 	PipeItemsCrossover,
 
-	PipeItemsExtraction, PipeItemsExtractionSide,
+	PipeItemsExtraction,
+	PipeItemsExtractionSide,
 
-	PipeItemsInsertion, PipeItemsRoundRobin,
+	PipeItemsInsertion,
+	PipeItemsRoundRobin,
 
 	PipeLiquidsBalance,
 
-	PipeLiquidsDiamondCenter, PipeLiquidsDiamondDown, PipeLiquidsDiamondUp, PipeLiquidsDiamondNorth, PipeLiquidsDiamondSouth, PipeLiquidsDiamondWest, PipeLiquidsDiamondEast,
+	PipeLiquidsDiamondCenter,
+	PipeLiquidsDiamondDown,
+	PipeLiquidsDiamondUp,
+	PipeLiquidsDiamondNorth,
+	PipeLiquidsDiamondSouth,
+	PipeLiquidsDiamondWest,
+	PipeLiquidsDiamondEast,
 
-	PipeLiquidsGoldenIron, PipeLiquidsGoldenIronSide,
+	PipeLiquidsGoldenIron,
+	PipeLiquidsGoldenIronSide,
 
-	PipeLiquidsValveClosed, PipeLiquidsValveClosedSide, PipeLiquidsValveOpen, PipeLiquidsValveOpenSide,
+	PipeLiquidsValveClosed,
+	PipeLiquidsValveClosedSide,
+	PipeLiquidsValveOpen,
+	PipeLiquidsValveOpenSide,
 
-	PipePowerSwitchPowered, PipePowerSwitchUnpowered,
+	PipePowerSwitchPowered,
+	PipePowerSwitchUnpowered,
 
-	PipePowerDiamondCenter, PipePowerDiamondDown, PipePowerDiamondUp, PipePowerDiamondNorth, PipePowerDiamondSouth, PipePowerDiamondWest, PipePowerDiamondEast,
+	PipePowerDiamondCenter,
+	PipePowerDiamondDown,
+	PipePowerDiamondUp,
+	PipePowerDiamondNorth,
+	PipePowerDiamondSouth,
+	PipePowerDiamondWest,
+	PipePowerDiamondEast,
 
-	PipePowerIron, PipePowerIronSide,
-
-	PipeItemsCompactorOn, PipeItemsCompactorOff,
-
+	PipePowerIron,
+	PipePowerIronSide,
+	
+	PipeItemsCompactorOn,
+	PipeItemsCompactorOff,
+	
 	PipeItemsDivide,
-
+	
 	PipeItemsEnderExtraction,
-
+	
 	PipePowerExtraction,
-
+	
 	PipeLiquidsInsertion,
-
+	
 	MAX
 };

@@ -37,7 +37,8 @@ class Neighbor {
 
 	public int getFluidId() {
 		FluidTankInfo tank = getTank();
-		if (tank == null) return 0;
+		if (tank == null)
+			return 0;
 
 		FluidStack fluid = tank.fluid;
 		return fluid != null ? fluid.fluidID : 0;
@@ -45,14 +46,16 @@ class Neighbor {
 
 	public int getFluidCapacity() {
 		FluidTankInfo tank = getTank();
-		if (tank == null) return 0;
+		if (tank == null)
+			return 0;
 
 		return tank.capacity;
 	}
 
 	public int getFluidAmount() {
 		FluidTankInfo tank = getTank();
-		if (tank == null) return 0;
+		if (tank == null)
+			return 0;
 
 		FluidStack fluid = tank.fluid;
 		return fluid != null ? fluid.amount : 0;
@@ -78,8 +81,8 @@ class Neighbor {
 		return o;
 	}
 
-	private final IFluidHandler		c;
-	private final ForgeDirection	o;
+	private final IFluidHandler c;
+	private final ForgeDirection o;
 }
 
 /**
@@ -90,7 +93,7 @@ class Neighbor {
  * 
  */
 public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
-	// private final int blockTexture = 5 * 16 + 0;
+	//private final int blockTexture = 5 * 16 + 0;
 
 	public PipeFluidsBalance(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
@@ -113,7 +116,8 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		if (tile == null || !(tile instanceof IFluidHandler) || tile instanceof TileGenericPipe) return false;
+		if (tile == null || !(tile instanceof IFluidHandler) || tile instanceof TileGenericPipe)
+			return false;
 
 		return super.canPipeConnect(tile, side);
 	}
@@ -124,7 +128,8 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 
 		for (ForgeDirection o : ForgeDirection.VALID_DIRECTIONS) {
 			TileEntity tile = container.getTile(o);
-			if (tile == null || tile instanceof TileGenericPipe || !(tile instanceof IFluidHandler)) continue;
+			if (tile == null || tile instanceof TileGenericPipe || !(tile instanceof IFluidHandler))
+				continue;
 
 			Neighbor neighbor = new Neighbor((IFluidHandler) tile, o);
 
@@ -137,29 +142,36 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 		int fluidNeighbors = 0;
 
 		for (FluidTankInfo tank : transport.getTankInfo(ForgeDirection.UNKNOWN)) {
-			if (tank == null) continue;
+			if (tank == null)
+				continue;
 
 			FluidStack fluid = tank.fluid;
-			if (fluid != null) fluidAmount += fluid.amount;
+			if (fluid != null)
+				fluidAmount += fluid.amount;
 		}
 
 		FluidTankInfo tank = transport.getTankInfo(ForgeDirection.UNKNOWN)[0];
 		FluidStack fluid = null;
 
-		if (tank != null) fluid = tank.fluid;
+		if (tank != null)
+			fluid = tank.fluid;
 
-		if (fluid != null && fluid.amount > 0) fluidID = fluid.fluidID;
+		if (fluid != null && fluid.amount > 0)
+			fluidID = fluid.fluidID;
 
 		if (fluidID == 0) {
 			for (Neighbor neighbor : neighbors) {
-				if (neighbor == null) continue;
+				if (neighbor == null)
+					continue;
 				fluidID = neighbor.getFluidId();
-				if (fluidID != 0) break;
+				if (fluidID != 0)
+					break;
 			}
 		}
 
 		for (Neighbor neighbor : neighbors) {
-			if (neighbor == null) continue;
+			if (neighbor == null)
+				continue;
 
 			if (neighbor.getFluidCapacity() > 0 && (fluidID == neighbor.getFluidId() || neighbor.getFluidId() == 0)) {
 
@@ -170,7 +182,8 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 		}
 
 		// should never happen ...
-		if (fluidCapacity == 0 || fluidNeighbors == 0) return;
+		if (fluidCapacity == 0 || fluidNeighbors == 0)
+			return;
 
 		int liquidAverage = fluidAmount / fluidNeighbors;
 
@@ -179,8 +192,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 
 			if (liquidToExtract > 1) {
 				// drain tank (read available liquid)
-				FluidStack liquidExtracted = neighbor.getTankEntity().drain(neighbor.getOrientation(),
-						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
+				FluidStack liquidExtracted = neighbor.getTankEntity().drain(neighbor.getOrientation(), liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
 				if (liquidExtracted != null) {
 					// fill pipe
 					int filled = transport.fill(neighbor.getOrientation(), liquidExtracted, true);
@@ -192,12 +204,10 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 
 			} else if (liquidToExtract < 1) {
 				// drain pipe (read available liquid)
-				FluidStack liquidExtracted = transport.drain(neighbor.getOrientation().getOpposite(),
-						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
+				FluidStack liquidExtracted = transport.drain(neighbor.getOrientation().getOpposite(), liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
 				if (liquidExtracted != null) {
 					// fill tank
-					int filled = neighbor.getTankEntity().fill(neighbor.getOrientation().getOpposite(),
-							liquidExtracted, true);
+					int filled = neighbor.getTankEntity().fill(neighbor.getOrientation().getOpposite(), liquidExtracted, true);
 					if (filled != 0) {
 						// really drain pipe
 						liquidExtracted = transport.drain(neighbor.getOrientation().getOpposite(), filled, true);

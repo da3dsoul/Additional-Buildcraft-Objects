@@ -36,18 +36,17 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- * This pipe will always prefer to insert it's objects into another pipe over
- * one that is not a pipe.
+ * This pipe will always prefer to insert it's objects into another pipe over one that is not a pipe.
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
 public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor {
-	private final int		standardIconIndex	= PipeIcons.PipeItemsExtraction.ordinal();
-	private final int		solidIconIndex		= PipeIcons.PipeItemsExtractionSide.ordinal();
-
-	private PowerHandler	powerHandler;
-
-	private boolean			powered;
+	private final int standardIconIndex = PipeIcons.PipeItemsExtraction.ordinal();
+	private final int solidIconIndex = PipeIcons.PipeItemsExtractionSide.ordinal();
+	
+	private PowerHandler powerHandler;
+	
+	private boolean powered;
 
 	@SuppressWarnings("unchecked")
 	public PipeItemsExtraction(Item itemID) {
@@ -56,7 +55,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 		PipeConnectionBans.banConnection(PipeItemsExtraction.class, PipeItemsWood.class);
 
 		transport.allowBouncing = true;
-
+		
 		powerHandler = new PowerHandler(this, Type.PIPE);
 	}
 
@@ -65,14 +64,16 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 	public IIconProvider getIconProvider() {
 		return ABO.instance.pipeIconProvider;
 	}
+	
+	
 
 	@Override
 	public void updateEntity() {
-		// updateRedstoneCurrent();
-		// useRedstoneAsPower();
+		//updateRedstoneCurrent();
+		//useRedstoneAsPower();
 		super.updateEntity();
 	}
-
+	
 	public void updateRedstoneCurrent() {
 		boolean lastPowered = powered;
 
@@ -90,14 +91,14 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0)
+						powered = true;
 				}
 			}
 		}
 
 		if (!powered)
-			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
-					container.zCoord);
+			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
 
 		if (lastPowered != powered) {
 			for (TileGenericPipe pipe : neighbours) {
@@ -110,14 +111,15 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 	@Override
 	public void onNeighborBlockChange(int blockId) {
 		super.onNeighborBlockChange(blockId);
-		// updateRedstoneCurrent();
+		//updateRedstoneCurrent();
 	}
-
+	
 	@SuppressWarnings("unused")
-	private void useRedstoneAsPower() {
-		if (powered) mjStored++;
+	private void useRedstoneAsPower()
+	{
+		if(powered)	mjStored++;
 	}
-
+	
 	public boolean isPowered() {
 		return powered;
 	}
@@ -139,18 +141,19 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 	public void eventHandler(PipeEventItem.FindDest event) {
 		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
 		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
-
+		
 		List<ForgeDirection> result = event.destinations;
 
 		for (ForgeDirection o : result) {
-			TileEntity entity = container.getTile(o);
-			if (entity instanceof IPipeTile)
-				pipesList.add(o);
-			else
-				nonPipesList.add(o);
+				TileEntity entity = container.getTile(o);
+					if (entity instanceof IPipeTile)
+						pipesList.add(o);
+					else
+						nonPipesList.add(o);
 		}
 
-		if (!pipesList.isEmpty()) {
+		if (!pipesList.isEmpty())
+		{
 			result.clear();
 			result.addAll(pipesList);
 			return;
@@ -161,7 +164,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 	}
 
 	@Override
-	public void doWork(PowerHandler arg0) {}
+	public void doWork(PowerHandler arg0) {	}
 
 	@Override
 	public PowerReceiver getPowerReceiver(ForgeDirection arg0) {

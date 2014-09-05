@@ -24,8 +24,8 @@ import buildcraft.transport.TileGenericPipe;
 
 public class ContainerPipeFluidsDiamond extends BuildCraftContainer {
 
-	public final PipeFluidsDistribution	pipe;
-	private final Fluid[]				fluids	= new Fluid[6 * 9];
+	public final PipeFluidsDistribution pipe;
+	private final Fluid[] fluids = new Fluid[6 * 9];
 
 	public ContainerPipeFluidsDiamond(InventoryPlayer inventory, TileGenericPipe tile) {
 		super(0);
@@ -45,8 +45,7 @@ public class ContainerPipeFluidsDiamond extends BuildCraftContainer {
 		for (Object crafter : crafters) {
 			for (int i = 0; i < fluids.length; ++i) {
 				if (fluids[i] != pipe.fluids[i]) {
-					((ICrafting) crafter).sendProgressBarUpdate(this, i,
-							pipe.fluids[i] != null ? pipe.fluids[i].getID() : 0);
+					((ICrafting) crafter).sendProgressBarUpdate(this, i, pipe.fluids[i] != null ? pipe.fluids[i].getID() : 0);
 					fluids[i] = pipe.fluids[i];
 				}
 			}

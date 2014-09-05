@@ -28,7 +28,7 @@ import buildcraft.transport.pipes.events.PipeEventItem;
  * 
  */
 public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> {
-	private int	lastOrientation	= 0;
+	private int lastOrientation = 0;
 
 	public PipeItemsRoundRobin(Item itemID) {
 		super(new PipeTransportItems(), itemID);
@@ -55,7 +55,7 @@ public class PipeItemsRoundRobin extends ABOPipe<PipeTransportItems> {
 
 	public void eventHandler(PipeEventItem.FindDest event) {
 		List<ForgeDirection> result = event.destinations;
-
+		
 		if (result.size() == 0) {
 			return;
 		} else {

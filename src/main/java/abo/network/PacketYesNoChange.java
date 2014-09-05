@@ -19,16 +19,16 @@ import buildcraft.transport.TileGenericPipe;
 
 public class PacketYesNoChange extends ABOPacket {
 
-	private int		slot;
-	private boolean	state;
+	private int slot;
+	private boolean state;
 
 	public PacketYesNoChange(int xCoord, int yCoord, int zCoord, int slot, boolean state) {
 		super(ABOPacketIds.YesNoChange, xCoord, yCoord, zCoord);
 		this.slot = slot;
 		this.state = state;
 	}
-
-	public PacketYesNoChange() {}
+	
+	public PacketYesNoChange(){}
 
 	@Override
 	public void writeData(ByteBuf data) {
@@ -48,9 +48,11 @@ public class PacketYesNoChange extends ABOPacket {
 
 	public void update(EntityPlayer player) {
 		TileGenericPipe pipe = getPipe(player.worldObj, posX, posY, posZ);
-		if (pipe == null || pipe.pipe == null) return;
+		if (pipe == null || pipe.pipe == null)
+			return;
 
-		if (!(pipe.pipe instanceof IYesNoChange)) return;
+		if (!(pipe.pipe instanceof IYesNoChange))
+			return;
 
 		((IYesNoChange) pipe.pipe).update(slot, state);
 	}

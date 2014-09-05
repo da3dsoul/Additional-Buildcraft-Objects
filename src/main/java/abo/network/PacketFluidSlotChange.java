@@ -26,16 +26,16 @@ import buildcraft.transport.TileGenericPipe;
 
 public class PacketFluidSlotChange extends ABOPacket {
 
-	private byte	slot;
-	private Fluid	fluid;
+	private byte slot;
+	private Fluid fluid;
 
 	public PacketFluidSlotChange(int xCoord, int yCoord, int zCoord, int slot, Fluid fluid) {
 		super(ABOPacketIds.LiquidSlotChange, xCoord, yCoord, zCoord);
 		this.slot = (byte) slot;
 		this.fluid = fluid;
 	}
-
-	public PacketFluidSlotChange() {}
+	
+	public PacketFluidSlotChange(){}
 
 	@Override
 	public void writeData(ByteBuf data) {
@@ -77,39 +77,50 @@ public class PacketFluidSlotChange extends ABOPacket {
 				e.printStackTrace();
 			}
 
+			
 		}
 	}
+	
+	public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt, ByteBuf data) throws IOException
+    {
+        if (nbt == null)
+        {
+            data.writeShort(-1);
+        }
+        else
+        {
+            byte[] abyte = CompressedStreamTools.compress(nbt);
+            data.writeShort((short)abyte.length);
+            data.writeBytes(abyte);
+        }
+    }
 
-	public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt, ByteBuf data) throws IOException {
-		if (nbt == null) {
-			data.writeShort(-1);
-		} else {
-			byte[] abyte = CompressedStreamTools.compress(nbt);
-			data.writeShort((short) abyte.length);
-			data.writeBytes(abyte);
-		}
-	}
+    /**
+     * Reads a compressed NBTTagCompound from this buffer
+     */
+    public NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf data) throws IOException
+    {
+        short short1 = data.readShort();
 
-	/**
-	 * Reads a compressed NBTTagCompound from this buffer
-	 */
-	public NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf data) throws IOException {
-		short short1 = data.readShort();
-
-		if (short1 < 0) {
-			return null;
-		} else {
-			byte[] abyte = new byte[short1];
-			data.readBytes(abyte);
-			return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
-		}
-	}
+        if (short1 < 0)
+        {
+            return null;
+        }
+        else
+        {
+            byte[] abyte = new byte[short1];
+            data.readBytes(abyte);
+            return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
+        }
+    }
 
 	public void update(EntityPlayer player) {
 		TileGenericPipe pipe = getPipe(player.worldObj, posX, posY, posZ);
-		if (pipe == null || pipe.pipe == null) return;
+		if (pipe == null || pipe.pipe == null)
+			return;
 
-		if (!(pipe.pipe instanceof IFluidSlotChange)) return;
+		if (!(pipe.pipe instanceof IFluidSlotChange))
+			return;
 
 		((IFluidSlotChange) pipe.pipe).update(slot, fluid);
 	}

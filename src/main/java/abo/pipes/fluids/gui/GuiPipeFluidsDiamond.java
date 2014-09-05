@@ -35,16 +35,15 @@ import buildcraft.core.render.FluidRenderer;
 import buildcraft.transport.TileGenericPipe;
 
 public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
-	private static final ResourceLocation		TEXTURE		= new ResourceLocation("additional-buildcraft-objects",
-																	"textures/gui/pipeLiquidsDiamond.png");
+	private static final ResourceLocation TEXTURE = new ResourceLocation("additional-buildcraft-objects", "textures/gui/pipeLiquidsDiamond.png");
 
-	private final ContainerPipeFluidsDiamond	container;
-	private final HashMap<String, Fluid>		fluids		= new HashMap<String, Fluid>();
-	private final LinkedList<String>			fluidsList	= new LinkedList<String>();
+	private final ContainerPipeFluidsDiamond container;
+	private final HashMap<String, Fluid> fluids = new HashMap<String, Fluid>();
+	private final LinkedList<String> fluidsList = new LinkedList<String>();
 
 	public class FluidSlot extends AdvancedSlot {
-		public Fluid		fluid;
-		public final int	nr;
+		public Fluid fluid;
+		public final int nr;
 
 		public FluidSlot(GuiAdvancedInterface gui, int nr, int x, int y) {
 			super(gui, x, y);
@@ -53,7 +52,8 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 
 		@Override
 		public void drawSprite(int cornerX, int cornerY) {
-			if (fluid != null) FluidRenderer.setColorForFluidStack(new FluidStack(fluid, 100));
+			if (fluid != null)
+				FluidRenderer.setColorForFluidStack(new FluidStack(fluid, 100));
 			super.drawSprite(cornerX, cornerY);
 		}
 
@@ -127,7 +127,8 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 
 		AdvancedSlot slot = null;
 
-		if (position < 0) return;
+		if (position < 0)
+			return;
 
 		slot = slots[position];
 
@@ -137,8 +138,7 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 			// left/right mouse button
 			if (mouseB == 0 || mouseB == 1) {
 				// advance to next/prev liquid
-				for (Iterator<String> key = (mouseB == 0 ? fluidsList.iterator() : fluidsList.descendingIterator()); key
-						.hasNext();) {
+				for (Iterator<String> key = (mouseB == 0 ? fluidsList.iterator() : fluidsList.descendingIterator()); key.hasNext();) {
 					if (fluidSlot.fluid == null || key.next() == fluidSlot.fluid.getName()) {
 						if (!key.hasNext())
 							key = (mouseB == 0 ? fluidsList.iterator() : fluidsList.descendingIterator());
@@ -156,8 +156,8 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 			container.detectAndSendChanges();
 
 			if (container.pipe.container.getWorldObj().isRemote) {
-				PacketFluidSlotChange packet = new PacketFluidSlotChange(container.pipe.container.xCoord,
-						container.pipe.container.yCoord, container.pipe.container.zCoord, fluidSlot.nr, fluidSlot.fluid);
+				PacketFluidSlotChange packet = new PacketFluidSlotChange(container.pipe.container.xCoord, container.pipe.container.yCoord, container.pipe.container.zCoord, fluidSlot.nr,
+						fluidSlot.fluid);
 				ABOProxy.proxy.sendToServer(packet);
 			}
 		}
