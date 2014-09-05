@@ -71,19 +71,19 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 			return true;
 		}
 	}
-	
+
 	public void eventHandler(PipeEventItem.FindDest event) {
 		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
 		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
-		
+
 		List<ForgeDirection> result = event.destinations;
 		TravelingItem item = event.item;
 
 		result.clear();
-		
+
 		EnumSet<ForgeDirection> sides = EnumSet.complementOf(item.blacklist);
 		sides.remove(ForgeDirection.UNKNOWN);
-		
+
 		for (ForgeDirection o : sides) {
 			if (outputOpen(o) && canReceivePipeObjects(o, item)) {
 				result.add(o);
@@ -91,15 +91,14 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 		}
 
 		for (ForgeDirection o : result) {
-				TileEntity entity = container.getTile(o);
-					if (entity instanceof IPipeTile)
-						pipesList.add(o);
-					else
-						nonPipesList.add(o);
+			TileEntity entity = container.getTile(o);
+			if (entity instanceof IPipeTile)
+				pipesList.add(o);
+			else
+				nonPipesList.add(o);
 		}
 
-		if (!nonPipesList.isEmpty())
-		{
+		if (!nonPipesList.isEmpty()) {
 			result.clear();
 			result.addAll(nonPipesList);
 			return;
@@ -133,28 +132,22 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 			}
 		}
 	}
-	
+
 	private boolean canReceivePipeObjects(ForgeDirection o, TravelingItem item) {
 		TileEntity entity = container.getTile(o);
 
-		if (!container.isPipeConnected(o)) {
-			return false;
-		}
+		if (!container.isPipeConnected(o)) { return false; }
 
 		if (entity instanceof TileGenericPipe) {
 			TileGenericPipe pipe = (TileGenericPipe) entity;
 
 			return pipe.pipe.transport instanceof PipeTransportItems;
 		} else if (entity instanceof IInventory && item.getInsertionHandler().canInsertItem(item, (IInventory) entity)) {
-			if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) {
-				return true;
-			}
+			if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
 		} else if (entity instanceof TileEntityEnderChest) {
-			if (new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance
-					.getInventoryEnderChest())).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) {
-				return true;
-			}
-	}
+			if (new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance.getInventoryEnderChest())).add(
+					item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
+		}
 
 		return false;
 	}

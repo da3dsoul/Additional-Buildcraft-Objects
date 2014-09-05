@@ -47,52 +47,46 @@ public class ItemGateSettingsDuplicator extends ABOItem {
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack itemStack, EntityPlayer entityPlayer, World worldObj, int x, int y, int z, int side, float var8, float var9, float var10) {
+	public boolean onItemUseFirst(ItemStack itemStack, EntityPlayer entityPlayer, World worldObj, int x, int y, int z,
+			int side, float var8, float var9, float var10) {
 		if (worldObj.isRemote)
 			return super.onItemUseFirst(itemStack, entityPlayer, worldObj, x, y, z, side, var8, var9, var10);
 
 		Pipe pipe = BlockGenericPipe.getPipe(worldObj, x, y, z);
-		
-		if(BlockGenericPipe.isValid(pipe))
-		{
-			if(pipe.hasGate())
-			{
-				if(itemStack.hasTagCompound())
-				{
-					if(areGatesEqual(itemStack, pipe.gate))
-					{
+
+		if (BlockGenericPipe.isValid(pipe)) {
+			if (pipe.hasGate()) {
+				if (itemStack.hasTagCompound()) {
+					if (areGatesEqual(itemStack, pipe.gate)) {
 						pasteSettings(itemStack, pipe.gate);
 						return true;
 					}
-				}else
-				{
+				} else {
 					itemStack.setTagCompound(copySettings(pipe.gate));
 					return true;
 				}
 			}
-		}else if(worldObj.getBlock(x, y, z) == Blocks.redstone_block)
-		{
+		} else if (worldObj.getBlock(x, y, z) == Blocks.redstone_block) {
 			itemStack.stackTagCompound = null;
 			return true;
 		}
 
 		return super.onItemUseFirst(itemStack, entityPlayer, worldObj, x, y, z, side, var8, var9, var10);
 	}
-	
-	private boolean areGatesEqual(ItemStack itemStack, Gate gate)
-	{
+
+	private boolean areGatesEqual(ItemStack itemStack, Gate gate) {
 		NBTTagCompound itemNBT = itemStack.getTagCompound();
 		NBTTagCompound nbt = itemNBT.getCompoundTag("GateIdentifier");
 		if (nbt.hasKey("material")) {
 			try {
-				if(gate.material != GateMaterial.valueOf(nbt.getString("material"))) return false;
+				if (gate.material != GateMaterial.valueOf(nbt.getString("material"))) return false;
 			} catch (IllegalArgumentException ex) {
 				return false;
 			}
 		}
 		if (nbt.hasKey("logic")) {
 			try {
-				if(gate.logic != GateLogic.valueOf(nbt.getString("logic"))) return false;
+				if (gate.logic != GateLogic.valueOf(nbt.getString("logic"))) return false;
 			} catch (IllegalArgumentException ex) {
 				return false;
 			}
@@ -108,12 +102,11 @@ public class ItemGateSettingsDuplicator extends ABOItem {
 				expansions.put(ex, con);
 			}
 		}
-		if(!gate.expansions.equals(expansions)) return false;
+		if (!gate.expansions.equals(expansions)) return false;
 		return true;
 	}
-	
-	private void pasteSettings(ItemStack itemStack, Gate gate)
-	{
+
+	private void pasteSettings(ItemStack itemStack, Gate gate) {
 		NBTTagCompound itemNBT = itemStack.getTagCompound();
 		NBTTagCompound data = itemNBT.getCompoundTag("GateSettings");
 		for (int i = 0; i < 8; ++i) {
@@ -129,9 +122,8 @@ public class ItemGateSettingsDuplicator extends ABOItem {
 			}
 		}
 	}
-	
-	private NBTTagCompound copySettings(Gate gate)
-	{
+
+	private NBTTagCompound copySettings(Gate gate) {
 		NBTTagCompound itemNBT = new NBTTagCompound();
 		NBTTagCompound gateIdentifier = new NBTTagCompound();
 		gateIdentifier.setString("material", gate.material.name());
@@ -147,7 +139,7 @@ public class ItemGateSettingsDuplicator extends ABOItem {
 		}
 		gateIdentifier.setTag("expansions", exList);
 		itemNBT.setTag("GateIdentifier", gateIdentifier);
-		
+
 		NBTTagCompound gateSettings = new NBTTagCompound();
 		for (int i = 0; i < 8; ++i) {
 			if (gate.triggers[i] != null) {

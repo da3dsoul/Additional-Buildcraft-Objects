@@ -24,15 +24,15 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 public class ItemIconProvider implements IIconProvider {
 
-	public static final int TriggerEngineSafe = 0;
-	public static final int ActionSwitchOnPipe = 1;
-	public static final int ActionToggleOnPipe = 2;
-	public static final int ActionToggleOffPipe = 3;
+	public static final int	TriggerEngineSafe	= 0;
+	public static final int	ActionSwitchOnPipe	= 1;
+	public static final int	ActionToggleOnPipe	= 2;
+	public static final int	ActionToggleOffPipe	= 3;
 
-	public static final int MAX = 4;
+	public static final int	MAX					= 4;
 
 	@SideOnly(Side.CLIENT)
-	private IIcon[] _icons;
+	private IIcon[]			_icons;
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -45,9 +45,13 @@ public class ItemIconProvider implements IIconProvider {
 	public void registerIcons(IIconRegister iconRegister) {
 		_icons = new IIcon[MAX];
 
-		_icons[TriggerEngineSafe] = iconRegister.registerIcon("additional-buildcraft-objects:triggers/TriggerEngineSafe");
-		_icons[ActionSwitchOnPipe] = iconRegister.registerIcon("additional-buildcraft-objects:actions/ActionSwitchOnPipe");
-		_icons[ActionToggleOnPipe] = iconRegister.registerIcon("additional-buildcraft-objects:actions/ActionToggleOnPipe");
-		_icons[ActionToggleOffPipe] = iconRegister.registerIcon("additional-buildcraft-objects:actions/ActionToggleOffPipe");
+		_icons[TriggerEngineSafe] = iconRegister
+				.registerIcon("additional-buildcraft-objects:triggers/TriggerEngineSafe");
+		_icons[ActionSwitchOnPipe] = iconRegister
+				.registerIcon("additional-buildcraft-objects:actions/ActionSwitchOnPipe");
+		_icons[ActionToggleOnPipe] = iconRegister
+				.registerIcon("additional-buildcraft-objects:actions/ActionToggleOnPipe");
+		_icons[ActionToggleOffPipe] = iconRegister
+				.registerIcon("additional-buildcraft-objects:actions/ActionToggleOffPipe");
 	}
 }

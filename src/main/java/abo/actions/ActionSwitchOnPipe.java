@@ -37,5 +37,4 @@ public class ActionSwitchOnPipe extends ABOAction {
 		return ItemIconProvider.ActionSwitchOnPipe;
 	}
 
-	
 }

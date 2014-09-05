@@ -24,27 +24,29 @@ import buildcraft.transport.pipes.PipeItemsEmerald.FilterMode;
 
 public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButtonClickEventListener {
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation("buildcraft", DefaultProps.TEXTURE_PATH_GUI + "/pipe_emerald.png");
+	private static final ResourceLocation	TEXTURE					= new ResourceLocation("buildcraft",
+																			DefaultProps.TEXTURE_PATH_GUI
+																					+ "/pipe_emerald.png");
 
-	private static final int WHITE_LIST_BUTTON_ID = 1;
-	private static final int BLACK_LIST_BUTTON_ID = 2;
-	private static final int ROUND_ROBIN_BUTTON_ID = 3;
+	private static final int				WHITE_LIST_BUTTON_ID	= 1;
+	private static final int				BLACK_LIST_BUTTON_ID	= 2;
+	private static final int				ROUND_ROBIN_BUTTON_ID	= 3;
 
-	private GuiImageButton whiteListButton;
-	private GuiImageButton blackListButton;
-	private GuiImageButton roundRobinButton;
+	private GuiImageButton					whiteListButton;
+	private GuiImageButton					blackListButton;
+	private GuiImageButton					roundRobinButton;
 
-	//private IInventory playerInventory;
-	//private IInventory filterInventory;
-	private PipeItemsEnderExtraction pipe;
+	// private IInventory playerInventory;
+	// private IInventory filterInventory;
+	private PipeItemsEnderExtraction		pipe;
 
 	public GuiPipeItemsEnderExtraction(IInventory playerInventory, PipeItemsEnderExtraction pipe) {
 		super(new ContainerPipeItemsEnderExtraction(playerInventory, pipe), pipe.getFilters(), TEXTURE);
 
 		this.pipe = pipe;
 
-		//this.playerInventory = playerInventory;
-		//this.filterInventory = pipe.getFilters();
+		// this.playerInventory = playerInventory;
+		// this.filterInventory = pipe.getFilters();
 
 		xSize = 175;
 		ySize = 161;
@@ -57,15 +59,18 @@ public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButto
 
 		this.buttonList.clear();
 
-		this.whiteListButton = new GuiImageButton(WHITE_LIST_BUTTON_ID, this.guiLeft + 7, this.guiTop + 41, GuiImageButton.ButtonImage.WHITE_LIST);
+		this.whiteListButton = new GuiImageButton(WHITE_LIST_BUTTON_ID, this.guiLeft + 7, this.guiTop + 41,
+				GuiImageButton.ButtonImage.WHITE_LIST);
 		this.whiteListButton.registerListener(this);
 		this.buttonList.add(this.whiteListButton);
 
-		this.blackListButton = new GuiImageButton(BLACK_LIST_BUTTON_ID, this.guiLeft + 7 + 18, this.guiTop + 41, GuiImageButton.ButtonImage.BLACK_LIST);
+		this.blackListButton = new GuiImageButton(BLACK_LIST_BUTTON_ID, this.guiLeft + 7 + 18, this.guiTop + 41,
+				GuiImageButton.ButtonImage.BLACK_LIST);
 		this.blackListButton.registerListener(this);
 		this.buttonList.add(this.blackListButton);
 
-		this.roundRobinButton = new GuiImageButton(ROUND_ROBIN_BUTTON_ID, this.guiLeft + 7 + 36, this.guiTop + 41, GuiImageButton.ButtonImage.ROUND_ROBIN);
+		this.roundRobinButton = new GuiImageButton(ROUND_ROBIN_BUTTON_ID, this.guiLeft + 7 + 36, this.guiTop + 41,
+				GuiImageButton.ButtonImage.ROUND_ROBIN);
 		this.roundRobinButton.registerListener(this);
 		this.buttonList.add(this.roundRobinButton);
 

@@ -1,7 +1,9 @@
 package abo.energy;
 
+import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 import buildcraft.api.mj.IBatteryObject;
@@ -12,32 +14,36 @@ import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
+import buildcraft.transport.TileGenericPipe;
 
 public class TileWindmill extends TileEngine {
 
-	static final float MAX_OUTPUT = 1.5f;
-	static final float MIN_OUTPUT = MAX_OUTPUT / 3;
-	public float TARGET_OUTPUT = 0.1f;
-	private float BIOME_OUTPUT = 0.175f;
-	private float HEIGHT_OUTPUT = 0f;
-	//final float kp = 1f;
-	//final float ki = 0.05f;
-	//final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
-	int burnTime = 0;
-	int totalBurnTime = 0;
-	//double esum = 0;
+	static final float						MAX_OUTPUT				= 1.5f;
+	static final float						MIN_OUTPUT				= MAX_OUTPUT / 3;
+	public float							TARGET_OUTPUT			= 0.1f;
+	private float							BIOME_OUTPUT			= 0.175f;
+	private float							HEIGHT_OUTPUT			= 0f;
+	// final float kp = 1f;
+	// final float ki = 0.05f;
+	// final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
+	int										burnTime				= 0;
+	int										totalBurnTime			= 0;
+	// double esum = 0;
 
-	int tickCount = 0;
+	int										tickCount				= 0;
 
-	private boolean checkOrienation = false;
+	private boolean							checkOrientation			= false;
 
-	public static final ResourceLocation TRUNK_BLUE_TEXTURE = new ResourceLocation("additional-buildcraft-objects:textures/blocks/trunk_blue.png");
-	public static final ResourceLocation TRUNK_GREEN_TEXTURE = new ResourceLocation("additional-buildcraft-objects:textures/blocks/trunk_green.png");
-	public static final ResourceLocation TRUNK_YELLOW_TEXTURE = new ResourceLocation("additional-buildcraft-objects:textures/blocks/trunk_yellow.png");
-	public static final ResourceLocation TRUNK_RED_TEXTURE = new ResourceLocation("additional-buildcraft-objects:textures/blocks/trunk_red.png");
+	public static final ResourceLocation	TRUNK_BLUE_TEXTURE		= new ResourceLocation(
+																			"additional-buildcraft-objects:textures/blocks/trunk_blue.png");
+	public static final ResourceLocation	TRUNK_GREEN_TEXTURE		= new ResourceLocation(
+																			"additional-buildcraft-objects:textures/blocks/trunk_green.png");
+	public static final ResourceLocation	TRUNK_YELLOW_TEXTURE	= new ResourceLocation(
+																			"additional-buildcraft-objects:textures/blocks/trunk_yellow.png");
+	public static final ResourceLocation	TRUNK_RED_TEXTURE		= new ResourceLocation(
+																			"additional-buildcraft-objects:textures/blocks/trunk_red.png");
 
-	public TileWindmill()
-	{
+	public TileWindmill() {
 		super();
 	}
 
@@ -51,12 +57,11 @@ public class TileWindmill extends TileEngine {
 		return CHAMBER_TEXTURES[0];
 	}
 
-
-
 	@Override
 	public void initialize() {
 		super.initialize();
 		updateTargetOutputFirst();
+		checkOrientation = true;
 	}
 
 	@Override
@@ -85,23 +90,21 @@ public class TileWindmill extends TileEngine {
 		return currentOutput + (TARGET_OUTPUT - currentOutput) / 200;
 	}
 
-	private void updateTargetOutput()
-	{
-		if(isRedstonePowered)
-		{
-			TARGET_OUTPUT = (float) 0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f) + (getWorldObj().rainingStrength / 8f);
+	private void updateTargetOutput() {
+		if (isRedstonePowered) {
+			TARGET_OUTPUT = (float) 0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f)
+					+ (getWorldObj().rainingStrength / 8f);
+		} else {
+			TARGET_OUTPUT = 0;
 		}
 	}
 
-	private void updateTargetOutputFirst()
-	{
+	private void updateTargetOutputFirst() {
 		BiomeGenBase biome = getWorldObj().getBiomeGenForCoords(xCoord, zCoord);
-		if(Math.round(biome.heightVariation + 0.2f) == 1.0f)
-		{
+		if (Math.round(biome.heightVariation + 0.2f) == 1.0f) {
 			BIOME_OUTPUT = 0.0f;
 			HEIGHT_OUTPUT = (float) MathUtils.clamp((yCoord - 58) / 66f, 0f, 1.2f);
-		}else
-		{
+		} else {
 			BIOME_OUTPUT = (float) MathUtils.clamp(1.2f - biome.heightVariation, 0f, 1.2f);
 			float distFrom64Mod = (float) (0.2f * (-0.00077160494 * yCoord * yCoord + 0.10185 * yCoord - 2.36111111));
 			HEIGHT_OUTPUT = (float) MathUtils.clamp(distFrom64Mod, 0f, 0.2f);
@@ -131,19 +134,19 @@ public class TileWindmill extends TileEngine {
 		super.updateEntity();
 
 		if (worldObj.isRemote) {
-			progress += getPistonSpeed();
+
+			if (currentOutput != 0) progress += getPistonSpeed();
 
 			if (progress > 1) {
 				progressPart = 0;
 				progress = 0;
 			}
 
-
 			return;
 		}
 
-		if (checkOrienation) {
-			checkOrienation = false;
+		if (checkOrientation) {
+			checkOrientation = false;
 
 			if (!isOrientationValid()) {
 				switchOrientation(true);
@@ -162,12 +165,12 @@ public class TileWindmill extends TileEngine {
 
 		TileEntity tile = getTileBuffer(orientation).getTile();
 
-
-		progress += getPistonSpeed();
+		if (currentOutput != 0) progress += getPistonSpeed();
 
 		if (progress > 0.5 && progressPart == 1) {
 			progressPart = 2;
-			if(progressPart != 0) sendPower(); // Comment out for constant power
+			if (progressPart != 0) sendPower(); // Comment out for constant
+												// power
 		} else if (progress >= 1) {
 			progress = 0;
 			progressPart = 0;
@@ -189,9 +192,9 @@ public class TileWindmill extends TileEngine {
 		}
 
 		// Uncomment for constant power
-		//		if (isRedstonePowered && isActive()) {
-		//			sendPower();
-		//		} else currentOutput = 0;
+		// if (isRedstonePowered && isActive()) {
+		// sendPower();
+		// } else currentOutput = 0;
 
 		burn();
 	}
@@ -204,15 +207,12 @@ public class TileWindmill extends TileEngine {
 			IBatteryObject battery = MjAPI.getMjBattery(tile, MjAPI.DEFAULT_POWER_FRAMEWORK, orientation.getOpposite());
 
 			if (battery != null) {
-				battery.addEnergy(extractEnergy(0, battery.maxReceivedPerCycle(),
-						true));
+				battery.addEnergy(extractEnergy(0, battery.maxReceivedPerCycle(), true));
 			} else if (tile instanceof IPowerReceptor) {
-				PowerReceiver receptor = ((IPowerReceptor) tile)
-						.getPowerReceiver(orientation.getOpposite());
+				PowerReceiver receptor = ((IPowerReceptor) tile).getPowerReceiver(orientation.getOpposite());
 
 				if (extracted > 0) {
-					double needed = receptor.receiveEnergy(
-							PowerHandler.Type.ENGINE, extracted,
+					double needed = receptor.receiveEnergy(PowerHandler.Type.ENGINE, extracted,
 							orientation.getOpposite());
 
 					extractEnergy(receptor.getMinEnergyReceived(), needed, true);
@@ -229,33 +229,31 @@ public class TileWindmill extends TileEngine {
 		if (battery != null) {
 			return extractEnergy(0, battery.getEnergyRequested(), false);
 		} else if (tile instanceof IPowerReceptor) {
-			PowerReceiver receptor = ((IPowerReceptor) tile)
-					.getPowerReceiver(orientation.getOpposite());
+			PowerReceiver receptor = ((IPowerReceptor) tile).getPowerReceiver(orientation.getOpposite());
 
-			return extractEnergy(receptor.getMinEnergyReceived(),
-					receptor.getMaxEnergyReceived(), false);
+			return extractEnergy(receptor.getMinEnergyReceived(), receptor.getMaxEnergyReceived(), false);
 		} else {
 			return 0;
 		}
 	}
 
-	private boolean canGetWind()
-	{
-		for(int i = -1; i < 2; i++)
-		{
-			for(int j = -2; j <= 2; j++)
-			{
-				for(int k = -2; k <= 2; k++)
-				{
-					if(getWorldObj().getBlock(xCoord + j, yCoord + i, zCoord + k).isOpaqueCube()) return false;
+	private boolean canGetWind() {
+		for (int i = -1; i < 2; i++) {
+			for (int j = -2; j <= 2; j++) {
+				for (int k = -2; k <= 2; k++) {
+					if (getWorldObj().getBlock(xCoord + j, yCoord + i, zCoord + k).isOpaqueCube()) return false;
 				}
 			}
 		}
 		return true;
 	}
+	
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		checkOrientation = true;
+	}
 
 	public boolean isOrientationValid() {
-		if(orientation == ForgeDirection.EAST) return false;
+		if (orientation == ForgeDirection.EAST) return false;
 		TileEntity tile = getTileBuffer(orientation).getTile();
 
 		return isPoweredTile(tile, orientation);
@@ -272,13 +270,22 @@ public class TileWindmill extends TileEngine {
 	private boolean switchOrientationDo(boolean pipesOnly) {
 		for (int i = orientation.ordinal() + 1; i <= orientation.ordinal() + 6; ++i) {
 			ForgeDirection o = ForgeDirection.VALID_DIRECTIONS[i % 6];
-			if(o == ForgeDirection.EAST) continue;
+			if (o == ForgeDirection.EAST) continue;
 			TileEntity tile = getTileBuffer(o).getTile();
 
 			if ((!pipesOnly || tile instanceof IPipeTile) && isPoweredTile(tile, o)) {
 				orientation = o;
 				getWorldObj().markBlockForUpdate(xCoord, yCoord, zCoord);
-				getWorldObj().notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, worldObj.getBlock(xCoord, yCoord, zCoord));
+				getWorldObj().notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord,
+						worldObj.getBlock(xCoord, yCoord, zCoord));
+				getWorldObj().notifyBlocksOfNeighborChange(xCoord + o.offsetX, yCoord + o.offsetY, zCoord + o.offsetZ,
+						worldObj.getBlock(xCoord, yCoord, zCoord));
+
+				if(tile instanceof TileGenericPipe)
+				{
+					((TileGenericPipe)tile).scheduleNeighborChange();
+					((TileGenericPipe)tile).updateEntity();
+				}
 
 				return true;
 			}
@@ -296,18 +303,21 @@ public class TileWindmill extends TileEngine {
 			currentOutput = output; // Comment out for constant power
 			addEnergy(output);
 		}
+		
+		if(tickCount % 60 == 0)
+		{
+			checkRedstonePower();
+		}
 
 		if (burnTime == 0 && isRedstonePowered) {
 			burnTime = totalBurnTime = 1200;
 			updateTargetOutput();
-		}else
-		{
-			if(tickCount >= 1198)
-			{
+		} else {
+			if (tickCount >= 1198) {
 				updateTargetOutput();
+
 				tickCount = 0;
-			}else
-			{
+			} else {
 				tickCount++;
 			}
 
@@ -319,22 +329,17 @@ public class TileWindmill extends TileEngine {
 		return (int) (((float) burnTime / (float) totalBurnTime) * i);
 	}
 
-	/*@Override
-	public void engineUpdate() {
-		super.engineUpdate();
-
-		if (isRedstonePowered) {
-			double output = getCurrentOutput();
-			currentOutput = output; // Comment out for constant power
-			addEnergy(output);
-		}
-	}*/
+	/*
+	 * @Override public void engineUpdate() { super.engineUpdate();
+	 * 
+	 * if (isRedstonePowered) { double output = getCurrentOutput();
+	 * currentOutput = output; // Comment out for constant power
+	 * addEnergy(output); } }
+	 */
 
 	@Override
 	public float explosionRange() {
 		return 1;
 	}
-
-
 
 }
