@@ -10,17 +10,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-public class EntityThrownBottle extends EntityPotion
-{
-	ItemStack itemstack = null;
-	public EntityThrownBottle(World par1World, ItemStack itemstack)
-	{
+public class EntityThrownBottle extends EntityPotion {
+	ItemStack	itemstack	= null;
+
+	public EntityThrownBottle(World par1World, ItemStack itemstack) {
 		super(par1World);
 		this.itemstack = itemstack;
 	}
 
-	public EntityThrownBottle(World par1World, EntityLivingBase par2EntityLivingBase, ItemStack itemstack)
-	{
+	public EntityThrownBottle(World par1World, EntityLivingBase par2EntityLivingBase, ItemStack itemstack) {
 		super(par1World, par2EntityLivingBase, 0);
 		this.itemstack = itemstack;
 	}
@@ -28,21 +26,17 @@ public class EntityThrownBottle extends EntityPotion
 	/**
 	 * Called when this EntityThrowable hits a block or entity.
 	 */
-	protected void onImpact(MovingObjectPosition par1MovingObjectPosition)
-	{
-		if (par1MovingObjectPosition.entityHit != null)
-		{
+	protected void onImpact(MovingObjectPosition par1MovingObjectPosition) {
+		if (par1MovingObjectPosition.entityHit != null) {
 
-			if(!(par1MovingObjectPosition.entityHit instanceof EntityPlayer))
-			{
-				if (!ItemBottle.hasCaptured(itemstack) && itemstack.stackSize == 1)
-				{
-					itemstack = ItemBottle.capture(itemstack, this, par1MovingObjectPosition.entityHit);					
+			if (!(par1MovingObjectPosition.entityHit instanceof EntityPlayer)) {
+				if (!ItemBottle.hasCaptured(itemstack) && itemstack.stackSize == 1) {
+					itemstack = ItemBottle.capture(itemstack, this, par1MovingObjectPosition.entityHit);
 				}
 			}
-		}else if(ItemBottle.hasCaptured(itemstack))
-		{
-			//NBTTagCompound mob = itemstack.stackTagCompound.getCompoundTag("mob");
+		} else if (ItemBottle.hasCaptured(itemstack)) {
+			// NBTTagCompound mob =
+			// itemstack.stackTagCompound.getCompoundTag("mob");
 			int i = par1MovingObjectPosition.blockX;
 			int j = par1MovingObjectPosition.blockY;
 			int k = par1MovingObjectPosition.blockZ;
@@ -51,64 +45,52 @@ public class EntityThrownBottle extends EntityPotion
 		}
 		drop();
 	}
-	
-	private void drop()
-	{
+
+	private void drop() {
 		EntityItem item = new EntityItem(worldObj, posX, posY, posZ, itemstack);
 		item.motionX = -motionX * 0.5D;
 		item.motionZ = -motionZ * 0.5D;
 		item.motionY = -motionY * 0.5D;
 		if (!worldObj.isRemote) worldObj.spawnEntityInWorld(item);
-		if (!this.worldObj.isRemote)
-		{
+		if (!this.worldObj.isRemote) {
 			this.setDead();
 		}
 	}
-	
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-    {
-        super.readEntityFromNBT(par1NBTTagCompound);
 
-        if (par1NBTTagCompound.hasKey("Potion"))
-        {
-            this.itemstack = ItemStack.loadItemStackFromNBT(par1NBTTagCompound.getCompoundTag("Potion"));
-        }
-        else
-        {
-            this.setPotionDamage(par1NBTTagCompound.getInteger("potionValue"));
-        }
+	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+		super.readEntityFromNBT(par1NBTTagCompound);
 
-        if (this.itemstack == null)
-        {
-            this.setDead();
-        }
-    }
-	
-    protected float func_70182_d()
-    {
-        return 1.5F;
-    }
+		if (par1NBTTagCompound.hasKey("Potion")) {
+			this.itemstack = ItemStack.loadItemStackFromNBT(par1NBTTagCompound.getCompoundTag("Potion"));
+		} else {
+			this.setPotionDamage(par1NBTTagCompound.getInteger("potionValue"));
+		}
 
-    protected float func_70183_g()
-    {
-        return 0.0F;
-    }
-    
-    protected float getGravityVelocity()
-    {
-        return 0.03F;
-    }
+		if (this.itemstack == null) {
+			this.setDead();
+		}
+	}
 
-    /**
-     * (abstract) Protected helper method to write subclass entity data to NBT.
-     */
-    public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-    {
-        super.writeEntityToNBT(par1NBTTagCompound);
+	protected float func_70182_d() {
+		return 1.5F;
+	}
 
-        if (this.itemstack != null)
-        {
-            par1NBTTagCompound.setTag("Potion", this.itemstack.writeToNBT(new NBTTagCompound()));
-        }
-    }
+	protected float func_70183_g() {
+		return 0.0F;
+	}
+
+	protected float getGravityVelocity() {
+		return 0.03F;
+	}
+
+	/**
+	 * (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+		super.writeEntityToNBT(par1NBTTagCompound);
+
+		if (this.itemstack != null) {
+			par1NBTTagCompound.setTag("Potion", this.itemstack.writeToNBT(new NBTTagCompound()));
+		}
+	}
 }

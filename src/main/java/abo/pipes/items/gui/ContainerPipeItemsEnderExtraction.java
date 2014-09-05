@@ -18,14 +18,14 @@ import buildcraft.core.gui.slots.SlotPhantom;
 
 public class ContainerPipeItemsEnderExtraction extends BuildCraftContainer {
 
-	private final PipeItemsEnderExtraction pipe;
-	//private final IInventory playerInv;
-	private final IInventory filterInv;
+	private final PipeItemsEnderExtraction	pipe;
+	// private final IInventory playerInv;
+	private final IInventory				filterInv;
 
 	public ContainerPipeItemsEnderExtraction(IInventory playerInventory, PipeItemsEnderExtraction pipe) {
 		super(pipe.getFilters().getSizeInventory());
 		this.pipe = pipe;
-		//this.playerInv = playerInventory;
+		// this.playerInv = playerInventory;
 		this.filterInv = pipe.getFilters();
 
 		for (int i = 0; i < 9; i++) {

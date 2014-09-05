@@ -59,8 +59,7 @@ public class TriggerEngineSafe extends ABOTrigger implements IPipeTrigger {
 
 			TileEntity entity = pipe.container.getTile(o);
 			if (entity instanceof TileEngine) {
-				if (!checkEngine(entity))
-					result = false;
+				if (!checkEngine(entity)) result = false;
 			}
 		}
 

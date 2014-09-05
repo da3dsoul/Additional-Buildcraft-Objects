@@ -31,59 +31,53 @@ public class ABOGuiHandler implements IGuiHandler {
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (!world.blockExists(x, y, z))
-			return null;
+		if (!world.blockExists(x, y, z)) return null;
 
 		TileEntity tile = world.getTileEntity(x, y, z);
-		if (!(tile instanceof TileGenericPipe))
-			return null;
+		if (!(tile instanceof TileGenericPipe)) return null;
 
 		TileGenericPipe pipe = (TileGenericPipe) tile;
 
-		if (pipe.pipe == null)
-			return null;
+		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-		case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
-			return new ContainerPipeFluidsDiamond(player.inventory, pipe);
+			case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
+				return new ContainerPipeFluidsDiamond(player.inventory, pipe);
 
-		case ABOGuiIds.PIPE_DIAMOND_POWER:
-			return new ContainerPipePowerDiamond(player.inventory, pipe);
-			
-		case ABOGuiIds.PIPE_ENDER_EXTRACTION:
-			return new ContainerPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);
+			case ABOGuiIds.PIPE_DIAMOND_POWER:
+				return new ContainerPipePowerDiamond(player.inventory, pipe);
 
-		default:
-			return null;
+			case ABOGuiIds.PIPE_ENDER_EXTRACTION:
+				return new ContainerPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);
+
+			default:
+				return null;
 		}
 	}
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if (!world.blockExists(x, y, z))
-			return null;
+		if (!world.blockExists(x, y, z)) return null;
 
 		TileEntity tile = world.getTileEntity(x, y, z);
-		if (!(tile instanceof TileGenericPipe))
-			return null;
+		if (!(tile instanceof TileGenericPipe)) return null;
 
 		TileGenericPipe pipe = (TileGenericPipe) tile;
 
-		if (pipe.pipe == null)
-			return null;
+		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-		case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
-			return new GuiPipeFluidsDiamond(player.inventory, pipe);
+			case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
+				return new GuiPipeFluidsDiamond(player.inventory, pipe);
 
-		case ABOGuiIds.PIPE_DIAMOND_POWER:
-			return new GuiPipePowerDiamond(player.inventory, pipe);
-			
-		case ABOGuiIds.PIPE_ENDER_EXTRACTION:
-			return new GuiPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);
+			case ABOGuiIds.PIPE_DIAMOND_POWER:
+				return new GuiPipePowerDiamond(player.inventory, pipe);
 
-		default:
-			return null;
+			case ABOGuiIds.PIPE_ENDER_EXTRACTION:
+				return new GuiPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);
+
+			default:
+				return null;
 		}
 	}
 }

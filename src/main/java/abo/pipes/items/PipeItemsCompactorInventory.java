@@ -12,8 +12,8 @@ import buildcraft.core.inventory.InvUtils;
 public class PipeItemsCompactorInventory {
 	private class InventorySlot {
 		@SuppressWarnings("deprecation")
-		private final SafeTimeTracker timeTracker = new SafeTimeTracker();
-		private final ItemStack itemStack;
+		private final SafeTimeTracker	timeTracker	= new SafeTimeTracker();
+		private final ItemStack			itemStack;
 
 		InventorySlot(World worldObj, ItemStack stack) {
 			itemStack = stack;
@@ -21,14 +21,12 @@ public class PipeItemsCompactorInventory {
 		}
 
 		public void markModifed(World worldObj) {
-			if (worldObj != null)
-				timeTracker.markTime(worldObj);
+			if (worldObj != null) timeTracker.markTime(worldObj);
 		}
 
 		@SuppressWarnings("deprecation")
 		public boolean isNotModifiedSince(World worldObj, int unchangedSince) {
-			if (worldObj != null)
-				return timeTracker.markTimeIfDelay(worldObj, unchangedSince);
+			if (worldObj != null) return timeTracker.markTimeIfDelay(worldObj, unchangedSince);
 
 			return true;
 		}
@@ -51,7 +49,8 @@ public class PipeItemsCompactorInventory {
 					markModifed(worldObj);
 					return null;
 				} else {
-					// no, fill up existing stack and reduce stacksize of other one
+					// no, fill up existing stack and reduce stacksize of other
+					// one
 					itemStack.stackSize = stack.getMaxStackSize();
 					stack.stackSize = stackSize - stack.getMaxStackSize();
 					markModifed(worldObj);
@@ -61,15 +60,14 @@ public class PipeItemsCompactorInventory {
 		}
 	};
 
-	private final LinkedList<InventorySlot> inventoryContents = new LinkedList<InventorySlot>();
+	private final LinkedList<InventorySlot>	inventoryContents	= new LinkedList<InventorySlot>();
 
 	/**
 	 * creates the inventory
 	 * 
 	 * @param world
 	 */
-	public PipeItemsCompactorInventory() {
-	}
+	public PipeItemsCompactorInventory() {}
 
 	/**
 	 * adds an itemstack to the list
@@ -87,8 +85,7 @@ public class PipeItemsCompactorInventory {
 		// find same item
 		for (InventorySlot slot : inventoryContents) {
 			stack = slot.appendToStack(worldObj, stack);
-			if (stack == null)
-				return;
+			if (stack == null) return;
 		}
 
 		inventoryContents.add(new InventorySlot(worldObj, stack));
@@ -109,8 +106,9 @@ public class PipeItemsCompactorInventory {
 	}
 
 	/**
-	 * finds a stack in the list which fulfills on of these criteria: - stackSize is larger than stackSize - has not been changed since unchangedSince ticks -
-	 * stack is full or not stackable
+	 * finds a stack in the list which fulfills on of these criteria: -
+	 * stackSize is larger than stackSize - has not been changed since
+	 * unchangedSince ticks - stack is full or not stackable
 	 * 
 	 * @param stackSize
 	 * @param unchangedSince
@@ -120,7 +118,8 @@ public class PipeItemsCompactorInventory {
 		for (Iterator<InventorySlot> inventorySlots = inventoryContents.iterator(); inventorySlots.hasNext();) {
 			InventorySlot inventorySlot = inventorySlots.next();
 
-			if (inventorySlot.getItemStack().stackSize >= stackSize || inventorySlot.isItemStackFull() || inventorySlot.isNotModifiedSince(worldObj, unchangedSince)) {
+			if (inventorySlot.getItemStack().stackSize >= stackSize || inventorySlot.isItemStackFull()
+					|| inventorySlot.isNotModifiedSince(worldObj, unchangedSince)) {
 				inventorySlots.remove();
 				return inventorySlot.getItemStack();
 			}

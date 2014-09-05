@@ -26,7 +26,6 @@ import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
-import buildcraft.api.core.Position;
 import buildcraft.api.gates.IAction;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.IPipeTransportPowerHook;
@@ -40,11 +39,11 @@ import buildcraft.transport.TileGenericPipe;
  * 
  */
 public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook, ISolidSideTile {
-	private final int unpoweredTexture = PipeIcons.PipePowerSwitchUnpowered.ordinal();
-	private final int poweredTexture = PipeIcons.PipePowerSwitchPowered.ordinal();
-	private boolean powered;
-	private boolean switched;
-	private boolean toggled;
+	private final int	unpoweredTexture	= PipeIcons.PipePowerSwitchUnpowered.ordinal();
+	private final int	poweredTexture		= PipeIcons.PipePowerSwitchPowered.ordinal();
+	private boolean		powered;
+	private boolean		switched;
+	private boolean		toggled;
 
 	@SuppressWarnings("unchecked")
 	public PipePowerSwitch(Item itemID) {
@@ -76,8 +75,8 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 
 		powered = false;
 		for (ForgeDirection o : ForgeDirection.VALID_DIRECTIONS) {
-			Position pos = new Position(container.xCoord, container.yCoord, container.zCoord, o);
-			pos.moveForwards(1.0);
+			//Position pos = new Position(container.xCoord, container.yCoord, container.zCoord, o);
+			//pos.moveForwards(1.0);
 
 			TileEntity tile = container.getTile(o);
 
@@ -85,14 +84,14 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0)
-						powered = true;
+					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
 				}
 			}
 		}
 
 		if (!powered)
-			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
+			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
+					container.zCoord);
 
 		if (lastPowered != powered) {
 			for (TileGenericPipe pipe : neighbours) {
@@ -152,7 +151,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 		boolean lastToggled = toggled;
 
 		super.actionsActivated(actions);
-		
+
 		switched = false;
 		// Activate the actions
 		for (IAction i : actions.keySet()) {
@@ -167,8 +166,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 			}
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
-			if (lastSwitched != switched && !switched)
-				toggled = false;
+			if (lastSwitched != switched && !switched) toggled = false;
 
 			container.scheduleRenderUpdate();
 			updateNeighbors(true);
@@ -178,8 +176,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	@Override
 	public double receiveEnergy(ForgeDirection from, double val) {
 		// no power is received if "disconnected"
-		if (!isPowered())
-			return val;
+		if (!isPowered()) return val;
 
 		if (val > 0.0) {
 			transport.internalNextPower[from.ordinal()] += val;
@@ -195,24 +192,26 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	@Override
 	public double requestEnergy(ForgeDirection from, double amount) {
 		// no power is requested if "disconnected"
-		if (!isPowered())
-			return 0;
+		if (!isPowered()) return 0;
 
 		return amount;
 	}
 
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		return super.canPipeConnect(tile, side) || getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ).getMaterial() == Material.circuits;
+		return super.canPipeConnect(tile, side)
+				|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
+						container.zCoord + side.offsetZ).getMaterial() == Material.circuits;
 	}
-	
+
 	@Override
 	public boolean isSolidOnSide(ForgeDirection side) {
-		if(getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ).getMaterial().isReplaceable() || getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY, container.zCoord + side.offsetZ).getMaterial() == Material.circuits)
-		{
-			return true;
-		}
+		if (getWorld()
+				.getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
+						container.zCoord + side.offsetZ).getMaterial().isReplaceable()
+				|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
+						container.zCoord + side.offsetZ).getMaterial() == Material.circuits) { return true; }
 		return false;
 	}
-	
+
 }

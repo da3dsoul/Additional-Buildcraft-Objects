@@ -26,9 +26,9 @@ import buildcraft.core.IItemPipe;
 import buildcraft.transport.PipeTransportPower;
 
 public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implements IYesNoChange {
-	public final boolean[] connectionMatrix = { true, true, true, true, true, true };
+	public final boolean[]	connectionMatrix	= { true, true, true, true, true, true };
 
-	public boolean isDirty = true;
+	public boolean			isDirty				= true;
 
 	public PipePowerDistribution(Item itemID) {
 		super(new PipeTransportPower(), itemID);
@@ -39,15 +39,14 @@ public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implement
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
-		if (entityplayer.getCurrentEquippedItem() != null && entityplayer.getCurrentEquippedItem().getItem() instanceof IItemPipe) {
-				return false;
-		}
+		if (entityplayer.getCurrentEquippedItem() != null
+				&& entityplayer.getCurrentEquippedItem().getItem() instanceof IItemPipe) { return false; }
 
-		if (super.blockActivated(entityplayer))
-			return true;
+		if (super.blockActivated(entityplayer)) return true;
 
 		if (!container.getWorldObj().isRemote)
-			entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_DIAMOND_POWER, container.getWorldObj(), container.xCoord, container.yCoord, container.zCoord);
+			entityplayer.openGui(ABO.instance, ABOGuiIds.PIPE_DIAMOND_POWER, container.getWorldObj(), container.xCoord,
+					container.yCoord, container.zCoord);
 
 		return true;
 	}
@@ -77,22 +76,22 @@ public class PipePowerDistribution extends ABOPipe<PipeTransportPower> implement
 	@Override
 	public int getIconIndex(ForgeDirection direction) {
 		switch (direction) {
-		case UNKNOWN:
-			return PipeIcons.PipePowerDiamondCenter.ordinal();
-		case DOWN:
-			return PipeIcons.PipePowerDiamondDown.ordinal();
-		case UP:
-			return PipeIcons.PipePowerDiamondUp.ordinal();
-		case NORTH:
-			return PipeIcons.PipePowerDiamondNorth.ordinal();
-		case SOUTH:
-			return PipeIcons.PipePowerDiamondSouth.ordinal();
-		case WEST:
-			return PipeIcons.PipePowerDiamondWest.ordinal();
-		case EAST:
-			return PipeIcons.PipePowerDiamondEast.ordinal();
-		default:
-			throw new IllegalArgumentException("direction out of bounds");
+			case UNKNOWN:
+				return PipeIcons.PipePowerDiamondCenter.ordinal();
+			case DOWN:
+				return PipeIcons.PipePowerDiamondDown.ordinal();
+			case UP:
+				return PipeIcons.PipePowerDiamondUp.ordinal();
+			case NORTH:
+				return PipeIcons.PipePowerDiamondNorth.ordinal();
+			case SOUTH:
+				return PipeIcons.PipePowerDiamondSouth.ordinal();
+			case WEST:
+				return PipeIcons.PipePowerDiamondWest.ordinal();
+			case EAST:
+				return PipeIcons.PipePowerDiamondEast.ordinal();
+			default:
+				throw new IllegalArgumentException("direction out of bounds");
 		}
 	}
 
