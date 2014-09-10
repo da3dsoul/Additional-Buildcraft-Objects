@@ -49,6 +49,8 @@ import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsDistribution;
 import abo.pipes.fluids.PipeFluidsInsertion;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
+import abo.pipes.fluids.PipeFluidsReinforcedGolden;
+import abo.pipes.fluids.PipeFluidsReinforcedGoldenIron;
 import abo.pipes.fluids.PipeFluidsValve;
 import abo.pipes.items.PipeItemsCompactor;
 import abo.pipes.items.PipeItemsCrossover;
@@ -122,6 +124,10 @@ public class ABO {
 	public static Item							pipeFluidsValve				= null;
 
 	public static Item							pipeFluidsGoldenIron		= null;
+	
+	public static Item							pipeFluidsReinforcedGolden		= null;
+	
+	public static Item							pipeFluidsReinforcedGoldenIron		= null;
 
 	public static Item							pipeFluidsInsertion			= null;
 
@@ -204,6 +210,12 @@ public class ABO {
 
 			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, "Golden Iron Waterproof Pipe", 1,
 					BuildCraftTransport.pipeFluidsGold, BuildCraftTransport.pipeFluidsIron, null);
+			
+			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class, "Reinfored Golden Waterproof Pipe", 1,
+					BuildCraftTransport.pipeFluidsGold, Blocks.obsidian, null);
+			
+			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class, "Reinfored Golden Iron Waterproof Pipe", 1,
+					pipeFluidsGoldenIron, Blocks.obsidian, null);
 
 			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, "Balancing Waterproof Pipe", 1,
 					BuildCraftTransport.pipeFluidsWood, new ItemStack(BuildCraftEnergy.engineBlock, 1, 0),

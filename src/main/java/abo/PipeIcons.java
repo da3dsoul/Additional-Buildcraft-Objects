@@ -30,6 +30,10 @@ public enum PipeIcons {
 	PipePowerExtraction,
 
 	PipeLiquidsInsertion,
+	
+	PipeLiquidsReinforcedGoldenIron, PipeLiquidsReinforcedGoldenIronSide,
+	
+	PipeLiquidsReinforcedGolden,
 
 	MAX
 };

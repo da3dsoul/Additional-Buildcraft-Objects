@@ -74,6 +74,15 @@ public class PipeIconProvider implements IIconProvider {
 				.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIron");
 		_icons[PipeIcons.PipeLiquidsGoldenIronSide.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeLiquidsGoldenIronSide");
+		
+		_icons[PipeIcons.PipeLiquidsReinforcedGoldenIron.ordinal()] = iconRegister
+				.registerIcon("additional-buildcraft-objects:PipeLiquidsReinforcedGoldenIron");
+		_icons[PipeIcons.PipeLiquidsReinforcedGoldenIronSide.ordinal()] = iconRegister
+				.registerIcon("additional-buildcraft-objects:PipeLiquidsReinforcedGoldenIronSide");
+		
+		_icons[PipeIcons.PipeLiquidsReinforcedGolden.ordinal()] = iconRegister
+				.registerIcon("additional-buildcraft-objects:PipeLiquidsReinforcedGolden");
+		
 
 		_icons[PipeIcons.PipeLiquidsValveClosed.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeLiquidsValveClosed");

@@ -2,6 +2,8 @@
 
 item.PipeFluidsValve.name=Valve Pipe
 item.PipeFluidsGoldenIron.name=Golden Iron Fluid Pipe
+item.PipeFluidsReinforcedGoldenIron.name=Reinforced Golden Iron Fluid Pipe
+item.PipeFluidsReinforcedGolden.name=Reinforced Golden Fluid Pipe
 item.PipeFluidsBalance.name=Balancing Fluid Pipe
 item.PipeFluidsDistribution.name=Diamond Fluid Pipe
 item.PipeFluidsInsertion.name=Insertion Fluid Pipe
