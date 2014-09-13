@@ -186,6 +186,7 @@ public class ABO {
 	public EnumMap<Side, FMLEmbeddedChannel>	channels;
 
 	public static boolean						valveConnectsStraight;
+	public static boolean						valvePhysics;
 
 	@EventHandler
 	public void preInitialize(FMLPreInitializationEvent evt) {
@@ -203,6 +204,9 @@ public class ABO {
 			windmillAnimDist = (byte) aboConfiguration.get("Misc", "AnimateWindmillDistance", 64).getInt(64);
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
+					.getBoolean(true);
+			
+			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true)
 					.getBoolean(true);
 
 			pipeFluidsValve = buildRedstonePipe(PipeFluidsValve.class, "Valve Pipe", 1,

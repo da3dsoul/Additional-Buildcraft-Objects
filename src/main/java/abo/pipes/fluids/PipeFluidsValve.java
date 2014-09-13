@@ -36,6 +36,8 @@ import buildcraft.api.core.Position;
 import buildcraft.api.gates.IAction;
 import buildcraft.api.mj.MjBattery;
 import buildcraft.api.transport.PipeManager;
+import buildcraft.factory.BlockTank;
+import buildcraft.factory.TileTank;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.Pipe;
@@ -50,6 +52,9 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	private boolean			switched;
 	private boolean			toggled;
 	private boolean			onlyStraight;
+	private boolean			valvePhysics;
+
+	private int				tankCache = 0;
 
 	@NetworkData
 	public int				liquidToExtract;
@@ -71,6 +76,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		transport.travelDelay = 2;
 
 		onlyStraight = ABO.valveConnectsStraight;
+		valvePhysics = ABO.valvePhysics;
 	}
 
 	@Override
@@ -193,19 +199,39 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 			if (tile instanceof IFluidHandler) {
 				IFluidHandler fluidHandler = (IFluidHandler) tile;
-
 				int flowRate = transport.flowRate;
-
-				FluidStack extracted = fluidHandler.drain(side.getOpposite(), liquidToExtract > flowRate ? flowRate
-						: liquidToExtract, false);
-
 				int inserted = 0;
+				int amountToExtract = liquidToExtract > flowRate ? flowRate	: liquidToExtract;
+				if(valvePhysics)
+				{
+					buildTankCache();
+
+					FluidStack stack = fluidHandler.getTankInfo(side.getOpposite())[0].fluid;
+					if(stack != null)
+					{
+						if(stack.amount > tankCache)
+						{
+							if(stack.amount - amountToExtract < tankCache)
+							{
+								amountToExtract = stack.amount - tankCache;
+							}
+						}else
+						{
+							amountToExtract = 0;
+						}
+					}
+				}
+				
+				FluidStack extracted = fluidHandler.drain(side.getOpposite(), amountToExtract, false);
+
 				if (extracted != null) {
 					inserted = transport.fill(side, extracted, true);
 
 					fluidHandler.drain(side.getOpposite(), inserted, true);
 				}
 				liquidToExtract -= inserted;
+
+
 			}
 		}
 
@@ -273,7 +299,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
 		return super.canPipeConnect(tile, side)
 				&& (container.getBlockMetadata() == side.getOpposite().ordinal()
-						|| container.getBlockMetadata() == side.ordinal() || !onlyStraight);
+				|| container.getBlockMetadata() == side.ordinal() || !onlyStraight);
 	}
 
 	/*
@@ -301,9 +327,46 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		if (getWorld()
 				.getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
 						container.zCoord + side.offsetZ).getMaterial().isReplaceable()
-				|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
-						container.zCoord + side.offsetZ).getMaterial() == Material.circuits) { return true; }
+						|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
+								container.zCoord + side.offsetZ).getMaterial() == Material.circuits) { return true; }
 		return false;
+	}
+
+	private void buildTankCache()
+	{
+		byte meta = (byte) container.blockMetadata;
+		ForgeDirection side = ForgeDirection.getOrientation(meta);
+		int x = container.xCoord + side.offsetX;
+		int y = container.yCoord + side.offsetY;
+		int z = container.zCoord + side.offsetZ;
+
+		TileEntity tile = container.getWorldObj().getTileEntity(x,y,z);
+
+		if (tile instanceof TileTank) {
+			int yCounter = y;
+
+			do
+			{
+				if(!(container.getWorldObj().getBlock(x, yCounter - 1, z) instanceof BlockTank))
+				{
+					break;
+				}
+				yCounter--;
+			}while(true);
+			
+			if(y - yCounter <= 0)
+			{
+				tankCache = 0;
+				return;
+			}
+
+			tankCache = (y - yCounter) * 16000 + 8000;
+
+		}else
+		{
+			tankCache = 0;
+		}
+
 	}
 
 }
