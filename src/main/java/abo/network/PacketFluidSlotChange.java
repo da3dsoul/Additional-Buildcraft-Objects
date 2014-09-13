@@ -63,7 +63,11 @@ public class PacketFluidSlotChange extends ABOPacket {
 
 		this.slot = data.readByte();
 
-		short length = data.readShort();
+		short length = 0;
+		try
+		{
+			length = data.readShort();
+		}catch(IndexOutOfBoundsException e) {}
 		if (length == 0)
 			fluid = null;
 		else {
@@ -94,7 +98,12 @@ public class PacketFluidSlotChange extends ABOPacket {
 	 * Reads a compressed NBTTagCompound from this buffer
 	 */
 	public NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf data) throws IOException {
-		short short1 = data.readShort();
+		short short1 = 0;
+		
+		try
+		{
+			short1 = data.readShort();
+		}catch(IndexOutOfBoundsException e) {}
 
 		if (short1 < 0) {
 			return null;
