@@ -9,13 +9,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemGlassBottle;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Facing;
 import net.minecraft.util.MathHelper;
@@ -52,8 +50,25 @@ public class ItemBottle extends ItemGlassBottle {
 	}
 
 	@Override
+	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+		ItemStack item;
+		if (stack.stackSize > 1) {
+			item = stack.splitStack(1);
+			if (player instanceof EntityPlayer) {
+				item = capture(item, player, entity);
+				if (!((EntityPlayer) player).inventory.addItemStackToInventory(item)) {
+					((EntityPlayer) player).dropPlayerItemWithRandomChoice(item, false);
+				}
+			}
+		} else {
+			stack = capture(stack, player, entity);
+		}
+		return true;
+	}
+
+	@Override
 	public boolean hitEntity(ItemStack itemstack, EntityLivingBase usedon, EntityLivingBase user) {
-		float i = 1;
+		/*float i = 1;
 		if (user instanceof EntityPlayer) {
 			float var2 = (float) user.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
 			float var4 = 0;
@@ -69,19 +84,8 @@ public class ItemBottle extends ItemGlassBottle {
 				i = var2;
 			}
 		}
-		usedon.heal(i);
-		ItemStack stack;
-		if (itemstack.stackSize > 1) {
-			stack = itemstack.splitStack(1);
-			if (user instanceof EntityPlayer) {
-				stack = capture(stack, user, usedon);
-				if (!((EntityPlayer) user).inventory.addItemStackToInventory(stack)) {
-					((EntityPlayer) user).dropPlayerItemWithRandomChoice(stack, false);
-				}
-			}
-		} else {
-			itemstack = capture(itemstack, user, usedon);
-		}
+		usedon.heal(i);*/
+		
 
 		return false;
 	}

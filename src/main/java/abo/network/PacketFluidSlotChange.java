@@ -13,13 +13,10 @@
 package abo.network;
 
 import io.netty.buffer.ByteBuf;
-
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTSizeTracker;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import buildcraft.transport.TileGenericPipe;
@@ -46,14 +43,11 @@ public class PacketFluidSlotChange extends ABOPacket {
 		if (fluid == null)
 			data.writeShort(0);
 		else {
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setString("FluidName", fluid.getName());
-
-			try {
-				writeNBTTagCompoundToBuffer(nbt, data);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			String nbt = fluid.getName();
+			byte[] stringData = nbt.getBytes(Charset.forName("UTF-8"));
+			data.writeShort((short)stringData.length);
+			data.writeBytes(stringData);
+			
 		}
 	}
 
@@ -73,44 +67,13 @@ public class PacketFluidSlotChange extends ABOPacket {
 		else {
 			byte[] compressed = new byte[length];
 			data.readBytes(compressed);
-			NBTTagCompound nbt;
-			try {
-				nbt = readNBTTagCompoundFromBuffer(data);
-				fluid = FluidRegistry.getFluid(nbt.getString("FluidName"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+				String nbt = "";
+				try {
+					nbt = new String(compressed, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+				}
+				fluid = FluidRegistry.getFluid(nbt);
 
-		}
-	}
-
-	public void writeNBTTagCompoundToBuffer(NBTTagCompound nbt, ByteBuf data) throws IOException {
-		if (nbt == null) {
-			data.writeShort(-1);
-		} else {
-			byte[] abyte = CompressedStreamTools.compress(nbt);
-			data.writeShort((short) abyte.length);
-			data.writeBytes(abyte);
-		}
-	}
-
-	/**
-	 * Reads a compressed NBTTagCompound from this buffer
-	 */
-	public NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf data) throws IOException {
-		short short1 = 0;
-		
-		try
-		{
-			short1 = data.readShort();
-		}catch(IndexOutOfBoundsException e) {}
-
-		if (short1 < 0) {
-			return null;
-		} else {
-			byte[] abyte = new byte[short1];
-			data.readBytes(abyte);
-			return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
 		}
 	}
 
