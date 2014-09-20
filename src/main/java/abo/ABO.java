@@ -93,10 +93,13 @@ import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
+import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
+import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
 /**
  * @author Flow86
@@ -104,81 +107,82 @@ import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
  */
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon")
 public class ABO {
-	public static final String					VERSION						= "2.0.2+";
+	public static final String					VERSION							= "2.0.2+";
 
-	public static final String					MINECRAFT_VERSION			= "1.7.10";
+	public static final String					MINECRAFT_VERSION				= "1.7.10";
 
-	public static final String					BUILDCRAFT_VERSION			= "6.0.17";
+	public static final String					BUILDCRAFT_VERSION				= "6.0.17";
 
-	public static final String					FORGE_VERSION				= "10.12.1.1085";
+	public static final String					FORGE_VERSION					= "10.12.1.1085";
 
-	public IIconProvider						itemIconProvider			= new ItemIconProvider();
-	public IIconProvider						pipeIconProvider			= new PipeIconProvider();
+	public IIconProvider						itemIconProvider				= new ItemIconProvider();
+	public IIconProvider						pipeIconProvider				= new PipeIconProvider();
 
 	public static ABOConfiguration				aboConfiguration;
-	public static Logger						aboLog						= LogManager
-																					.getLogger("Additional-Buildcraft-Objects");
+	public static Logger						aboLog							= LogManager
+																						.getLogger("Additional-Buildcraft-Objects");
 
-	public static Item							itemGateSettingsDuplicator	= null;
+	public static Item							itemGateSettingsDuplicator		= null;
 
-	public static Item							pipeFluidsValve				= null;
+	public static Item							pipeFluidsValve					= null;
 
-	public static Item							pipeFluidsGoldenIron		= null;
-	
+	public static Item							pipeFluidsGoldenIron			= null;
+
 	public static Item							pipeFluidsReinforcedGolden		= null;
-	
-	public static Item							pipeFluidsReinforcedGoldenIron		= null;
 
-	public static Item							pipeFluidsInsertion			= null;
+	public static Item							pipeFluidsReinforcedGoldenIron	= null;
 
-	public static Item							pipeFluidsBalance			= null;
+	public static Item							pipeFluidsInsertion				= null;
 
-	public static Item							pipeFluidsDiamond			= null;
+	public static Item							pipeFluidsBalance				= null;
 
-	public static Item							pipeItemsRoundRobin			= null;
+	public static Item							pipeFluidsDiamond				= null;
 
-	public static Item							pipeItemsDivide				= null;
+	public static Item							pipeItemsRoundRobin				= null;
 
-	public static Item							pipeItemsCompactor			= null;
+	public static Item							pipeItemsDivide					= null;
 
-	public static Item							pipeItemsInsertion			= null;
+	public static Item							pipeItemsCompactor				= null;
 
-	public static Item							pipeItemsExtraction			= null;
+	public static Item							pipeItemsInsertion				= null;
 
-	public static Item							pipeItemsEnderExtraction	= null;
+	public static Item							pipeItemsExtraction				= null;
 
-	public static Item							pipeItemsCrossover			= null;
+	public static Item							pipeItemsEnderExtraction		= null;
 
-	public static Item							pipePowerSwitch				= null;
+	public static Item							pipeItemsCrossover				= null;
 
-	public static Item							pipePowerIron				= null;
+	public static Item							pipePowerSwitch					= null;
 
-	public static Item							pipeDistributionConductive	= null;
+	public static Item							pipePowerIron					= null;
 
-	public static Item							pipePowerExtraction			= null;
+	public static Item							pipeDistributionConductive		= null;
 
-	public static Item							bottle						= null;
+	public static Item							pipePowerExtraction				= null;
+
+	public static Item							bottle							= null;
+	public static Item							goldenstaff						= null;
 
 	public static BlockWindmill					windmillBlock;
 
-	public static int							triggerEngineSafeID			= 128;
-	public static ITrigger						triggerEngineSafe			= null;
+	public static int							triggerEngineSafeID				= 128;
+	public static ITrigger						triggerEngineSafe				= null;
 
-	public static int							actionSwitchOnPipeID		= 128;
-	public static IAction						actionSwitchOnPipe			= null;
+	public static int							actionSwitchOnPipeID			= 128;
+	public static IAction						actionSwitchOnPipe				= null;
 
-	public static int							actionToggleOnPipeID		= 129;
-	public static IAction						actionToggleOnPipe			= null;
+	public static int							actionToggleOnPipeID			= 129;
+	public static IAction						actionToggleOnPipe				= null;
 
-	public static int							actionToggleOffPipeID		= 130;
-	public static IAction						actionToggleOffPipe			= null;
+	public static int							actionToggleOffPipeID			= 130;
+	public static IAction						actionToggleOffPipe				= null;
 
 	public static boolean						windmillAnimations;
 	public static byte							windmillAnimDist;
 
-	public static String						loadedEnderInventory		= "";
+	public static String						loadedEnderInventory			= "";
 
-	private InventoryEnderChest					theInventoryEnderChest		= new InventoryEnderChest();
+	private InventoryEnderChest					theInventoryEnderChest			= new InventoryEnderChest();
 
 	@Instance("Additional-Buildcraft-Objects")
 	public static ABO							instance;
@@ -188,10 +192,11 @@ public class ABO {
 	public static boolean						valveConnectsStraight;
 	public static boolean						valvePhysics;
 
+	// Mod Init Handling
+
 	@EventHandler
 	public void preInitialize(FMLPreInitializationEvent evt) {
 
-		// aboLog.setParent(FMLLog.getLogger());
 		aboLog.info("Starting Additional-Buildcraft-Objects #@BUILD_NUMBER@ " + VERSION + " (Built for Minecraft"
 				+ MINECRAFT_VERSION + " with Buildcraft " + BUILDCRAFT_VERSION + " and Forge " + FORGE_VERSION);
 		aboLog.info("Copyright (c) Flow86, 2011-2013");
@@ -205,21 +210,20 @@ public class ABO {
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
 					.getBoolean(true);
-			
-			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true)
-					.getBoolean(true);
+
+			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true).getBoolean(true);
 
 			pipeFluidsValve = buildRedstonePipe(PipeFluidsValve.class, "Valve Pipe", 1,
 					BuildCraftTransport.pipeFluidsWood, BuildCraftTransport.pipeGate, null);
 
 			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, "Golden Iron Waterproof Pipe", 1,
 					BuildCraftTransport.pipeFluidsGold, BuildCraftTransport.pipeFluidsIron, null);
-			
-			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class, "Reinfored Golden Waterproof Pipe", 1,
-					BuildCraftTransport.pipeFluidsGold, Blocks.obsidian, null);
-			
-			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class, "Reinfored Golden Iron Waterproof Pipe", 1,
-					pipeFluidsGoldenIron, Blocks.obsidian, null);
+
+			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class,
+					"Reinfored Golden Waterproof Pipe", 1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian, null);
+
+			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class,
+					"Reinfored Golden Iron Waterproof Pipe", 1, pipeFluidsGoldenIron, Blocks.obsidian, null);
 
 			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, "Balancing Waterproof Pipe", 1,
 					BuildCraftTransport.pipeFluidsWood, new ItemStack(BuildCraftEnergy.engineBlock, 1, 0),
@@ -285,6 +289,16 @@ public class ABO {
 							Blocks.planks });
 			GameRegistry.registerItem(bottle, "MobBottle");
 
+			goldenstaff = new ItemGoldenStaff();
+
+			GameRegistry.addShapedRecipe(new ItemStack(goldenstaff),
+					new Object[] { "B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
+							new ItemStack(Items.dye, 1, 11) });
+			GameRegistry.registerItem(goldenstaff, "GoldenStaff");
+
+			EntityRegistry.registerGlobalEntityID(FollowableEntity.class, "FollowableItem",
+					EntityRegistry.findGlobalUniqueEntityId());
+
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
 					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
@@ -338,6 +352,32 @@ public class ABO {
 
 	}
 
+	// Side Handling
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void textureHook(TextureStitchEvent.Pre event) {
+		if (event.map.getTextureType() == 1) {
+			itemIconProvider.registerIcons(event.map);
+		}
+	}
+
+	public void sendToServer(BuildCraftPacket packet) {
+		try {
+			channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.TOSERVER);
+			channels.get(Side.CLIENT).writeOutbound(packet);
+		} catch (Throwable t) {
+			BCLog.logger.log(Level.WARNING, "sentToServer crash", t);
+		}
+	}
+
+	@Mod.EventHandler
+	public void processIMCRequests(FMLInterModComms.IMCEvent event) {
+		InterModComms.processIMC(event);
+	}
+
+	// Ender Pipe Handling
+
 	private void loadEnderInventory(boolean isRemote) {
 		if (!isRemote) {
 			try {
@@ -367,6 +407,10 @@ public class ABO {
 		}
 	}
 
+	public InventoryEnderChest getInventoryEnderChest() {
+		return this.theInventoryEnderChest;
+	}
+
 	private File getWorldDir() throws IOException {
 
 		return new File(FMLCommonHandler.instance().getSavesDirectory().getCanonicalPath()
@@ -376,29 +420,10 @@ public class ABO {
 
 	}
 
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-	public void textureHook(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() == 1) {
-			// pipeIconProvider.registerIcons(event.map);
-			itemIconProvider.registerIcons(event.map);
-		}
-	}
-
-	private static class ABORecipe {
-		Item		itemID;
-		boolean		isPipe		= false;
-		boolean		isShapeless	= false;
-		ItemStack	result;
-		Object[]	input;
-	}
-
-	private static LinkedList<ABORecipe>	aboRecipes	= new LinkedList<ABORecipe>();
+	// Item Init Handling
 
 	private static Item createItem(Class<? extends ABOItem> clazz, String descr, Object ingredient1,
 			Object ingredient2, Object ingredient3) {
-		// String name = Character.toLowerCase(clazz.getSimpleName().charAt(0))
-		// + clazz.getSimpleName().substring(1);
 
 		Item item = null;
 		try {
@@ -417,6 +442,68 @@ public class ABO {
 		return item;
 	}
 
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
+		ItemPipe res = buildPipe(clas, descr);
+
+		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
+
+		return res;
+	}
+
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, boolean isShapelessRecipe,
+			Object... ingredients) {
+		ItemPipe res = buildPipe(clas, descr);
+
+		addRecipe(res, count, isShapelessRecipe, ingredients);
+
+		return res;
+	}
+
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr) {
+
+		ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
+		res.setUnlocalizedName(clas.getSimpleName());
+		ABOProxy.proxy.registerPipe(res);
+
+		return res;
+	}
+
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr) {
+
+		ItemPipe res = BlockRedstonePipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
+		res.setUnlocalizedName(clas.getSimpleName());
+		ABOProxy.proxy.registerPipe(res);
+
+		return res;
+	}
+
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count,
+			boolean isShapelessRecipe, Object... ingredients) {
+		ItemPipe res = buildRedstonePipe(clas, descr);
+
+		addRecipe(res, count, isShapelessRecipe, ingredients);
+
+		return res;
+	}
+
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
+		ItemPipe res = buildRedstonePipe(clas, descr);
+
+		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
+
+		return res;
+	}
+
+	// Recipe Handling
+
+	private static class ABORecipe {
+		boolean		isShapeless	= false;
+		ItemStack	result;
+		Object[]	input;
+	}
+
+	private static LinkedList<ABORecipe>	aboRecipes	= new LinkedList<ABORecipe>();
+
 	private static void addRecipe(Item item, int count, Object ingredient1, Object ingredient2, Object ingredient3) {
 		if (ingredient1 != null && ingredient2 != null && ingredient3 != null) {
 			addRecipe(item, count, false,
@@ -428,114 +515,13 @@ public class ABO {
 	}
 
 	private static void addRecipe(Item item, int count, boolean isShapeless, Object[] ingredients) {
-		// Add appropriate recipe to temporary list
 		ABORecipe recipe = new ABORecipe();
-
-		recipe.isPipe = (item instanceof ItemPipe);
-		recipe.itemID = item;
 		recipe.isShapeless = isShapeless;
 		recipe.input = ingredients;
 		recipe.result = new ItemStack(item, count);
 
 		aboRecipes.add(recipe);
 	}
-
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = buildPipe(clas, descr);
-
-		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
-
-		return res;
-	}
-
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, boolean isShapelessRecipe,
-			Object... ingredients) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = buildPipe(clas, descr);
-
-		addRecipe(res, count, isShapelessRecipe, ingredients);
-
-		return res;
-	}
-
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
-		res.setUnlocalizedName(clas.getSimpleName());
-
-		return res;
-	}
-
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = BlockRedstonePipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
-		res.setUnlocalizedName(clas.getSimpleName());
-
-		return res;
-	}
-
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count,
-			boolean isShapelessRecipe, Object... ingredients) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = buildRedstonePipe(clas, descr);
-
-		addRecipe(res, count, isShapelessRecipe, ingredients);
-
-		return res;
-	}
-
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
-		// String name = Character.toLowerCase(clas.getSimpleName().charAt(0)) +
-		// clas.getSimpleName().substring(1);
-
-		ItemPipe res = buildRedstonePipe(clas, descr);
-
-		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
-
-		return res;
-	}
-
-	/*
-	 * private static ItemPipe createPipe(Class<? extends Pipe> clazz, String
-	 * descr) { //String name =
-	 * Character.toLowerCase(clazz.getSimpleName().charAt(0)) +
-	 * clazz.getSimpleName().substring(1);
-	 * 
-	 * ItemPipe pipe = BlockGenericPipe.registerPipe(clazz,
-	 * CreativeTabBuildCraft.PIPES);
-	 * pipe.setUnlocalizedName(clazz.getSimpleName());
-	 * GameRegistry.registerItem(pipe,
-	 * pipe.getUnlocalizedName().replace("item.", ""));
-	 * 
-	 * return pipe; }
-	 * 
-	 * private static Item createPipe(Class<? extends Pipe> clazz, String descr,
-	 * int count, boolean isShapeless, Object[] ingredients) { ItemPipe pipe =
-	 * createPipe(clazz, descr);
-	 * 
-	 * addRecipe(pipe, count, isShapeless, ingredients);
-	 * 
-	 * return pipe; }
-	 * 
-	 * private static Item createPipe(Class<? extends Pipe> clazz, String descr,
-	 * int count, Object ingredient1, Object ingredient2, Object ingredient3) {
-	 * ItemPipe pipe = createPipe(clazz, descr);
-	 * 
-	 * addRecipe(pipe, count, ingredient1, ingredient2, ingredient3);
-	 * 
-	 * return pipe; }
-	 */
 
 	public void loadRecipes() {
 		// Add pipe recipes
@@ -546,25 +532,7 @@ public class ABO {
 				GameRegistry.addRecipe(recipe.result, recipe.input);
 			}
 
-			if (recipe.isPipe) ABOProxy.proxy.registerPipe(recipe.itemID);
 		}
 	}
 
-	public void sendToServer(BuildCraftPacket packet) {
-		try {
-			channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.TOSERVER);
-			channels.get(Side.CLIENT).writeOutbound(packet);
-		} catch (Throwable t) {
-			BCLog.logger.log(Level.WARNING, "sentToServer crash", t);
-		}
-	}
-
-	@Mod.EventHandler
-	public void processIMCRequests(FMLInterModComms.IMCEvent event) {
-		InterModComms.processIMC(event);
-	}
-
-	public InventoryEnderChest getInventoryEnderChest() {
-		return this.theInventoryEnderChest;
-	}
 }

@@ -21,6 +21,7 @@ item.PipePowerExtraction.name=Reinforced Wooden Kinesis Pipe
 item.ItemGateSettingsDuplicator.name=Gate Settings Duplicator
 item.MobBottleFull.name=Mob Bottle (Full)
 item.MobBottleEmpty.name=Mob Bottle (Empty)
+item.GoldenStaff.name=Yellow Dye on a Stick
 tile.windmillBlock.name=Windmill
 tile.solarPanelBlock.name=Solar Panel
 gui.GateSettings.copied.name=Gate settings copied

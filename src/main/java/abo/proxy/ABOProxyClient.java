@@ -44,15 +44,11 @@ public class ABOProxyClient extends ABOProxy {
 	public void registerTileEntities() {
 		super.registerTileEntities();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileWindmill.class, new RenderWindmill());
-		// ClientRegistry.bindTileEntitySpecialRenderer(TileSolarPanel.class,
-		// new RenderSolarPanel());
 
 	}
 
 	public void registerBlockRenderers() {
 		RenderingEntityBlocks.blockByEntityRenders.put(new EntityRenderIndex(ABO.windmillBlock, 0),
 				new RenderWindmill());
-		// RenderingEntityBlocks.blockByEntityRenders.put(new
-		// EntityRenderIndex(ABO.solarpanelBlock), new RenderSolarPanel());
 	}
 }
