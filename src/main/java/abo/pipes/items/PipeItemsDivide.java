@@ -54,7 +54,7 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 			ItemStack newStack = stack.splitStack(desiredSize);
 			TravelingItem newItem = copyTravelingItem(item, newStack);
 			newItem.getExtraData().setBoolean("DONT MERGE ME", true);
-			if (transport.canReceivePipeObjects(item.input, newItem)) {
+			if (transport.inputOpen(item.input)) {
 				newItem.input = newItem.output;
 			}
 			transport.injectItem(newItem, item.input);
@@ -132,7 +132,7 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 		TravelingItem item = event.item;
 		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		if (transport.canReceivePipeObjects(item.input, item)) {
+		if (transport.inputOpen(item.input)) {
 			list.add(item.input);
 			result.clear();
 			result.addAll(list);

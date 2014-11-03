@@ -12,8 +12,8 @@
 
 package abo.pipes.items;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -31,8 +31,10 @@ import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
 import buildcraft.api.core.Position;
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.gates.IAction;
-import buildcraft.api.gates.IActionReceptor;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.IActionReceptor;
+import buildcraft.api.statements.IStatement;
+import buildcraft.api.statements.IStatementParameter;
 import buildcraft.core.inventory.InvUtils;
 import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
@@ -40,6 +42,7 @@ import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
+import buildcraft.transport.gates.StatementSlot;
 import buildcraft.transport.pipes.events.PipeEventItem;
 
 /**
@@ -182,7 +185,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
 				}
 			}
 		}
@@ -206,8 +209,8 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 	}
 
 	@Override
-	public LinkedList<IAction> getActions() {
-		LinkedList<IAction> actions = super.getActions();
+	public LinkedList<IActionInternal> getActions() {
+		LinkedList<IActionInternal> actions = super.getActions();
 		actions.add(ABO.actionSwitchOnPipe);
 		actions.add(ABO.actionToggleOnPipe);
 		actions.add(ABO.actionToggleOffPipe);
@@ -215,7 +218,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 	}
 
 	@Override
-	protected void actionsActivated(Map<IAction, Boolean> actions) {
+	protected void actionsActivated(Collection<StatementSlot> actions) {
 		boolean lastSwitched = switched;
 		boolean lastToggled = toggled;
 
@@ -223,8 +226,8 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 
 		switched = false;
 		// Activate the actions
-		for (IAction i : actions.keySet()) {
-			if (actions.get(i)) {
+		for (StatementSlot actionslot : actions) {
+			IStatement i = actionslot.statement;
 				if (i instanceof ActionSwitchOnPipe) {
 					switched = true;
 				} else if (i instanceof ActionToggleOnPipe) {
@@ -232,29 +235,13 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 				} else if (i instanceof ActionToggleOffPipe) {
 					toggled = false;
 				}
-			}
+			
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
 			if (lastSwitched != switched && !switched) toggled = false;
-		}
-	}
 
-	@Override
-	public void actionActivated(IAction action) {
-		boolean lastSwitched = switched;
-		boolean lastToggled = toggled;
-
-		switched = false;
-
-		// Activate the actions
-		if (action instanceof ActionToggleOnPipe) {
-			toggled = true;
-		} else if (action instanceof ActionToggleOffPipe) {
-			toggled = false;
-		}
-
-		if ((lastSwitched != switched) || (lastToggled != toggled)) {
-			if (lastSwitched != switched && !switched) toggled = false;
+			container.scheduleRenderUpdate();
+			updateNeighbors(true);
 		}
 	}
 
@@ -296,5 +283,24 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 	public int getIconIndex(ForgeDirection direction) {
 		if (container != null && container.getWorldObj() != null) return (isPowered() ? onTexture : offTexture);
 		return offTexture;
+	}
+
+	@Override
+	public void actionActivated(IStatement action, IStatementParameter[] parameters) {
+		boolean lastSwitched = switched;
+		boolean lastToggled = toggled;
+
+		switched = false;
+
+		// Activate the actions
+		if (action instanceof ActionToggleOnPipe) {
+			toggled = true;
+		} else if (action instanceof ActionToggleOffPipe) {
+			toggled = false;
+		}
+
+		if ((lastSwitched != switched) || (lastToggled != toggled)) {
+			if (lastSwitched != switched && !switched) toggled = false;
+		}
 	}
 }

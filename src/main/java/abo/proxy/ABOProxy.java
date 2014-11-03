@@ -39,4 +39,9 @@ public class ABOProxy {
 		// GameRegistry.registerTileEntity(TileSolarPanel.class,
 		// "net.minecraft.src.abo.energy.TileSolarPanel");
 	}
+	
+	public void registerEntities()
+	{
+		
+	}
 }

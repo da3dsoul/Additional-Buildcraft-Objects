@@ -12,6 +12,7 @@
 
 package abo.pipes.power;
 
+import cofh.api.energy.IEnergyConnection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -27,6 +28,7 @@ import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipePowerWood;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
 
+@SuppressWarnings("deprecation")
 public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook {
 
 	private final int			baseTexture	= PipeIcons.PipePowerIron.ordinal();
@@ -44,7 +46,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 															return true;
 														return false;
 													}
-													if (tile instanceof IPowerReceptor) return true;
+													if (tile instanceof IPowerReceptor || tile instanceof IEnergyConnection) return true;
 													return false;
 												}
 											};
@@ -75,7 +77,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 	public PipePowerDirected(Item itemID) {
 		super(new PipeTransportPower(), itemID);
 
-		PipeTransportPower.powerCapacities.put(PipePowerDirected.class, 1024);
+		PipeTransportPower.powerCapacities.put(PipePowerDirected.class, 10240);
 		transport.initFromPipe(getClass());
 	}
 
@@ -94,7 +96,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 	}
 
 	@Override
-	public double receiveEnergy(ForgeDirection from, double val) {
+	public int receiveEnergy(ForgeDirection from, int val) {
 		int metadata = container.getBlockMetadata();
 
 		if (metadata != from.ordinal() && val > 0.0) {
@@ -109,7 +111,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 	}
 
 	@Override
-	public double requestEnergy(ForgeDirection from, double amount) {
+	public int requestEnergy(ForgeDirection from, int amount) {
 		int metadata = container.getBlockMetadata();
 
 		if (metadata == from.ordinal()) { return amount; }

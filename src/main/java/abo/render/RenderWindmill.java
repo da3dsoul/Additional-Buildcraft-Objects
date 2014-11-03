@@ -21,7 +21,6 @@ import net.minecraft.util.ResourceLocation;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftCore.RenderMode;
 import buildcraft.core.IInventoryRenderer;
-import buildcraft.energy.TileEngine;
 
 public class RenderWindmill extends TileEntitySpecialRenderer implements IInventoryRenderer {
 	// fields
@@ -65,7 +64,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z, float f) {
 
-		TileEngine engine = (TileEngine) tileentity;
+		TileWindmill engine = (TileWindmill) tileentity;
 
 		if (engine != null) {
 			render(engine.progress, x, y, z, engine.getTrunkTexture(engine.getEnergyStage()), tileentity.xCoord,

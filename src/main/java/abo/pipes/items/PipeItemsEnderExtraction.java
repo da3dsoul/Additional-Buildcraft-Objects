@@ -16,6 +16,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.LinkedList;
 
+import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -30,11 +31,7 @@ import abo.PipeIcons;
 import abo.gui.ABOGuiIds;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
-import buildcraft.api.mj.MjBattery;
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.api.power.PowerHandler;
-import buildcraft.api.power.PowerHandler.PowerReceiver;
-import buildcraft.api.power.PowerHandler.Type;
+import buildcraft.core.RFBattery;
 import buildcraft.core.inventory.SimpleInventory;
 import buildcraft.core.inventory.StackHelper;
 import buildcraft.core.network.IClientState;
@@ -57,14 +54,11 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
-public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IPowerReceptor, IClientState,
+public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IEnergyHandler, IClientState,
 		IGuiReturnHandler {
 	private final int		standardIconIndex	= PipeIcons.PipeItemsEnderExtraction.ordinal();
 
-	private PowerHandler	powerHandler;
-
-	@MjBattery(maxCapacity = 64, maxReceivedPerCycle = 64, minimumConsumption = 1)
-	public double			mjStored			= 0;
+	protected RFBattery battery = new RFBattery(640, 640, 0);
 
 	private boolean			powered;
 
@@ -107,7 +101,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 		transport.allowBouncing = true;
 
-		powerHandler = new PowerHandler(this, Type.PIPE);
 	}
 
 	@Override
@@ -126,12 +119,13 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 		if (container.getWorldObj().isRemote) { return; }
 
-		if (mjStored > 0) {
+		
+		if (battery.getEnergyStored() > 10) {
 			if (transport.getNumberOfStacks() < PipeTransportItems.MAX_PIPE_STACKS) {
 				extractItems();
 			}
 
-			mjStored = 0;
+			battery.setEnergy(0);
 		}
 	}
 
@@ -179,6 +173,8 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			ItemStack stack = inventory.getStackInSlot(k);
 
 			if (stack == null || stack.stackSize <= 0) {
+				
+				battery.useEnergy(10, 10, false);
 				continue;
 			}
 
@@ -190,10 +186,9 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			}
 
 			if (doRemove) {
-				double energyUsed = mjStored > stack.stackSize ? stack.stackSize : mjStored;
-				mjStored -= energyUsed;
-
-				stack = inventory.decrStackSize(k, (int) Math.floor(energyUsed));
+				int stackSize = (int) Math.floor(battery.useEnergy(10, 10 * stack.stackSize, false) / 10);
+				
+				stack = inventory.decrStackSize(k, stackSize);
 			}
 
 			return new ItemStack[] { stack };
@@ -246,7 +241,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
 				}
 			}
 		}
@@ -271,7 +266,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 	@SuppressWarnings("unused")
 	private void useRedstoneAsPower() {
-		if (powered) mjStored++;
+		if (powered) battery.addEnergy(0,10,false);
 	}
 
 	public boolean isPowered() {
@@ -283,14 +278,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 		return standardIconIndex;
 	}
 
-	@Override
-	public void doWork(PowerHandler arg0) {}
-
-	@Override
-	public PowerReceiver getPowerReceiver(ForgeDirection arg0) {
-		return powerHandler.getPowerReceiver();
-	}
-
 	private void extractItems() {
 
 		IInventory inventory = ABO.instance.getInventoryEnderChest();
@@ -299,7 +286,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 		for (ItemStack stack : extracted) {
 			if (stack == null || stack.stackSize == 0) {
-				mjStored = mjStored > 1 ? mjStored - 1 : 0;
 
 				continue;
 			}
@@ -354,10 +340,9 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 			if (slot != null && slot.stackSize > 0) {
 				if (doRemove) {
-					double energyUsed = mjStored > slot.stackSize ? slot.stackSize : mjStored;
-					mjStored -= energyUsed;
+					int stackSize = battery.useEnergy(10, slot.stackSize * 10, false) / 10;
 
-					return inventory.decrStackSize(k, (int) energyUsed);
+					return inventory.decrStackSize(k, stackSize);
 				} else {
 					return slot;
 				}
@@ -446,5 +431,32 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	@Override
 	public void readGuiData(ByteBuf data, EntityPlayer sender) {
 		settings.setFilterMode(FilterMode.values()[data.readByte()]);
+	}
+
+	@Override
+	public boolean canConnectEnergy(ForgeDirection from) {
+		return true;
+	}
+
+	@Override
+	public int receiveEnergy(ForgeDirection from, int maxReceive,
+			boolean simulate) {
+		return battery.receiveEnergy(maxReceive, simulate);
+	}
+
+	@Override
+	public int extractEnergy(ForgeDirection from, int maxExtract,
+			boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection from) {
+		return battery.getEnergyStored();
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection from) {
+		return battery.getMaxEnergyStored();
 	}
 }

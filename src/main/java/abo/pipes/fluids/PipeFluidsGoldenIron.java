@@ -12,8 +12,8 @@
 
 package abo.pipes.fluids;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -23,14 +23,15 @@ import net.minecraftforge.fluids.IFluidHandler;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.BuildCraftTransport;
-import buildcraft.api.gates.IAction;
+import buildcraft.api.statements.IActionInternal;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.gates.StatementSlot;
 import buildcraft.transport.pipes.PipeFluidsWood;
 import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
-import buildcraft.transport.triggers.ActionPipeDirection;
+import buildcraft.transport.statements.ActionPipeDirection;
 
 /**
  * @author Flow86
@@ -108,20 +109,20 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 	}
 
 	@Override
-	protected void actionsActivated(Map<IAction, Boolean> actions) {
+	protected void actionsActivated(Collection<StatementSlot> actions) {
 		super.actionsActivated(actions);
 
-		for (Map.Entry<IAction, Boolean> action : actions.entrySet()) {
-			if (action.getKey() instanceof ActionPipeDirection && action.getValue() != null && action.getValue()) {
-				logic.setFacing(((ActionPipeDirection) action.getKey()).direction);
+		for (StatementSlot action : actions) {
+			if (action.statement instanceof ActionPipeDirection) {
+				logic.setFacing(((ActionPipeDirection) action.statement).direction);
 				break;
 			}
 		}
 	}
 
 	@Override
-	public LinkedList<IAction> getActions() {
-		LinkedList<IAction> action = super.getActions();
+	public LinkedList<IActionInternal> getActions() {
+		LinkedList<IActionInternal> action = super.getActions();
 		for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
 			if (container.isPipeConnected(direction))
 				action.add(BuildCraftTransport.actionPipeDirection[direction.ordinal()]);

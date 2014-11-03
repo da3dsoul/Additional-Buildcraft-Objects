@@ -46,7 +46,7 @@ public class PipeItemsCrossover extends ABOPipe<PipeTransportItems> {
 		TravelingItem item = event.item;
 		List<ForgeDirection> list = new LinkedList<ForgeDirection>();
 
-		if (transport.canReceivePipeObjects(item.input, item)) {
+		if (transport.inputOpen(item.input)) {
 			list.add(item.input);
 			result.clear();
 			result.addAll(list);

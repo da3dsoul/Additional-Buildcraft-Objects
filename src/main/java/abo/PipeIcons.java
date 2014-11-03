@@ -27,8 +27,6 @@ public enum PipeIcons {
 
 	PipeItemsEnderExtraction,
 
-	PipePowerExtraction,
-
 	PipeLiquidsInsertion,
 	
 	PipeLiquidsReinforcedGoldenIron, PipeLiquidsReinforcedGoldenIronSide,

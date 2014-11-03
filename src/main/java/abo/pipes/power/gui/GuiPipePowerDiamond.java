@@ -12,6 +12,8 @@
 
 package abo.pipes.power.gui;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -56,9 +58,9 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 
 		guiContainer = (ContainerPipePowerDiamond) inventorySlots;
 
-		slots = new AdvancedSlot[6];
+		slots = new ArrayList<AdvancedSlot>(6);
 		for (int i = 0; i < 6; ++i) {
-			slots[i] = new YesNoSlot(this, i, 8, 18 + i * (16 + 2), tile);
+			slots.add(i, new YesNoSlot(this, i, 8, 18 + i * (16 + 2), tile));
 		}
 
 		xSize = 175;
@@ -74,10 +76,10 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 		String names[] = { "Down", "Up", "North", "South", "West", "East" };
 
 		for (int i = 0; i < 6; ++i) {
-			fontRendererObj.drawString(names[i], slots[i].x + 20, slots[i].y + 4, 0x404040);
+			fontRendererObj.drawString(names[i], slots.get(i).x + 20, slots.get(i).y + 4, 0x404040);
 		}
 
-		drawForegroundSelection(x, y);
+		//drawForegroundSelection(x, y);
 	}
 
 	@Override
@@ -106,13 +108,13 @@ public class GuiPipePowerDiamond extends GuiAdvancedInterface {
 		int cornerX = (width - xSize) / 2;
 		int cornerY = (height - ySize) / 2;
 
-		int position = getSlotAtLocation(mouseX - cornerX, mouseY - cornerY);
+		int position = getSlotIndexAtLocation(mouseX - cornerX, mouseY - cornerY);
 
 		AdvancedSlot slot = null;
 
 		if (position < 0) return;
 
-		slot = slots[position];
+		slot = slots.get(position);
 
 		if (slot instanceof YesNoSlot) {
 			YesNoSlot s = (YesNoSlot) slot;

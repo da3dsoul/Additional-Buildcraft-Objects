@@ -17,11 +17,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
-import java.util.logging.Level;
+import java.util.Random;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryEnderChest;
@@ -41,8 +44,6 @@ import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.energy.BlockWindmill;
 import abo.gui.ABOGuiHandler;
-import abo.items.ABOItem;
-import abo.items.ItemGateSettingsDuplicator;
 import abo.network.ABOPacketHandler;
 import abo.pipes.BlockRedstonePipe;
 import abo.pipes.fluids.PipeFluidsBalance;
@@ -61,27 +62,21 @@ import abo.pipes.items.PipeItemsInsertion;
 import abo.pipes.items.PipeItemsRoundRobin;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerDistribution;
-import abo.pipes.power.PipePowerExtraction;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
-import abo.triggers.ABOTriggerProvider;
-import abo.triggers.TriggerEngineSafe;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftEnergy;
 import buildcraft.BuildCraftTransport;
-import buildcraft.BuildCraftSilicon;
 import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IIconProvider;
-import buildcraft.api.gates.ActionManager;
-import buildcraft.api.gates.IAction;
-import buildcraft.api.gates.ITrigger;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.StatementManager;
 import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.InterModComms;
 import buildcraft.core.network.BuildCraftPacket;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
-import buildcraft.transport.PipeTransportPower;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -95,8 +90,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import da3dsoul.scaryGen.entity.EntityItemBat;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
@@ -158,24 +155,19 @@ public class ABO {
 
 	public static Item							pipeDistributionConductive		= null;
 
-	public static Item							pipePowerExtraction				= null;
-
 	public static Item							bottle							= null;
 	public static Item							goldenstaff						= null;
 
 	public static BlockWindmill					windmillBlock;
 
-	public static int							triggerEngineSafeID				= 128;
-	public static ITrigger						triggerEngineSafe				= null;
-
 	public static int							actionSwitchOnPipeID			= 128;
-	public static IAction						actionSwitchOnPipe				= null;
+	public static IActionInternal						actionSwitchOnPipe				= null;
 
 	public static int							actionToggleOnPipeID			= 129;
-	public static IAction						actionToggleOnPipe				= null;
+	public static IActionInternal						actionToggleOnPipe				= null;
 
 	public static int							actionToggleOffPipeID			= 130;
-	public static IAction						actionToggleOffPipe				= null;
+	public static IActionInternal						actionToggleOffPipe				= null;
 
 	public static boolean						windmillAnimations;
 	public static byte							windmillAnimDist;
@@ -194,6 +186,7 @@ public class ABO {
 
 	// Mod Init Handling
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void preInitialize(FMLPreInitializationEvent evt) {
 
@@ -273,14 +266,10 @@ public class ABO {
 
 			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, "Distribution Conductive Pipe", 2,
 					pipePowerIron, BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
-			PipeTransportPower.powerCapacities.put(PipePowerExtraction.class, 1024);
-			pipePowerExtraction = buildPipe(PipePowerExtraction.class, "Extraction Kinesis Pipe", 1, false,
-					new Object[] { "AA", "AA", Character.valueOf('A'), BuildCraftTransport.pipePowerWood });
-
-			itemGateSettingsDuplicator = createItem(ItemGateSettingsDuplicator.class, "Gate Settings Duplicator",
-					BuildCraftCore.wrenchItem, new ItemStack(BuildCraftSilicon.redstoneChipset, 1, 4), null);
 
 			windmillBlock = new BlockWindmill();
+			
+			// scaryGen
 
 			bottle = new ItemBottle();
 
@@ -290,27 +279,33 @@ public class ABO {
 			GameRegistry.registerItem(bottle, "MobBottle");
 
 			goldenstaff = new ItemGoldenStaff();
+			
+			
 
 			GameRegistry.addShapedRecipe(new ItemStack(goldenstaff),
 					new Object[] { "B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
 							new ItemStack(Items.dye, 1, 11) });
 			GameRegistry.registerItem(goldenstaff, "GoldenStaff");
-
-			EntityRegistry.registerGlobalEntityID(FollowableEntity.class, "FollowableItem",
-					EntityRegistry.findGlobalUniqueEntityId());
+			
+			int id = 0;
+			
+			addEntity(FollowableEntity.class, "FollowableItem", ++id, false);
+			addEntity(EntityItemBat.class, "ItemBat", ++id, true);
+			
+			LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name", "Item Bat");
+			
+			// end scaryGen
 
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
 					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
 							Character.valueOf('B'), Items.iron_ingot });
 
-			triggerEngineSafe = new TriggerEngineSafe(triggerEngineSafeID);
 			actionSwitchOnPipe = new ActionSwitchOnPipe(actionSwitchOnPipeID);
 			actionToggleOnPipe = new ActionToggleOnPipe(actionToggleOnPipeID);
 			actionToggleOffPipe = new ActionToggleOffPipe(actionToggleOffPipeID);
 
-			ActionManager.registerActionProvider(new ABOActionProvider());
-			ActionManager.registerTriggerProvider(new ABOTriggerProvider());
+			StatementManager.registerActionProvider(new ABOActionProvider());
 
 			FMLCommonHandler.instance().bus().register(this);
 			MinecraftForge.EVENT_BUS.register(this);
@@ -329,7 +324,23 @@ public class ABO {
 		ABOProxy.proxy.registerTileEntities();
 		ABOProxy.proxy.registerBlockRenderers();
 
+		ABOProxy.proxy.registerEntities();
+
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addEntity(Class<? extends Entity> entityClass, String name, int entityID, boolean addEgg) {
+		
+		EntityRegistry.registerModEntity(entityClass, name, entityID, instance, 128, 3, true);
+		if (addEgg) {
+			long seed = name.hashCode();
+			Random rand = new Random(seed);
+			int primaryColor = rand.nextInt() * 16777215;
+			int secondaryColor = rand.nextInt() * 16777215;
+			EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor,
+					secondaryColor));
+		}
 	}
 
 	@SubscribeEvent
@@ -367,7 +378,7 @@ public class ABO {
 			channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.TOSERVER);
 			channels.get(Side.CLIENT).writeOutbound(packet);
 		} catch (Throwable t) {
-			BCLog.logger.log(Level.WARNING, "sentToServer crash", t);
+			BCLog.logger.log(Level.WARN, "sentToServer crash", t);
 		}
 	}
 
@@ -421,26 +432,6 @@ public class ABO {
 	}
 
 	// Item Init Handling
-
-	private static Item createItem(Class<? extends ABOItem> clazz, String descr, Object ingredient1,
-			Object ingredient2, Object ingredient3) {
-
-		Item item = null;
-		try {
-			item = clazz.getConstructor().newInstance();
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-
-		if (item == null) return item;
-
-		item.setUnlocalizedName(clazz.getSimpleName());
-		GameRegistry.registerItem(item, item.getUnlocalizedName().replace("item.", ""));
-
-		addRecipe(item, 1, ingredient1, ingredient2, ingredient3);
-
-		return item;
-	}
 
 	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
 		ItemPipe res = buildPipe(clas, descr);

@@ -17,11 +17,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 
 
-// Referenced classes of package net.minecraft.src:
-//            Entity
-
-@SuppressWarnings("unused")
-public class FollowableEntity extends EntityItem implements Comparable<FollowableEntity>
+//@SuppressWarnings("unused")
+public class FollowableEntity extends EntityItem implements Comparable<FollowableEntity>,IFollowable
 {
 
 	public FollowableEntity(World par1World, boolean legacy) {
@@ -92,7 +89,7 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 		return this.moveHelper;
 	}
 
-	public FollowPathNavigate getNavigator()
+	public FollowPathNavigate getNavigator(boolean nil)
 	{
 		return this.navigator;
 	}
@@ -140,6 +137,7 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 		if(!canMove)
 		{
 			motionX = motionY = motionZ = 0;
+			setPosition(posX, posY, posZ);
 			return;
 		}
 		
@@ -269,6 +267,7 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 			((FollowableEntity)entity).followingEntity = this;
 		}
 		followTarget = entity;
+		ticksUntilSearch = 0;
 	}
 
 	public void setMoveForward(float par1)
@@ -317,20 +316,21 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 					Collections.sort(list);
 					FollowableEntity prev = null;
 					it = list.listIterator();
-					boolean a = false;
+					boolean first = true;
 					do
 					{
 						if(!it.hasNext()) break;
 						FollowableEntity ent = it.next();
 						if(ent == null || ent.followTarget == null) continue;
-						if(!ent.follows || !(ent.followTarget == followTarget)) continue;
-						if(a == false)
+						if(first == true)
 						{
 							prev = ent;
-							a = true;
+							first = false;
 							continue;
 						}
-						ent.followTarget = prev;
+						ent.setFollowTarget(prev);
+						ent.ticksUntilSearch = 0;
+						prev = ent;
 					}while(true);
 
 					ticksUntilSearch = 400;
@@ -484,7 +484,6 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 
 	public void setDead()
 	{
-		//super.setDead();
 		if(followTarget != null)
 		{
 			if(followingEntity != null)
@@ -493,5 +492,22 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 		this.isDead = true;
 	}
 
+	@Override
+	public Vec3 getDest() {
+		return getMoveHelper().getDestination();
+	}
+
+	@Override
+	public void setDest(Vec3 vec) { this.getMoveHelper().setMoveTo(vec.xCoord, vec.yCoord, vec.zCoord, getAIMoveSpeed());
+	}
+
+	
+	@Override
+    protected void fall(float par1) {
+		if(!follows) super.fall(par1);
+	}
+
+	@Override
+    protected void updateFallState(double par1, boolean par3) { if(!follows) super.updateFallState(par1, par3); }
 
 }

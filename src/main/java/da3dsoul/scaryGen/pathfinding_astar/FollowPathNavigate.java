@@ -1,13 +1,15 @@
 package da3dsoul.scaryGen.pathfinding_astar;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.world.World;
 import net.minecraft.util.*;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 
 public class FollowPathNavigate
 {
-	private FollowableEntity theEntity;
+	private Entity theEntity;
 	private World worldObj;
 
 	/** The PathEntity being followed. */
@@ -57,7 +59,7 @@ public class FollowPathNavigate
 	@SuppressWarnings("unused")
 	private boolean canFly = false;
 	
-	public FollowPathNavigate(FollowableEntity par1EntityLiving, World par2World, float par3)
+	public FollowPathNavigate(Entity par1EntityLiving, World par2World, float par3)
 	{
 		this.theEntity = par1EntityLiving;
 		this.worldObj = par2World;
@@ -134,12 +136,14 @@ public class FollowPathNavigate
 	 
 	 private void runPathFindToXYZ(double destX, double destY, double destZ, float speed)
 	 {
+		 if(!worldObj.isRemote) Minecraft.getMinecraft().mcProfiler.startSection("AStar");
 		 AStar_ThreadFindPath thread = new AStar_ThreadFindPath(this, theEntity, destX, destY, destZ, speed);
 		 thread.start();
+		 if(!worldObj.isRemote) Minecraft.getMinecraft().mcProfiler.endSection();
 	 }
 
 	 /**
-	  * Try to find and set a path to EntityLiving. Returns true if successful.
+	  * Try to find and set a path to EntityLiving.
 	  */
 	 public void tryMoveToEntityLiving(Entity par1EntityLiving, float par2)
 	 {
@@ -207,7 +211,14 @@ public class FollowPathNavigate
 				 if (var1 != null)
 				 {
 					 //Minecraft.getMinecraft().getLogAgent().logInfo("Next Path Coord:" + var1.xCoord + ", " + var1.yCoord + ", " + var1.zCoord);
-					 this.theEntity.getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, this.speed);
+					 if(this.theEntity instanceof IFollowable)
+					 {
+						 ((IFollowable)this.theEntity).setDest(Vec3.createVectorHelper(var1.xCoord, var1.yCoord, var1.zCoord));
+					 }
+					 if(this.theEntity instanceof EntityCreature)
+					 {
+						 ((EntityCreature)this.theEntity).getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, this.speed);
+					 }
 				 }
 			 }
 		 }

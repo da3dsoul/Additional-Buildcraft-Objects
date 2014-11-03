@@ -15,6 +15,7 @@ package abo.pipes.items;
 import java.util.LinkedList;
 import java.util.List;
 
+import cofh.api.energy.IEnergyHandler;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -22,10 +23,6 @@ import abo.ABO;
 import abo.PipeIcons;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.Position;
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.api.power.PowerHandler;
-import buildcraft.api.power.PowerHandler.PowerReceiver;
-import buildcraft.api.power.PowerHandler.Type;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeConnectionBans;
@@ -41,11 +38,9 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  * @author Scott Chamberlain (Leftler) ported to BC > 2.2 by Flow86
  */
-public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor {
+public class PipeItemsExtraction extends PipeItemsWood implements IEnergyHandler {
 	private final int		standardIconIndex	= PipeIcons.PipeItemsExtraction.ordinal();
 	private final int		solidIconIndex		= PipeIcons.PipeItemsExtractionSide.ordinal();
-
-	private PowerHandler	powerHandler;
 
 	private boolean			powered;
 
@@ -56,8 +51,6 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 		PipeConnectionBans.banConnection(PipeItemsExtraction.class, PipeItemsWood.class);
 
 		transport.allowBouncing = true;
-
-		powerHandler = new PowerHandler(this, Type.PIPE);
 	}
 
 	@Override
@@ -90,7 +83,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
 				}
 			}
 		}
@@ -115,7 +108,7 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 
 	@SuppressWarnings("unused")
 	private void useRedstoneAsPower() {
-		if (powered) mjStored++;
+		if (powered) battery.addEnergy(0, 1, false);
 	}
 
 	public boolean isPowered() {
@@ -159,12 +152,29 @@ public class PipeItemsExtraction extends PipeItemsWood implements IPowerReceptor
 		result.addAll(nonPipesList);
 		return;
 	}
+	
+	@Override
+	public boolean canConnectEnergy(ForgeDirection from) {
+		return true;
+	}
 
 	@Override
-	public void doWork(PowerHandler arg0) {}
+	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+		return super.receiveEnergy(from, maxReceive, simulate);
+	}
 
 	@Override
-	public PowerReceiver getPowerReceiver(ForgeDirection arg0) {
-		return powerHandler.getPowerReceiver();
+	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection from) {
+		return super.getEnergyStored(from);
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection from) {
+		return super.getMaxEnergyStored(from);
 	}
 }

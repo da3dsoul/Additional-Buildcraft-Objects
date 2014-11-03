@@ -3,6 +3,7 @@ package da3dsoul.scaryGen.pathfinding_astar;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -14,12 +15,14 @@ public class AStar_PathFinder {
 	private ChunkCoordinates start;
 	private ChunkCoordinates goal;
 	private AStar aStar;
+	public Entity theEntity;
 	
-	public AStar_PathFinder(FollowableEntity entity)
+	public AStar_PathFinder(Entity theEntity2)
 	{
-		worldObj = entity.worldObj;
-		start = new ChunkCoordinates(MathHelper.floor_double(entity.posX), MathHelper.floor_double(entity.posY), MathHelper.floor_double(entity.posZ));
+		worldObj = theEntity2.worldObj;
+		start = new ChunkCoordinates(MathHelper.floor_double(theEntity2.posX), MathHelper.floor_double(theEntity2.posY), MathHelper.floor_double(theEntity2.posZ));
 		DiagonalHeuristic heuristic = new DiagonalHeuristic();
+		theEntity = theEntity2;
 		aStar = new AStar(worldObj, heuristic, this);
 	}
 	
@@ -30,13 +33,11 @@ public class AStar_PathFinder {
 		ArrayList<ChunkCoordinates> shortestPath = aStar.calcShortestPath(start, goal);
 		if(shortestPath == null || shortestPath.isEmpty())
 		{
-			//Minecraft.getMinecraft().getLogAgent().logInfo("Fuck This Shit I'm goin home.");
 			return null;
 		}
 		ArrayList<ChunkCoordinates> waypoints = calculateWayPoints(shortestPath);
 		if(waypoints == null || waypoints.isEmpty())
 		{
-			//Minecraft.getMinecraft().getLogAgent().logInfo("Fuck This Shit I'm goin home.");
 			return null;
 		}
 		return waypoints;

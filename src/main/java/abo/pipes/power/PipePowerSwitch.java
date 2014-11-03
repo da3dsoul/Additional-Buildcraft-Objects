@@ -12,8 +12,8 @@
 
 package abo.pipes.power;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -26,13 +26,15 @@ import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
-import buildcraft.api.gates.IAction;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.IStatement;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.IPipeTransportPowerHook;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeConnectionBans;
 import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.gates.StatementSlot;
 
 /**
  * @author Flow86
@@ -51,7 +53,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 
 		PipeConnectionBans.banConnection(PipePowerSwitch.class, PipePowerSwitch.class);
 
-		PipeTransportPower.powerCapacities.put(PipePowerSwitch.class, 1024);
+		PipeTransportPower.powerCapacities.put(PipePowerSwitch.class, 10240);
 		transport.initFromPipe(getClass());
 	}
 
@@ -84,7 +86,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
 				}
 			}
 		}
@@ -137,8 +139,8 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	}
 
 	@Override
-	public LinkedList<IAction> getActions() {
-		LinkedList<IAction> actions = super.getActions();
+	public LinkedList<IActionInternal> getActions() {
+		LinkedList<IActionInternal> actions = super.getActions();
 		actions.add(ABO.actionSwitchOnPipe);
 		actions.add(ABO.actionToggleOnPipe);
 		actions.add(ABO.actionToggleOffPipe);
@@ -146,7 +148,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	}
 
 	@Override
-	protected void actionsActivated(Map<IAction, Boolean> actions) {
+	protected void actionsActivated(Collection<StatementSlot> actions) {
 		boolean lastSwitched = switched;
 		boolean lastToggled = toggled;
 
@@ -154,8 +156,8 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 
 		switched = false;
 		// Activate the actions
-		for (IAction i : actions.keySet()) {
-			if (actions.get(i)) {
+		for (StatementSlot action : actions) {
+			IStatement i = action.statement;
 				if (i instanceof ActionSwitchOnPipe) {
 					switched = true;
 				} else if (i instanceof ActionToggleOnPipe) {
@@ -163,7 +165,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 				} else if (i instanceof ActionToggleOffPipe) {
 					toggled = false;
 				}
-			}
+			
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
 			if (lastSwitched != switched && !switched) toggled = false;
@@ -174,7 +176,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	}
 
 	@Override
-	public double receiveEnergy(ForgeDirection from, double val) {
+	public int receiveEnergy(ForgeDirection from, int val) {
 		// no power is received if "disconnected"
 		if (!isPowered()) return val;
 
@@ -190,7 +192,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 	}
 
 	@Override
-	public double requestEnergy(ForgeDirection from, double amount) {
+	public int requestEnergy(ForgeDirection from, int amount) {
 		// no power is requested if "disconnected"
 		if (!isPowered()) return 0;
 

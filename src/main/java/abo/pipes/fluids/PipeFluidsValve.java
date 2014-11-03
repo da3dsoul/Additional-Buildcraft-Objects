@@ -12,8 +12,8 @@
 
 package abo.pipes.fluids;
 
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,8 +33,8 @@ import abo.pipes.PipeLogicValve;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.NetworkData;
 import buildcraft.api.core.Position;
-import buildcraft.api.gates.IAction;
-import buildcraft.api.mj.MjBattery;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.IStatement;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.factory.BlockTank;
 import buildcraft.factory.TileTank;
@@ -43,6 +43,7 @@ import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.gates.StatementSlot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -64,7 +65,6 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	private final int		openTexture			= PipeIcons.PipeLiquidsValveOpen.ordinal();
 	private final int		openTextureSide		= PipeIcons.PipeLiquidsValveOpenSide.ordinal();
 
-	@MjBattery(maxCapacity = 250, maxReceivedPerCycle = 100, minimumConsumption = 0)
 	private double			mjStored			= 0;
 
 	private PipeLogicValve	logic				= new PipeLogicValve(this);
@@ -120,7 +120,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 				TileGenericPipe pipe = (TileGenericPipe) tile;
 				if (BlockGenericPipe.isValid(pipe.pipe)) {
 					neighbours.add(pipe);
-					if (pipe.pipe.hasGate() && pipe.pipe.gate.getRedstoneOutput() > 0) powered = true;
+					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
 				}
 			}
 		}
@@ -253,16 +253,18 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 	}
 
 	@Override
-	public LinkedList<IAction> getActions() {
-		LinkedList<IAction> actions = super.getActions();
+	public LinkedList<IActionInternal> getActions() {
+		LinkedList<IActionInternal> actions = super.getActions();
 		actions.add(ABO.actionSwitchOnPipe);
 		actions.add(ABO.actionToggleOnPipe);
 		actions.add(ABO.actionToggleOffPipe);
 		return actions;
 	}
+	
+	
 
 	@Override
-	protected void actionsActivated(Map<IAction, Boolean> actions) {
+	protected void actionsActivated(Collection<StatementSlot> actions) {
 		boolean lastSwitched = switched;
 		boolean lastToggled = toggled;
 
@@ -270,8 +272,8 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 		switched = false;
 		// Activate the actions
-		for (IAction i : actions.keySet()) {
-			if (actions.get(i)) {
+		for (StatementSlot actionslot : actions) {
+			IStatement i = actionslot.statement;
 				if (i instanceof ActionSwitchOnPipe) {
 					switched = true;
 				} else if (i instanceof ActionToggleOnPipe) {
@@ -279,7 +281,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 				} else if (i instanceof ActionToggleOffPipe) {
 					toggled = false;
 				}
-			}
+			
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
 			if (lastSwitched != switched && !switched) toggled = false;

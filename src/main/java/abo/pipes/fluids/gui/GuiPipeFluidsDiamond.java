@@ -12,6 +12,7 @@
 
 package abo.pipes.fluids.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,7 +29,6 @@ import org.lwjgl.opengl.GL12;
 
 import abo.network.PacketFluidSlotChange;
 import abo.proxy.ABOProxy;
-
 import buildcraft.core.gui.AdvancedSlot;
 import buildcraft.core.gui.GuiAdvancedInterface;
 import buildcraft.core.render.FluidRenderer;
@@ -79,13 +79,13 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 
 		fluidsList.addAll(fluids.keySet());
 
-		slots = new AdvancedSlot[6 * 9];
+		slots = new ArrayList<AdvancedSlot>(6 * 9);
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 9; j++) {
 				int nr = i * 9 + j;
-				slots[nr] = new FluidSlot(this, nr, 8 + j * (16 + 2), 18 + i * (16 + 2));
+				slots.add(nr, new FluidSlot(this, nr, 8 + j * (16 + 2), 18 + i * (16 + 2)));
 
-				((FluidSlot) slots[nr]).fluid = container.pipe.fluids[nr];
+				((FluidSlot) slots.get(nr)).fluid = container.pipe.fluids[nr];
 			}
 		}
 
@@ -99,7 +99,7 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 
 		fontRendererObj.drawString(name, getCenteredOffset(name), 6, 0x404040);
 
-		drawForegroundSelection(x, y);
+		//drawForegroundSelection(x, y);
 	}
 
 	@Override
@@ -123,13 +123,13 @@ public class GuiPipeFluidsDiamond extends GuiAdvancedInterface {
 		int cornerX = (width - xSize) / 2;
 		int cornerY = (height - ySize) / 2;
 
-		int position = getSlotAtLocation(mouseX - cornerX, mouseY - cornerY);
+		int position = getSlotIndexAtLocation(mouseX - cornerX, mouseY - cornerY);
 
 		AdvancedSlot slot = null;
 
 		if (position < 0) return;
 
-		slot = slots[position];
+		slot = slots.get(position);
 
 		if (slot instanceof FluidSlot) {
 			FluidSlot fluidSlot = (FluidSlot) slot;

@@ -65,9 +65,9 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 		if (tile instanceof TileWindmill) {
 			if (!world.isRemote) {
 				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).currentOutput) + "MJ/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).realCurrentOutput/100) + "RF/t"));
 				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT) + "MJ/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT/100) + "RF/t"));
 			}
 			return ((TileWindmill) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}

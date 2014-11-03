@@ -32,4 +32,5 @@ public class ActionToggleOnPipe extends ABOAction {
 	public int getIconIndex() {
 		return ItemIconProvider.ActionToggleOnPipe;
 	}
+
 }

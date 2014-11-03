@@ -1,13 +1,12 @@
 package abo.energy;
 
+import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
-import buildcraft.api.mj.IBatteryObject;
-import buildcraft.api.mj.MjAPI;
 import buildcraft.api.power.IPowerReceptor;
 import buildcraft.api.power.PowerHandler;
 import buildcraft.api.power.PowerHandler.PowerReceiver;
@@ -16,6 +15,7 @@ import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
 
+@SuppressWarnings("deprecation")
 public class TileWindmill extends TileEngine {
 
 	static final float						MAX_OUTPUT				= 1.5f;
@@ -43,6 +43,8 @@ public class TileWindmill extends TileEngine {
 	public static final ResourceLocation	TRUNK_RED_TEXTURE		= new ResourceLocation(
 																			"additional-buildcraft-objects:textures/blocks/trunk_red.png");
 
+	public float realCurrentOutput = 0;
+	
 	public TileWindmill() {
 		super();
 	}
@@ -55,6 +57,23 @@ public class TileWindmill extends TileEngine {
 	@Override
 	public ResourceLocation getChamberTexture() {
 		return CHAMBER_TEXTURES[0];
+	}
+	
+	
+
+	public ResourceLocation getTrunkTexture(EnergyStage stage) {
+		switch (stage) {
+			case BLUE:
+				return TRUNK_BLUE_TEXTURE;
+			case GREEN:
+				return TRUNK_GREEN_TEXTURE;
+			case YELLOW:
+				return TRUNK_YELLOW_TEXTURE;
+			case RED:
+				return TRUNK_RED_TEXTURE;
+			default:
+				return TRUNK_RED_TEXTURE;
+		}
 	}
 
 	@Override
@@ -70,30 +89,31 @@ public class TileWindmill extends TileEngine {
 	}
 
 	@Override
-	public double maxEnergyReceived() {
+	public int maxEnergyReceived() {
 		return 0;
 	}
 
 	@Override
-	public double maxEnergyExtracted() {
-		return getMaxEnergy();
+	public int maxEnergyExtracted() {
+		return getMaxEnergy()/10;
 	}
 
 	@Override
-	public double getMaxEnergy() {
-		return 1000;
+	public int getMaxEnergy() {
+		return 100000;
 	}
 
 	@Override
-	public double getCurrentOutput() {
+	public int calculateCurrentOutput() {
 		updateTargetOutput();
-		return currentOutput + (TARGET_OUTPUT - currentOutput) / 200;
+		realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - currentOutput) / 200;
+		return Math.round(realCurrentOutput);
 	}
 
 	private void updateTargetOutput() {
 		if (isRedstonePowered) {
-			TARGET_OUTPUT = (float) 0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f)
-					+ (getWorldObj().rainingStrength / 8f);
+			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f)
+					+ (getWorldObj().rainingStrength / 8f)) * 10000;
 		} else {
 			TARGET_OUTPUT = 0;
 		}
@@ -119,11 +139,11 @@ public class TileWindmill extends TileEngine {
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;
-		if (energyLevel < 0.375f) {
+		if (energyLevel < 375f) {
 			return EnergyStage.BLUE;
-		} else if (energyLevel < 0.75f) {
+		} else if (energyLevel < 750f) {
 			return EnergyStage.GREEN;
-		} else if (energyLevel < 1.374f) {
+		} else if (energyLevel < 1374f) {
 			return EnergyStage.YELLOW;
 		} else {
 			return EnergyStage.RED;
@@ -182,7 +202,7 @@ public class TileWindmill extends TileEngine {
 					progressPart = 1;
 					setPumping(true);
 				} else {
-					setPumping(false);
+					//setPumping(false);
 				}
 			} else {
 				setPumping(false);
@@ -199,41 +219,54 @@ public class TileWindmill extends TileEngine {
 		burn();
 	}
 
-	private void sendPower() {
+	private int getPowerToExtract() {
 		TileEntity tile = getTileBuffer(orientation).getTile();
-		if (isPoweredTile(tile, orientation)) {
-			double extracted = getPowerToExtract();
 
-			IBatteryObject battery = MjAPI.getMjBattery(tile, MjAPI.DEFAULT_POWER_FRAMEWORK, orientation.getOpposite());
+		if (tile instanceof IEnergyHandler) {
+			IEnergyHandler handler = (IEnergyHandler) tile;
 
-			if (battery != null) {
-				battery.addEnergy(extractEnergy(0, battery.maxReceivedPerCycle(), true));
-			} else if (tile instanceof IPowerReceptor) {
-				PowerReceiver receptor = ((IPowerReceptor) tile).getPowerReceiver(orientation.getOpposite());
+			int minEnergy = 0;
+			int maxEnergy = handler.receiveEnergy(
+					orientation.getOpposite(),
+					Math.round(this.energy), true);
+			return extractEnergy(minEnergy * 100, maxEnergy * 100, false);
+		} else if (tile instanceof IPowerReceptor) {
+			PowerReceiver receptor = ((IPowerReceptor) tile)
+					.getPowerReceiver(orientation.getOpposite());
 
-				if (extracted > 0) {
-					double needed = receptor.receiveEnergy(PowerHandler.Type.ENGINE, extracted,
-							orientation.getOpposite());
-
-					extractEnergy(receptor.getMinEnergyReceived(), needed, true);
-				}
-			}
+			return extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 1000),
+					(int) Math.ceil(receptor.getMaxEnergyReceived() * 1000), false);
+		} else {
+			return 0;
 		}
 	}
 
-	private double getPowerToExtract() {
+	protected void sendPower() {
 		TileEntity tile = getTileBuffer(orientation).getTile();
+		if (isPoweredTile(tile, orientation)) {
+			int extracted = getPowerToExtract();
 
-		IBatteryObject battery = MjAPI.getMjBattery(tile, MjAPI.DEFAULT_POWER_FRAMEWORK, orientation.getOpposite());
+			if (tile instanceof IEnergyHandler) {
+				IEnergyHandler handler = (IEnergyHandler) tile;
+				if (extracted > 0) {
+					int neededRF = handler.receiveEnergy(
+							orientation.getOpposite(),
+							(int) Math.round(extracted) / 100, false);
 
-		if (battery != null) {
-			return extractEnergy(0, battery.getEnergyRequested(), false);
-		} else if (tile instanceof IPowerReceptor) {
-			PowerReceiver receptor = ((IPowerReceptor) tile).getPowerReceiver(orientation.getOpposite());
+					extractEnergy(0, neededRF / 100, true);
+				}
+			} else if (tile instanceof IPowerReceptor) {
+				PowerReceiver receptor = ((IPowerReceptor) tile)
+						.getPowerReceiver(orientation.getOpposite());
 
-			return extractEnergy(receptor.getMinEnergyReceived(), receptor.getMaxEnergyReceived(), false);
-		} else {
-			return 0;
+				if (extracted > 0) {
+					double neededMJ = receptor.receiveEnergy(
+							PowerHandler.Type.ENGINE, extracted / 1000.0,
+							orientation.getOpposite());
+
+					extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 1000), (int) Math.ceil(neededMJ * 1000), true);
+				}
+			}
 		}
 	}
 
@@ -299,7 +332,7 @@ public class TileWindmill extends TileEngine {
 		if (burnTime > 0) {
 			burnTime--;
 
-			double output = getCurrentOutput();
+			int output = calculateCurrentOutput();
 			currentOutput = output; // Comment out for constant power
 			addEnergy(output);
 		}
@@ -324,7 +357,6 @@ public class TileWindmill extends TileEngine {
 		}
 	}
 
-	@Override
 	public int getScaledBurnTime(int i) {
 		return (int) (((float) burnTime / (float) totalBurnTime) * i);
 	}
@@ -340,6 +372,39 @@ public class TileWindmill extends TileEngine {
 	@Override
 	public float explosionRange() {
 		return 1;
+	}
+	
+	//RF
+	
+	@Override
+	public int receiveEnergy(ForgeDirection from, int maxReceive,
+			boolean simulate) {
+		return 0;
+	}
+
+	@Override
+	public int extractEnergy(ForgeDirection from, int maxExtract,
+			boolean simulate) {
+		return this.extractEnergy(0, maxExtract, !simulate);
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection from) {
+		if (!(from == orientation)) {
+			return 0;
+		}
+
+		return energy;
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection from) {
+		return this.getMaxEnergy();
+	}
+
+	@Override
+	public boolean canConnectEnergy(ForgeDirection from) {
+		return from == orientation;
 	}
 
 }

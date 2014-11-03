@@ -22,8 +22,14 @@ group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.htm
 archivesBaseName = "Additional-Buildcraft-Objects"
 
 minecraft {
-    version = "1.7.10-10.13.0.1188"
+    version = "1.7.10-10.13.0.1208"
     assetDir = "eclipse/assets"
+}
+
+repositories {
+    flatDir {
+       dirs 'libs'
+   }
 }
 
 dependencies {
@@ -33,7 +39,10 @@ dependencies {
     //compile "some.group:artifact:version"
       
     // real examples
-    compile 'com.mod-buildcraft:buildcraft:6.0.17:dev'  // adds buildcraft to the dev env
+    //if buildcraft maven is not updated again, replace this with buildcraft-version-dev and uncomment it
+    //compile name: 'buildcraft-6.1.4-dev'
+    //if buildcraft maven is not updated, comment out this line
+    compile 'com.mod-buildcraft:buildcraft:6.1.5:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
     // for more info...

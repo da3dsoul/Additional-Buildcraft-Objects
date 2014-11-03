@@ -21,7 +21,6 @@ public class AStar {
 	private ArrayList<AStar_Node> closedList;
 	private SortedNodeList openList;
 	private ArrayList<ChunkCoordinates> shortestPath;
-	@SuppressWarnings("unused")
 	private AStar_PathFinder finder;
 	
 	public ChunkCoordinates currentGoal;
@@ -64,6 +63,8 @@ public class AStar {
 
 		//while we haven't reached the goal yet
 		while(openList.size() != 0) {
+			if(finder.theEntity == null || finder.theEntity.isDead) return null;
+			
 			cycles++;
 			//get the first AStar_Node from non-searched AStar_Node list, sorted by lowest distance from our goal as guessed by our heuristic
 			AStar_Node current = openList.getFirst();

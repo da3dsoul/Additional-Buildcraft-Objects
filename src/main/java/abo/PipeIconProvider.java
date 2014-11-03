@@ -131,7 +131,6 @@ public class PipeIconProvider implements IIconProvider {
 
 		_icons[PipeIcons.PipeItemsEnderExtraction.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeItemsEnderExtract");
-		_icons[PipeIcons.PipePowerExtraction.ordinal()] = iconRegister
-				.registerIcon("additional-buildcraft-objects:PipePowerExtraction");
+		
 	}
 }

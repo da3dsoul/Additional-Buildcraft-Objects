@@ -12,33 +12,42 @@
 
 package abo.actions;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
-import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import abo.ABO;
-import abo.pipes.power.PipePowerSwitch;
-import buildcraft.api.gates.IAction;
-import buildcraft.api.gates.IActionProvider;
+import net.minecraftforge.common.util.ForgeDirection;
+import abo.pipes.ABOPipe;
+import buildcraft.api.statements.IActionExternal;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.IActionProvider;
+import buildcraft.api.statements.IStatementContainer;
+import buildcraft.transport.Pipe;
 import buildcraft.transport.TileGenericPipe;
 
-/**
- * @author Flow86
- * 
- */
 public class ABOActionProvider implements IActionProvider {
-	@Override
-	public LinkedList<IAction> getNeighborActions(Block block, TileEntity tile) {
-		LinkedList<IAction> result = new LinkedList<IAction>();
 
+	@Override
+	public Collection<IActionInternal> getInternalActions(IStatementContainer container) {
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Collection<IActionExternal> getExternalActions(ForgeDirection side, TileEntity tile) {
+		LinkedList<IActionExternal> result = new LinkedList<IActionExternal>();
 		if (tile instanceof TileGenericPipe) {
-			TileGenericPipe pipe = (TileGenericPipe) tile;
-			if (pipe.pipe instanceof PipePowerSwitch) {
-				result.add(ABO.actionToggleOnPipe);
-				result.add(ABO.actionToggleOffPipe);
+			Pipe pipe = ((TileGenericPipe) tile).pipe;
+			
+			if(pipe instanceof ABOPipe)
+			{
+				LinkedList<IActionExternal> list = ((ABOPipe)pipe).getExternalActions();
+				if(list == null || list.isEmpty())
+					return null;
+				result.addAll(list);
 			}
 		}
-
+		
 		return result;
 	}
 }

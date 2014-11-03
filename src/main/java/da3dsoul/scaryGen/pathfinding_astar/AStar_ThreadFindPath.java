@@ -2,19 +2,20 @@ package da3dsoul.scaryGen.pathfinding_astar;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 
 public class AStar_ThreadFindPath extends Thread {
 
 	private FollowPathNavigate	parent;
-	private FollowableEntity	theEntity;
+	private Entity	theEntity;
 	private double				destX;
 	private double				destY;
 	private double				destZ;
 	private float				speed;
 
-	public AStar_ThreadFindPath(FollowPathNavigate parentNavigate, FollowableEntity theEntity, double x, double y,
+	public AStar_ThreadFindPath(FollowPathNavigate parentNavigate, Entity theEntity, double x, double y,
 			double z, float speed) {
 		this.setName("A*");
 		setDaemon(true);
