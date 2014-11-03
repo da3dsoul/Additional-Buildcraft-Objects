@@ -195,6 +195,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 		if (liquidToExtract > 0 && meta < 6) {
 			ForgeDirection side = ForgeDirection.getOrientation(meta);
+			if(side == null || side == ForgeDirection.UNKNOWN) return;
 			TileEntity tile = container.getTile(side);
 
 			if (tile instanceof IFluidHandler) {
@@ -206,22 +207,25 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 				{
 					buildTankCache();
 
-					FluidStack stack = fluidHandler.getTankInfo(side.getOpposite())[0].fluid;
-					if(stack != null)
+					try
 					{
-						if(stack.amount > tankCache)
+						FluidStack stack = fluidHandler.getTankInfo(side.getOpposite())[0].fluid;
+						if(stack != null)
 						{
-							if(stack.amount - amountToExtract < tankCache)
+							if(stack.amount > tankCache)
 							{
-								amountToExtract = stack.amount - tankCache;
+								if(stack.amount - amountToExtract < tankCache)
+								{
+									amountToExtract = stack.amount - tankCache;
+								}
+							}else
+							{
+								amountToExtract = 0;
 							}
-						}else
-						{
-							amountToExtract = 0;
 						}
-					}
+					} catch(Exception e) {};
 				}
-				
+
 				FluidStack extracted = fluidHandler.drain(side.getOpposite(), amountToExtract, false);
 
 				if (extracted != null) {
@@ -260,8 +264,8 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		actions.add(ABO.actionToggleOffPipe);
 		return actions;
 	}
-	
-	
+
+
 
 	@Override
 	protected void actionsActivated(Collection<StatementSlot> actions) {
@@ -274,14 +278,14 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 		// Activate the actions
 		for (StatementSlot actionslot : actions) {
 			IStatement i = actionslot.statement;
-				if (i instanceof ActionSwitchOnPipe) {
-					switched = true;
-				} else if (i instanceof ActionToggleOnPipe) {
-					toggled = true;
-				} else if (i instanceof ActionToggleOffPipe) {
-					toggled = false;
-				}
-			
+			if (i instanceof ActionSwitchOnPipe) {
+				switched = true;
+			} else if (i instanceof ActionToggleOnPipe) {
+				toggled = true;
+			} else if (i instanceof ActionToggleOffPipe) {
+				toggled = false;
+			}
+
 		}
 		if ((lastSwitched != switched) || (lastToggled != toggled)) {
 			if (lastSwitched != switched && !switched) toggled = false;
@@ -355,7 +359,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 				}
 				yCounter--;
 			}while(true);
-			
+
 			if(y - yCounter <= 0)
 			{
 				tankCache = 0;
