@@ -195,6 +195,7 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 		if (liquidToExtract > 0 && meta < 6) {
 			ForgeDirection side = ForgeDirection.getOrientation(meta);
+			if(side == null || side == ForgeDirection.UNKNOWN) return;
 			TileEntity tile = container.getTile(side);
 
 			if (tile instanceof IFluidHandler) {
@@ -205,21 +206,23 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 				if(valvePhysics)
 				{
 					buildTankCache();
-
-					FluidStack stack = fluidHandler.getTankInfo(side.getOpposite())[0].fluid;
-					if(stack != null)
+					try
 					{
-						if(stack.amount > tankCache)
+						FluidStack stack = fluidHandler.getTankInfo(side.getOpposite())[0].fluid;
+						if(stack != null)
 						{
-							if(stack.amount - amountToExtract < tankCache)
+							if(stack.amount > tankCache)
 							{
-								amountToExtract = stack.amount - tankCache;
+								if(stack.amount - amountToExtract < tankCache)
+								{
+									amountToExtract = stack.amount - tankCache;
+								}
+							}else
+							{
+								amountToExtract = 0;
 							}
-						}else
-						{
-							amountToExtract = 0;
 						}
-					}
+					} catch(Exception e) {};
 				}
 				
 				FluidStack extracted = fluidHandler.drain(side.getOpposite(), amountToExtract, false);
