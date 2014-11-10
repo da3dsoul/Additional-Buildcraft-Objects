@@ -269,7 +269,7 @@ public class ABO {
 					BuildCraftTransport.pipePowerGold, Blocks.lever, null);
 
 			pipePowerIron = buildPipe(PipePowerDirected.class, "Directed Kinesis Pipe", 1, new ItemStack(
-					BuildCraftTransport.pipeGate, 1, 1), BuildCraftTransport.pipePowerGold, null);
+					BuildCraftTransport.pipeGate, 1), BuildCraftTransport.pipePowerGold, null);
 
 			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, "Distribution Conductive Pipe", 2,
 					pipePowerIron, BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
