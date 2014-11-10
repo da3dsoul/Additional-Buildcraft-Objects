@@ -206,45 +206,45 @@ public class ABO {
 
 			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true).getBoolean(true);
 
-			pipeFluidsValve = buildRedstonePipe(PipeFluidsValve.class, "Valve Pipe", 1,
+			pipeFluidsValve = buildRedstonePipe(PipeFluidsValve.class, 1,
 					BuildCraftTransport.pipeFluidsWood, BuildCraftTransport.pipeGate, null);
 
-			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, "Golden Iron Waterproof Pipe", 1,
+			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1,
 					BuildCraftTransport.pipeFluidsGold, BuildCraftTransport.pipeFluidsIron, null);
 
 			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class,
-					"Reinfored Golden Waterproof Pipe", 1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian, null);
+					1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian, null);
 
 			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class,
-					"Reinfored Golden Iron Waterproof Pipe", 1, pipeFluidsGoldenIron, Blocks.obsidian, null);
+					1, pipeFluidsGoldenIron, Blocks.obsidian, null);
 
-			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, "Balancing Waterproof Pipe", 1,
+			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1,
 					BuildCraftTransport.pipeFluidsWood, new ItemStack(BuildCraftEnergy.engineBlock, 1, 0),
 					BuildCraftTransport.pipeFluidsWood);
 
-			pipeFluidsDiamond = buildPipe(PipeFluidsDistribution.class, "Diamond Waterproof Pipe", 1,
+			pipeFluidsDiamond = buildPipe(PipeFluidsDistribution.class, 1,
 					BuildCraftTransport.pipeItemsDiamond, BuildCraftTransport.pipeWaterproof, null);
 
-			pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, "RoundRobin Transport Pipe", 1,
+			pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1,
 					BuildCraftTransport.pipeItemsStone, Blocks.gravel, null);
 
-			pipeItemsDivide = buildPipe(PipeItemsDivide.class, "Division Transport Pipe");
+			pipeItemsDivide = buildPipe(PipeItemsDivide.class);
 
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.stone_sword, null);
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.iron_sword, null);
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.golden_sword, null);
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.diamond_sword, null);
 
-			pipeItemsCompactor = buildPipe(PipeItemsCompactor.class, "Compactor Pipe", 1,
+			pipeItemsCompactor = buildPipe(PipeItemsCompactor.class, 1,
 					BuildCraftTransport.pipeItemsStone, Blocks.piston, null);
 
-			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, "Insertion Pipe", 1,
+			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, 1,
 					BuildCraftTransport.pipeItemsIron, new ItemStack(Items.dye, 1, 2), null);
 
-			pipeFluidsInsertion = buildPipe(PipeFluidsInsertion.class, "Insertion Fluid Pipe", 1,
+			pipeFluidsInsertion = buildPipe(PipeFluidsInsertion.class, 1,
 					BuildCraftTransport.pipeFluidsIron, new ItemStack(Items.dye, 1, 2), null);
 
-			pipeItemsExtraction = buildPipe(PipeItemsExtraction.class, "Extraction Transport Pipe");
+			pipeItemsExtraction = buildPipe(PipeItemsExtraction.class);
 			ArrayList<ItemStack> list = OreDictionary.getOres("plankWood");
 			if (list.size() >= 1) {
 				for (ItemStack item : list) {
@@ -252,19 +252,19 @@ public class ABO {
 				}
 			}
 
-			pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, "Ender Extraction Transport Pipe", 1,
+			pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, 1,
 					ABO.pipeItemsExtraction, Items.ender_pearl, null);
 
-			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, "Crossover Transport Pipe", 1,
+			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, 1,
 					BuildCraftTransport.pipeItemsStone, BuildCraftTransport.pipeItemsIron, null);
 
-			pipePowerSwitch = buildRedstonePipe(PipePowerSwitch.class, "Power Switch Pipe", 1,
+			pipePowerSwitch = buildRedstonePipe(PipePowerSwitch.class, 1,
 					BuildCraftTransport.pipePowerGold, Blocks.lever, null);
 
-			pipePowerIron = buildPipe(PipePowerDirected.class, "Directed Kinesis Pipe", 1, new ItemStack(
-					BuildCraftTransport.pipeGate, 1, 1), BuildCraftTransport.pipePowerGold, null);
+			pipePowerIron = buildPipe(PipePowerDirected.class, 1, new ItemStack(
+					BuildCraftTransport.pipeGate, 1), BuildCraftTransport.pipePowerGold, null);
 
-			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, "Distribution Conductive Pipe", 2,
+			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, 2,
 					pipePowerIron, BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
 
 			windmillBlock = new BlockWindmill();
@@ -433,24 +433,24 @@ public class ABO {
 
 	// Item Init Handling
 
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
-		ItemPipe res = buildPipe(clas, descr);
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
+		ItemPipe res = buildPipe(clas);
 
 		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
 
 		return res;
 	}
 
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr, int count, boolean isShapelessRecipe,
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas, int count, boolean isShapelessRecipe,
 			Object... ingredients) {
-		ItemPipe res = buildPipe(clas, descr);
+		ItemPipe res = buildPipe(clas);
 
 		addRecipe(res, count, isShapelessRecipe, ingredients);
 
 		return res;
 	}
 
-	public static ItemPipe buildPipe(Class<? extends Pipe> clas, String descr) {
+	public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
 
 		ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
 		res.setUnlocalizedName(clas.getSimpleName());
@@ -459,7 +459,7 @@ public class ABO {
 		return res;
 	}
 
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr) {
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas) {
 
 		ItemPipe res = BlockRedstonePipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
 		res.setUnlocalizedName(clas.getSimpleName());
@@ -468,17 +468,17 @@ public class ABO {
 		return res;
 	}
 
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count,
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, int count,
 			boolean isShapelessRecipe, Object... ingredients) {
-		ItemPipe res = buildRedstonePipe(clas, descr);
+		ItemPipe res = buildRedstonePipe(clas);
 
 		addRecipe(res, count, isShapelessRecipe, ingredients);
 
 		return res;
 	}
 
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, String descr, int count, Object... ingredients) {
-		ItemPipe res = buildRedstonePipe(clas, descr);
+	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
+		ItemPipe res = buildRedstonePipe(clas);
 
 		addRecipe(res, count, ingredients[0], ingredients[1], ingredients[2]);
 
