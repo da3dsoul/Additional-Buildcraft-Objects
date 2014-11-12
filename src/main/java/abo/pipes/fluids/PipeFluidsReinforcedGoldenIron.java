@@ -1,5 +1,6 @@
 package abo.pipes.fluids;
 
+import buildcraft.BuildCraftTransport;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIcons;
@@ -12,7 +13,7 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 	public PipeFluidsReinforcedGoldenIron(Item itemID) {
 		super(itemID);
 
-		transport.flowRate = 250;
+		transport.flowRate = 12 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
 	}
 	

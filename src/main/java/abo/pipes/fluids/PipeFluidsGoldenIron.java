@@ -62,7 +62,7 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 	public PipeFluidsGoldenIron(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
 
-		transport.flowRate = 80;
+		transport.flowRate = 4 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
 	}
 

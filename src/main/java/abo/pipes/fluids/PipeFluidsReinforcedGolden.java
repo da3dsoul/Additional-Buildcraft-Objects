@@ -6,15 +6,17 @@ import net.minecraft.item.Item;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import abo.PipeIcons;
+import abo.pipes.ABOPipe;
 import buildcraft.api.core.IIconProvider;
-import buildcraft.transport.pipes.PipeFluidsGold;
+import buildcraft.BuildCraftTransport;
+import buildcraft.transport.PipeTransportFluids;
 
-public class PipeFluidsReinforcedGolden extends PipeFluidsGold {
-	
-	public PipeFluidsReinforcedGolden(Item itemID) {
-		super(itemID);
+public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluids> {
 
-		transport.flowRate = 250;
+	public PipeFluidsReinforcedGolden(Item item) {
+	        super(new PipeTransportFluids(), item);
+
+		transport.flowRate = 12 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
 	}
 	

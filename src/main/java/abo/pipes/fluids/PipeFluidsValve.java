@@ -29,8 +29,8 @@ import abo.PipeIcons;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
+import abo.pipes.ABOPipe;
 import abo.pipes.PipeLogicValve;
-import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.NetworkData;
 import buildcraft.api.core.Position;
 import buildcraft.api.statements.IActionInternal;
@@ -40,14 +40,11 @@ import buildcraft.factory.BlockTank;
 import buildcraft.factory.TileTank;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ISolidSideTile;
-import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.StatementSlot;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolidSideTile {
+public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile {
 
 	private boolean			powered;
 	private boolean			switched;
@@ -77,12 +74,6 @@ public class PipeFluidsValve extends Pipe<PipeTransportFluids> implements ISolid
 
 		onlyStraight = ABO.valveConnectsStraight;
 		valvePhysics = ABO.valvePhysics;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIconProvider getIconProvider() {
-		return ABO.instance.pipeIconProvider;
 	}
 
 	@Override
