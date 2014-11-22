@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
@@ -42,6 +43,7 @@ import abo.actions.ABOActionProvider;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
+import abo.energy.BlockNull;
 import abo.energy.BlockWindmill;
 import abo.gui.ABOGuiHandler;
 import abo.network.ABOPacketHandler;
@@ -159,6 +161,8 @@ public class ABO {
 	public static Item							goldenstaff						= null;
 
 	public static BlockWindmill					windmillBlock;
+	
+	public static Block	blockNull;
 
 	public static int							actionSwitchOnPipeID			= 128;
 	public static IActionInternal						actionSwitchOnPipe				= null;
@@ -195,11 +199,16 @@ public class ABO {
 		aboLog.info("Copyright (c) Flow86, 2011-2013");
 
 		aboConfiguration = new ABOConfiguration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
+		
+		float windmillScalar = 1;
+		
 		try {
 			aboConfiguration.load();
 
 			windmillAnimations = aboConfiguration.get("Misc", "WindmillAnimations", true).getBoolean(true);
 			windmillAnimDist = (byte) aboConfiguration.get("Misc", "AnimateWindmillDistance", 64).getInt(64);
+			
+			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
 					.getBoolean(true);
@@ -267,7 +276,14 @@ public class ABO {
 			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, 2,
 					pipePowerIron, BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
 
-			windmillBlock = new BlockWindmill();
+			blockNull = new BlockNull().setLightOpacity(0).setBlockUnbreakable().setStepSound(Block.soundTypePiston).setBlockName("null").setBlockTextureName("additional-buildcraft-objects:null");
+			windmillBlock = new BlockWindmill(windmillScalar);
+			
+			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
+			GameRegistry.registerBlock(blockNull, "null");
+			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
+					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
+							Character.valueOf('B'), Items.iron_ingot });
 			
 			// scaryGen
 
@@ -295,11 +311,6 @@ public class ABO {
 			LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name", "Item Bat");
 			
 			// end scaryGen
-
-			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
-			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
-					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
-							Character.valueOf('B'), Items.iron_ingot });
 
 			actionSwitchOnPipe = new ActionSwitchOnPipe(actionSwitchOnPipeID);
 			actionToggleOnPipe = new ActionToggleOnPipe(actionToggleOnPipeID);

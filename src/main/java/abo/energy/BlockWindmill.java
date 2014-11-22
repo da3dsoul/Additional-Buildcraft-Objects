@@ -2,6 +2,7 @@ package abo.energy;
 
 import java.text.DecimalFormat;
 import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -19,6 +20,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.common.util.ForgeDirection;
+import abo.ABO;
 import buildcraft.BuildCraftCore;
 import buildcraft.core.BlockBuildCraft;
 import buildcraft.core.CreativeTabBuildCraft;
@@ -33,11 +35,19 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 			AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) };
 
 	private static IIcon					texture;
+	
+	private float scalar = 1;
 
 	public BlockWindmill() {
 		super(Material.iron);
 		setBlockName("windmillBlock");
 		setCreativeTab(CreativeTabBuildCraft.BLOCKS.get());
+	}
+	
+	public BlockWindmill(float s)
+	{
+		this();
+		scalar = s;
 	}
 
 	@Override
@@ -65,9 +75,9 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 		if (tile instanceof TileWindmill) {
 			if (!world.isRemote) {
 				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).realCurrentOutput/100) + "RF/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).realCurrentOutput/1000) + "RF/t"));
 				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT/100) + "RF/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT/1000) + "RF/t"));
 			}
 			return ((TileWindmill) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
@@ -93,7 +103,7 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 
 	@Override
 	public TileEntity createTileEntity(World world, int metadata) {
-		return new TileWindmill();
+		return new TileWindmill(scalar);
 	}
 
 	@Override
@@ -170,7 +180,7 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 			return false;
 		if (world.getBlock(x, y - 2, z) != Blocks.fence && world.getBlock(x, y - 2, z) != Blocks.nether_brick_fence)
 			return false;
-		if (world.getBlock(x, y + 1, z) != Blocks.air) return false;
+		if (world.getBlock(x, y + 1, z) != Blocks.air && world.getBlock(x, y + 1, z) != ABO.blockNull) return false;
 		return true;
 	}
 
@@ -189,7 +199,22 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return null;
 	}
-	
+
+	@Override
+	public void onBlockAdded(World world, int i, int j, int k) {
+		super.onBlockAdded(world, i, j, k);
+		
+		if(world.getBlock(i, j + 1, k) == Blocks.air)
+		{
+			world.setBlock(i, j + 1, k, ABO.blockNull);
+		}
+	}
+
+	@Override
+	public void onBlockPreDestroy(World world, int i, int j, int k, int oldMeta) {
+		if(world.getBlock(i, j + 1, k) == ABO.blockNull) world.setBlock(i, j + 1, k, Blocks.air);
+	}
+
 	
 
 }

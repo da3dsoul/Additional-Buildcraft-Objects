@@ -23,6 +23,8 @@ public class TileWindmill extends TileEngine {
 	public float							TARGET_OUTPUT			= 0.1f;
 	private float							BIOME_OUTPUT			= 0.175f;
 	private float							HEIGHT_OUTPUT			= 0f;
+	
+	public static float windmillScalar;
 	// final float kp = 1f;
 	// final float ki = 0.05f;
 	// final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
@@ -47,6 +49,11 @@ public class TileWindmill extends TileEngine {
 	
 	public TileWindmill() {
 		super();
+	}
+	
+	public TileWindmill(float scalar) {
+		this();
+		windmillScalar = scalar;
 	}
 
 	@Override
@@ -113,7 +120,7 @@ public class TileWindmill extends TileEngine {
 	private void updateTargetOutput() {
 		if (isRedstonePowered) {
 			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f)
-					+ (getWorldObj().rainingStrength / 8f)) * 10000;
+					+ (getWorldObj().rainingStrength / 8f)) * 10000 * windmillScalar;
 		} else {
 			TARGET_OUTPUT = 0;
 		}
@@ -139,14 +146,33 @@ public class TileWindmill extends TileEngine {
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;
-		if (energyLevel < 375f) {
+		if (energyLevel < 3750f * windmillScalar) {
 			return EnergyStage.BLUE;
-		} else if (energyLevel < 750f) {
+		} else if (energyLevel < 7500f * windmillScalar) {
 			return EnergyStage.GREEN;
-		} else if (energyLevel < 1374f) {
+		} else if (energyLevel < 13740f * windmillScalar) {
 			return EnergyStage.YELLOW;
 		} else {
 			return EnergyStage.RED;
+		}
+	}
+	
+	public float getPistonSpeed() {
+		if (!worldObj.isRemote) {
+			return Math.max(0.16f * (realCurrentOutput / 15000F / windmillScalar), 0.01f);
+		}
+
+		switch (getEnergyStage()) {
+			case BLUE:
+				return 0.02F;
+			case GREEN:
+				return 0.04F;
+			case YELLOW:
+				return 0.08F;
+			case RED:
+				return 0.16F;
+			default:
+				return 0.01F;
 		}
 	}
 
@@ -229,16 +255,21 @@ public class TileWindmill extends TileEngine {
 			int maxEnergy = handler.receiveEnergy(
 					orientation.getOpposite(),
 					Math.round(this.energy), true);
-			return extractEnergy(minEnergy * 100, maxEnergy * 100, false);
+			return extractEnergy(in(minEnergy * 1000 * windmillScalar), in(maxEnergy * 1000 * windmillScalar), false);
 		} else if (tile instanceof IPowerReceptor) {
 			PowerReceiver receptor = ((IPowerReceptor) tile)
 					.getPowerReceiver(orientation.getOpposite());
 
-			return extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 1000),
-					(int) Math.ceil(receptor.getMaxEnergyReceived() * 1000), false);
+			return extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 10000 * windmillScalar),
+					(int) Math.ceil(receptor.getMaxEnergyReceived() * 10000 * windmillScalar), false);
 		} else {
 			return 0;
 		}
+	}
+	
+	private int in(float a)
+	{
+		return Math.round(a);
 	}
 
 	protected void sendPower() {
@@ -251,9 +282,9 @@ public class TileWindmill extends TileEngine {
 				if (extracted > 0) {
 					int neededRF = handler.receiveEnergy(
 							orientation.getOpposite(),
-							(int) Math.round(extracted) / 100, false);
+							(int) Math.round(extracted * windmillScalar) / 1000, false);
 
-					extractEnergy(0, neededRF / 100, true);
+					extractEnergy(0, neededRF / 1000, true);
 				}
 			} else if (tile instanceof IPowerReceptor) {
 				PowerReceiver receptor = ((IPowerReceptor) tile)
@@ -261,10 +292,10 @@ public class TileWindmill extends TileEngine {
 
 				if (extracted > 0) {
 					double neededMJ = receptor.receiveEnergy(
-							PowerHandler.Type.ENGINE, extracted / 1000.0,
+							PowerHandler.Type.ENGINE, extracted * windmillScalar / 10000.0,
 							orientation.getOpposite());
 
-					extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 1000), (int) Math.ceil(neededMJ * 1000), true);
+					extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 10000), (int) Math.ceil(neededMJ * 10000), true);
 				}
 			}
 		}
