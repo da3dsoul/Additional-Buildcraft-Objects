@@ -13,7 +13,7 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 	public PipeFluidsReinforcedGoldenIron(Item itemID) {
 		super(itemID);
 
-		transport.flowRate = 12 * BuildCraftTransport.pipeFluidsBaseFlowRate;
+		transport.flowRate = 16 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
 	}
 	

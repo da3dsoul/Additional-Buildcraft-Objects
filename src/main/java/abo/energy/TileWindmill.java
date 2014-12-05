@@ -7,15 +7,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.api.power.PowerHandler;
-import buildcraft.api.power.PowerHandler.PowerReceiver;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
 
-@SuppressWarnings("deprecation")
 public class TileWindmill extends TileEngine {
 
 	static final float						MAX_OUTPUT				= 1.5f;
@@ -159,7 +155,7 @@ public class TileWindmill extends TileEngine {
 	
 	public float getPistonSpeed() {
 		if (!worldObj.isRemote) {
-			return Math.max(0.16f * (realCurrentOutput / 15000F / windmillScalar), 0.01f);
+			return Math.max(0.16f * ((realCurrentOutput != 0 ? realCurrentOutput : TARGET_OUTPUT) / 15000F / windmillScalar), 0.01f);
 		}
 
 		switch (getEnergyStage()) {
@@ -205,11 +201,11 @@ public class TileWindmill extends TileEngine {
 			}
 		}
 
-		updateHeatLevel();
+		updateHeat();
 		getEnergyStage();
 		engineUpdate();
 
-		TileEntity tile = getTileBuffer(orientation).getTile();
+		TileEntity tile = getTile(orientation);
 
 		if (currentOutput != 0) progress += getPistonSpeed();
 
@@ -227,11 +223,7 @@ public class TileWindmill extends TileEngine {
 				if (getPowerToExtract() > 0) {
 					progressPart = 1;
 					setPumping(true);
-				} else {
-					//setPumping(false);
 				}
-			} else {
-				setPumping(false);
 			}
 		} else {
 			setPumping(false);
@@ -246,23 +238,16 @@ public class TileWindmill extends TileEngine {
 	}
 
 	private int getPowerToExtract() {
-		TileEntity tile = getTileBuffer(orientation).getTile();
+		TileEntity tile = getTile(orientation);
 
 		if (tile instanceof IEnergyHandler) {
 			IEnergyHandler handler = (IEnergyHandler) tile;
-
-			int minEnergy = 0;
 			int maxEnergy = handler.receiveEnergy(
 					orientation.getOpposite(),
 					Math.round(this.energy), true);
-			return extractEnergy(in(minEnergy * 1000 * windmillScalar), in(maxEnergy * 1000 * windmillScalar), false);
-		} else if (tile instanceof IPowerReceptor) {
-			PowerReceiver receptor = ((IPowerReceptor) tile)
-					.getPowerReceiver(orientation.getOpposite());
-
-			return extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 10000 * windmillScalar),
-					(int) Math.ceil(receptor.getMaxEnergyReceived() * 10000 * windmillScalar), false);
-		} else {
+			return extractEnergy(in(maxEnergy * 1000 * windmillScalar), false);
+		}else
+		{
 			return 0;
 		}
 	}
@@ -273,7 +258,7 @@ public class TileWindmill extends TileEngine {
 	}
 
 	protected void sendPower() {
-		TileEntity tile = getTileBuffer(orientation).getTile();
+		TileEntity tile = getTile(orientation);
 		if (isPoweredTile(tile, orientation)) {
 			int extracted = getPowerToExtract();
 
@@ -284,18 +269,7 @@ public class TileWindmill extends TileEngine {
 							orientation.getOpposite(),
 							(int) Math.round(extracted * windmillScalar) / 1000, false);
 
-					extractEnergy(0, neededRF / 1000, true);
-				}
-			} else if (tile instanceof IPowerReceptor) {
-				PowerReceiver receptor = ((IPowerReceptor) tile)
-						.getPowerReceiver(orientation.getOpposite());
-
-				if (extracted > 0) {
-					double neededMJ = receptor.receiveEnergy(
-							PowerHandler.Type.ENGINE, extracted * windmillScalar / 10000.0,
-							orientation.getOpposite());
-
-					extractEnergy((int) Math.floor(receptor.getMinEnergyReceived() * 10000), (int) Math.ceil(neededMJ * 10000), true);
+					extractEnergy(neededRF / 1000, true);
 				}
 			}
 		}
@@ -318,7 +292,7 @@ public class TileWindmill extends TileEngine {
 
 	public boolean isOrientationValid() {
 		if (orientation == ForgeDirection.EAST) return false;
-		TileEntity tile = getTileBuffer(orientation).getTile();
+		TileEntity tile = getTile(orientation);
 
 		return isPoweredTile(tile, orientation);
 	}
@@ -335,7 +309,7 @@ public class TileWindmill extends TileEngine {
 		for (int i = orientation.ordinal() + 1; i <= orientation.ordinal() + 6; ++i) {
 			ForgeDirection o = ForgeDirection.VALID_DIRECTIONS[i % 6];
 			if (o == ForgeDirection.EAST) continue;
-			TileEntity tile = getTileBuffer(o).getTile();
+			TileEntity tile = getTile(o);
 
 			if ((!pipesOnly || tile instanceof IPipeTile) && isPoweredTile(tile, o)) {
 				orientation = o;
@@ -361,7 +335,7 @@ public class TileWindmill extends TileEngine {
 	@Override
 	public void burn() {
 		if (burnTime > 0) {
-			burnTime--;
+			burnTime = burnTime - 1;
 
 			int output = calculateCurrentOutput();
 			currentOutput = output; // Comment out for constant power
@@ -391,19 +365,6 @@ public class TileWindmill extends TileEngine {
 	public int getScaledBurnTime(int i) {
 		return (int) (((float) burnTime / (float) totalBurnTime) * i);
 	}
-
-	/*
-	 * @Override public void engineUpdate() { super.engineUpdate();
-	 * 
-	 * if (isRedstonePowered) { double output = getCurrentOutput();
-	 * currentOutput = output; // Comment out for constant power
-	 * addEnergy(output); } }
-	 */
-
-	@Override
-	public float explosionRange() {
-		return 1;
-	}
 	
 	//RF
 	
@@ -416,7 +377,7 @@ public class TileWindmill extends TileEngine {
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract,
 			boolean simulate) {
-		return this.extractEnergy(0, maxExtract, !simulate);
+		return this.extractEnergy(maxExtract, !simulate);
 	}
 
 	@Override

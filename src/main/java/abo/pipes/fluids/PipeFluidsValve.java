@@ -12,6 +12,8 @@
 
 package abo.pipes.fluids;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -31,11 +33,12 @@ import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
 import abo.pipes.PipeLogicValve;
-import buildcraft.api.core.NetworkData;
+import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.Position;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.transport.PipeManager;
+import buildcraft.core.network.IClientState;
 import buildcraft.factory.BlockTank;
 import buildcraft.factory.TileTank;
 import buildcraft.transport.BlockGenericPipe;
@@ -44,7 +47,7 @@ import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.StatementSlot;
 
-public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile {
+public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile, IClientState {
 
 	private boolean			powered;
 	private boolean			switched;
@@ -54,7 +57,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 
 	private int				tankCache = 0;
 
-	@NetworkData
 	public int				liquidToExtract;
 
 	private final int		closedTexture		= PipeIcons.PipeLiquidsValveClosed.ordinal();
@@ -69,7 +71,7 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 	public PipeFluidsValve(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
 
-		transport.flowRate = 160;
+		transport.flowRate = 16 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
 
 		onlyStraight = ABO.valveConnectsStraight;
@@ -299,26 +301,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 				|| container.getBlockMetadata() == side.ordinal() || !onlyStraight);
 	}
 
-	/*
-	 * private ForgeDirection getDirectionToTile(TileEntity tile) { int x1 =
-	 * container.xCoord; int x2 = tile.xCoord; int y1 = container.yCoord; int y2
-	 * = tile.yCoord; int z1 = container.zCoord; int z2 = tile.zCoord;
-	 * 
-	 * // Offsets on multiple axes or same block if(x1 == x2 && y1 == y2 && z1
-	 * == z2) return ForgeDirection.UNKNOWN; if(x1 != x2 && y1 != y2 && z1 !=
-	 * z2) return ForgeDirection.UNKNOWN; if(x1 == x2 && y1 != y2 && z1 != z2)
-	 * return ForgeDirection.UNKNOWN; if(x1 != x2 && y1 == y2 && z1 != z2)
-	 * return ForgeDirection.UNKNOWN; if(x1 != x2 && y1 != y2 && z1 == z2)
-	 * return ForgeDirection.UNKNOWN;
-	 * 
-	 * if(x1 > x2) return ForgeDirection.WEST; if(x1 < x2) return
-	 * ForgeDirection.EAST; if(y1 > y2) return ForgeDirection.DOWN; if(y1 < y2)
-	 * return ForgeDirection.UP; if(z1 > z2) return ForgeDirection.NORTH; if(z1
-	 * < z2) return ForgeDirection.SOUTH;
-	 * 
-	 * // android.util.Log.wtf(msg); return ForgeDirection.UNKNOWN; }
-	 */
-
 	@Override
 	public boolean isSolidOnSide(ForgeDirection side) {
 		if (getWorld()
@@ -364,6 +346,16 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 			tankCache = 0;
 		}
 
+	}
+
+	@Override
+	public void writeData(ByteBuf data) {
+		data.writeInt(liquidToExtract);
+	}
+
+	@Override
+	public void readData(ByteBuf data) {
+		liquidToExtract = data.readInt();
 	}
 
 }

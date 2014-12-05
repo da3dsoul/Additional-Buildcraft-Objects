@@ -212,6 +212,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Tom/.gradle/caches/minecraft/net/minecraftforge/forge/1.7.10-10.13.0.1188/start"/>
-	<classpathentry kind="lib" path="C:/Users/Tom/Documents/GitHub/Additional-Buildcraft-Objects-Mod/buildcraft-6.1.8-dev.jar" sourcepath="C:/Users/Tom/buildcraft.zip"/>
+	<classpathentry kind="lib" path="C:/Users/Tom/Documents/GitHub/Additional-Buildcraft-Objects-Mod/buildcraft-6.2.2-dev.jar" sourcepath="C:/Users/Tom/buildcraft.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

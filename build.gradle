@@ -42,7 +42,7 @@ dependencies {
     //if buildcraft maven is not updated again, replace this with buildcraft-version-dev and uncomment it
     //compile name: 'buildcraft-6.1.4-dev'
     //if buildcraft maven is not updated, comment out this line
-    compile 'com.mod-buildcraft:buildcraft:6.1.5:dev'  // adds buildcraft to the dev env
+    compile 'com.mod-buildcraft:buildcraft:6.2.2:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
     // for more info...

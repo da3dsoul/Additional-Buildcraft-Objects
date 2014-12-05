@@ -6,6 +6,8 @@ import java.util.ListIterator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -47,7 +49,7 @@ public class ItemGoldenStaff extends Item {
 				break;
 			}
 			Entity item = (Entity) it.next();
-			if(!entityplayer.isSneaking())
+			if(!hasRespiration(itemstack))
 			{
 				item.onCollideWithPlayer(entityplayer);
 				entityplayer.xpCooldown = 0;
@@ -89,6 +91,11 @@ public class ItemGoldenStaff extends Item {
 		return itemstack;
 	}
 
-
+	private boolean hasRespiration(ItemStack itemstack)
+	{
+		if(!itemstack.isItemEnchanted()) return false;
+		if(EnchantmentHelper.getEnchantmentLevel(Enchantment.respiration.effectId, itemstack) <= 0) return false;
+		return true;
+	}
 
 }

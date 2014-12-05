@@ -19,7 +19,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
-import buildcraft.api.power.IPowerReceptor;
 import buildcraft.transport.IPipeTransportPowerHook;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportPower;
@@ -28,7 +27,6 @@ import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipePowerWood;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
 
-@SuppressWarnings("deprecation")
 public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook {
 
 	private final int			baseTexture	= PipeIcons.PipePowerIron.ordinal();
@@ -46,7 +44,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 															return true;
 														return false;
 													}
-													if (tile instanceof IPowerReceptor || tile instanceof IEnergyConnection) return true;
+													if (tile instanceof IEnergyConnection) return true;
 													return false;
 												}
 											};

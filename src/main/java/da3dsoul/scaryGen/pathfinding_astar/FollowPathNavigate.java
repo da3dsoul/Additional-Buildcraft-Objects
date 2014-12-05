@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.world.World;
 import net.minecraft.util.*;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 
 public class FollowPathNavigate
 {
@@ -136,10 +135,8 @@ public class FollowPathNavigate
 	 
 	 private void runPathFindToXYZ(double destX, double destY, double destZ, float speed)
 	 {
-		 if(!worldObj.isRemote) Minecraft.getMinecraft().mcProfiler.startSection("AStar");
 		 AStar_ThreadFindPath thread = new AStar_ThreadFindPath(this, theEntity, destX, destY, destZ, speed);
 		 thread.start();
-		 if(!worldObj.isRemote) Minecraft.getMinecraft().mcProfiler.endSection();
 	 }
 
 	 /**
