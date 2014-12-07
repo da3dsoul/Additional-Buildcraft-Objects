@@ -1,14 +1,12 @@
 # Additional Buildcraft Objects
 
    ![Additional Buildcraft Objects](http://ma.ra-doersch.de/abo-logo.png "Additional Buildcraft Objects")
-   
-   **The majority of this readme is outdated.**
 
    Minecraft Forum: http://www.minecraftforum.net/index.php?app=forums&module=forums&section=findpost&pid=8920844
 
    Download Links:   http://www.siedler25.org/uploads/minecraft/AdditionalBuildcraftObjects/
 
-   Please report any bugs to GitHUB: https://github.com/Flow86/Additional-Buildcraft-Objects-Mod
+   Please report any bugs to GitHUB: https://github.com/da3dsoul/Additional-Buildcraft-Objects-Mod
 
 
 
@@ -22,7 +20,84 @@ If you post an error, the first response if given at all will be to first re-dow
 
 ## Items
 
+#### Windmills
+
+* Recipe: 
+
+      ![StoneTransportPipe Gravel](recipes/windmill.png)
+      
+      
+* Placement rules:
+Must be placed on 2 fence posts (or nether fence)
+must not have any opaque blocks within 2 blocks at its height or 1 below
+Can NOT push energy to the east (over the blades, they don't rotate)
+
+Windmill energy rules are grouped into two sections: Plains and Hills.
+
+Windmills gain two types of boosts: Biome and Height.
+
+**Plains Rules:**
+If a windmill is placed in a biome with low height variation (flat), it
+will follow the Plains rule set.
+
+**Bonuses:
+
+* Biome:
+Windmills gain a bonus for simply being placed in the plains section,
+the amount of bonus depends on the biome. Flatter is better.
+
+* Height:
+Windmills placed as close as possible to sea level will provide the
+maximum height boost. Sea level assumed 64 -> + 2 for fence posts -> the
+windmill block should be at 66.
+
+**Hills Rules:**
+
+* Biome:
+Windmills gain no bonus from biome placement in hills, but can make up
+for it and still achieve maximum output with Height.
+
+* Height:
+The higher a windmill is placed in hills, the greater the bonus, capping
+at a height of 124 meters.
+
+All windmills gain an extra a boost in the rain.
+
+The maximum output for windmills is 1.375 MJ/t without rain and 1.5 MJ/t
+with rain.
+
+### Ender Storage
+Simply an Ender Chest for Buildcraft. Adding an insertion pipe to an
+ender chest allows putting items in. Right-clicking on the insertion
+pipe when connected opens the bc Ender Chest for easy of use and
+debugging purposes, for that "where'd all my items go?" moment.
+
+* Insertion
+The Insertion Pipe will choose to add items to the ender
+chest before anything else. If you don't like that, don't put an ender
+chest next to an insertion pipe. It is the only pipe that will connect
+to them now.
+
+* Ender Extraction Pipe
+   * Recipe:
+
+      ![StoneTransportPipe Gravel](recipes/EnderExtraction.png)
+
+* Usage
+Stole/borrowed the gui from the emerald pipe in buildcraft, along with
+all the logic and everything but the item extraction, which only pulls
+from the ender storage. I doubt BC will sue me, and they can have it. I
+just wanted a way to transport items 6000 blocks without making all that
+pipe and then keeping it loaded. Yes, this works across dimensions.
+
+Power it with an engine, it'll extract just like an emerald but doesn't
+need to be connected to a chest.
+
 ## Pipes
+
+#### Division Pipe
+   Splits stacks into a specified size 1-8, incremented with a wrench. If 
+   the stack has a remainder, the moving item will be reversed.
 
 #### Round Robin Transport Pipe
    will change output per item(stack)
@@ -140,11 +215,6 @@ If you post an error, the first response if given at all will be to first re-dow
 
       ![DiamondTransportPipe DirectedKinesisPipe](recipes/DistributionKinesisPipe.png)
 
-   * GUI:
-
-      You can toggle each side on or off via GUI.
-	  
-	  ![Diamond Kinesis Pipe GUI](recipes/DistributionKinesisPipeGUI.png)
 ## Actions
 
 #### Switch On Pipe
@@ -165,10 +235,10 @@ If you post an error, the first response if given at all will be to first re-dow
 
 ## Changelog:
 
-DA3DSOUL:
+**DA3DSOUL:**
 
 MC 1.7.2+
-rewrote everything...
+  - rewrote everything...
   - Added windmills
   - Added Golden Iron Transport Pipe
   - Added Reinforced Golden and Golden Iron Fluid Pipes
@@ -177,7 +247,7 @@ rewrote everything...
   - Added Division Pipe
   - Added Mob Bottles and Yellow Dye on a Stick...which don't exist (from a different mod [DA3DSOUL Server] stuck in 1.8.1 beta I have been trying to update forever).
   
-Flow86:
+**Flow86:**
 
 * 1.0.7@559
   - fixed recipe conflict (Iron Kinesis Pipe)
