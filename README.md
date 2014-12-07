@@ -14,42 +14,15 @@
 
 ## License
 
-   **AdditionalBuildcraftObjects is open-source.**
+This is originally by Flow86, but I have at this point rewritten the entire mod.
 
-   It is distributed under the terms of my Open Source License.
-
-   It grants rights to read, modify, compile or run the code.
-
-   It does **NOT** grant the right to redistribute this software or its
-   modifications in any form, binary or source, except if expressively
-   granted by the copyright holder.
-
-   * **Mod Packs:**
-      You can include ( **precompiled** ) ABO-packages in your modpacks as long you're not making money out of it ( **so no adfly or something like that!** ).
-
-      **AND: you have to send me a pm in which you post a link to your modpack.**
-      <br />(If you want to use it in a private modpack, only pm me that you'll use it)
-
-   **If you want to distribute a custom/modified abo build, you have to ask for permission first!**
+My license is: unless you are Flow86, don't say it is yours. Other than that, I don't care. If you download it, make sure you trust the source.
+If you post an error, the first response if given at all will be to first re-download from me.
 
 
 ## Items
 
-#### Gate Settings Duplicator
-   With the Gate Settings Duplicator you can simply copy and paste Gate Settings.
-   <br />
-   Right-Click on gate will copy the settings.
-   <br />
-   Sneak+Right-Click will paste it.
-   
-   * Recipe:
-   
-      ![Wrench AutarchicGate](recipes/GateSettingsDuplicator.png)
-
-
 ## Pipes
-
-
 
 #### Round Robin Transport Pipe
    will change output per item(stack)
@@ -87,17 +60,6 @@
       ![WoodTransportPipe Planks](recipes/ExtractionTransportPipe.png)
 
 
-
-#### Bounce Transport Pipe
-   This pipe will cause whatever enters the pipe to come back out the way it came
-   unless the pipe is powered by redstone, then it behaves as a normal pipe.
-
-   * Recipe:
-
-      ![StoneTransportPipe Cobblestone](recipes/BounceTransportPipe.png)
-
-
-
 #### Crossover Transport Pipe
    This pipe will direct material entering it to the pipe
    (or something accepting material, like chests) directly across from it.
@@ -125,14 +87,18 @@
    can be toggled/switched by ABO-Actions and Redstone
    
    **can empty a full tank with enough (=full) pressure for two golden pipes in seconds!**
+   
+   Pressure behavior: Will empty down to half of tank valve pipe is connected to or entire tank if placed on bottom tank.
+   
+   Config option to disable pressure behavior.
 
    * Recipe:
 
-      ![WoodenWaterproofPipe AutarchicGate](recipes/ValvePipe.png)
+      ![WoodenWaterproofPipe BasicGate](recipes/valve.png)
 
 
 
-#### Golden Iron Waterproof Pipe
+#### Golden Iron Fluid Pipe
    acts like a iron pipe with speed of a golden pipe
 
    * Recipe:
@@ -141,33 +107,16 @@
 
 
 
-#### Balancing Waterproof Pipe
+#### Balancing Fluid Pipe
    balances liquid of connected tanks
 
-   Thanks to Oxygene13 for his idea :-)
+   Thanks to Oxygene13 for his idea.
 
    * Recipe:
 
-      ![WoodenWaterproofPipe IronORGate WoodenWaterproofPipe](recipes/BalancingWaterproofPipe.png)
+      ![WoodenWaterproofPipe RedstoneEngine WoodenWaterproofPipe](recipes/BalancingWaterproofPipe.png)
 
-
-
-#### Diamond Waterproof Pipe
-   acts like a diamond pipe but for liquids.
-   every filter item not being a bucket or liquid gets ignored.
-
-   * Recipe:
-
-      ![DiamondTransportPipe PipeWaterproof](recipes/DiamondWaterproofPipe.png)
-
-   * GUI:
-
-      - Left Click: Set next liquid on clicked slot
-      - Right Click: Set previous liquid on clicked slot
-      - Middle Click: Delete filter on clicked slot
-
-
-#### Power Switch Pipe
+#### Kinesis Switch Pipe
    acts as lever for power pipes
    <br>
    can be toggled/switched by ABO-Actions and Redstone
@@ -176,7 +125,7 @@
 
       ![GoldenKinesisPipe Lever](recipes/PowerSwitchPipe.png)
 
-#### Directed Kinesis Pipe
+#### Diode Kinesis Pipe
    acts as a diode/iron pipe for kinesis pipes
 
    * Recipe:
@@ -196,34 +145,6 @@
       You can toggle each side on or off via GUI.
 	  
 	  ![Diamond Kinesis Pipe GUI](recipes/DistributionKinesisPipeGUI.png)
-
-#### Water Pump Pipe
-   soaks water from a source block below it
-   
-   * (Shaped) Recipe:
-
-      ![X GoldenWaterproofPipe X<br>
-      RedstoneDust IronGear RedstoneDust<br>
-      X WoodenWaterproofPipe X<br>](recipes/WaterPumpPipe.png)
-      
-   Original by [AdditionalPipes](https://github.com/DaStormBringer/AdditionalPipesBC2)
-   
-   It will only show up if AdditionalPipes is not installed and tries to use the same Id.
-   
-   Since both pipe do the same (I even have copied the Recipe), you can load old maps 
-   where you only used the Water Pump Pipe.
-
-## Triggers
-   
-
-#### Safe-Engine Trigger
-   acts like the blue & green state trigger, so it will be active as long the
-   engines are "blue" or "green"
-
-   i.e power them up via an AND gate and an external wire signal, but have an
-   "emergency stop"
-   
-
 ## Actions
 
 #### Switch On Pipe
@@ -243,6 +164,20 @@
 ---------------------------------------------------------------------------------
 
 ## Changelog:
+
+DA3DSOUL:
+
+MC 1.7.2+
+rewrote everything...
+  - Added windmills
+  - Added Golden Iron Transport Pipe
+  - Added Reinforced Golden and Golden Iron Fluid Pipes
+  - Added Ender Extraction Pipe
+  - Made Insertion Pipe insert into ender chests for a global level ender chest
+  - Added Division Pipe
+  - Added Mob Bottles and Yellow Dye on a Stick...which don't exist (from a different mod [DA3DSOUL Server] stuck in 1.8.1 beta I have been trying to update forever).
+  
+Flow86:
 
 * 1.0.7@559
   - fixed recipe conflict (Iron Kinesis Pipe)
