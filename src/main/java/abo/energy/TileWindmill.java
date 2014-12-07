@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
+import abo.ABO;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
@@ -169,6 +170,19 @@ public class TileWindmill extends TileEngine {
 				return 0.16F;
 			default:
 				return 0.01F;
+		}
+	}
+	
+	
+
+	@Override
+	public double getMaxRenderDistanceSquared() {
+		if(ABO.windmillAnimations && ABO.windmillAnimDist > 64)
+		{
+			return ABO.windmillAnimDist * ABO.windmillAnimDist;
+		}else
+		{
+			return 4096.0D;
 		}
 	}
 

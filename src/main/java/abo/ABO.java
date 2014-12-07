@@ -1,14 +1,4 @@
-/** 
- * Copyright (C) 2011-2013 Flow86
- * 
- * AdditionalBuildcraftObjects is open-source.
- *
- * It is distributed under the terms of my Open Source License. 
- * It grants rights to read, modify, compile or run the code. 
- * It does *NOT* grant the right to redistribute this software or its 
- * modifications in any form, binary or source, except if expressively
- * granted by the copyright holder.
- */
+
 
 package abo;
 
@@ -100,10 +90,6 @@ import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
-/**
- * @author Flow86
- * 
- */
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon")
 public class ABO {
 	public static final String					VERSION							= "2.0.2+";
