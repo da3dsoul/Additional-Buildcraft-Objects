@@ -28,9 +28,9 @@ If you post an error, the first response if given at all will be to first re-dow
       
       
 * Placement rules:
-Must be placed on 2 fence posts (or nether fence)
-must not have any opaque blocks within 2 blocks at its height or 1 below
-Can NOT push energy to the east (over the blades, they don't rotate)
+Must be placed on 2 fence posts (or nether fence).
+Must not have any opaque blocks within 2 blocks at its height or 1 below.
+Can NOT push energy to the east (over the blades, they don't rotate).
 
 Windmill energy rules are grouped into two sections: Plains and Hills.
 
