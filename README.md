@@ -2,11 +2,11 @@
 
    ![Additional Buildcraft Objects](http://ma.ra-doersch.de/abo-logo.png "Additional Buildcraft Objects")
 
-   Minecraft Forum: http://www.minecraftforum.net/index.php?app=forums&module=forums&section=findpost&pid=8920844
+   Minecraft Forum: http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2310397-additional-buildcraft-objects-a-plugin-for
 
-   Download Links:   http://www.siedler25.org/uploads/minecraft/AdditionalBuildcraftObjects/
+   Download Links:   https://github.com/da3dsoul/Additional-Buildcraft-Objects/releases
 
-   Please report any bugs to GitHUB: https://github.com/da3dsoul/Additional-Buildcraft-Objects-Mod
+   Please report any bugs to GitHUB: https://github.com/da3dsoul/Additional-Buildcraft-Objects
 
 For recipes: I made some pictures, but it's best to use NEI.
 
@@ -14,7 +14,7 @@ For recipes: I made some pictures, but it's best to use NEI.
 
 This is originally by Flow86, but I have at this point rewritten the entire mod.
 
-My license is: unless you are Flow86, don't say it is yours. Other than that, I don't care. If you download it, make sure you trust the source.
+My license is: unless you are Flow86, don't say it is yours. Other than that, I don't care. If I see it, I'd like to at least see a shoutout in at least 4pt font. If you download it, make sure you trust the source.
 If you post an error, the first response if given at all will be to first re-download from me.
 
 
