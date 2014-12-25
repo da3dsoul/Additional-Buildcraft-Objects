@@ -8,7 +8,7 @@
 
    Please report any bugs to GitHUB: https://github.com/da3dsoul/Additional-Buildcraft-Objects-Mod
 
-
+For recipes: I made some pictures, but it's best to use NEI.
 
 ## License
 
@@ -72,7 +72,7 @@ ender chest allows putting items in. Right-clicking on the insertion
 pipe when connected opens the bc Ender Chest for easy of use and
 debugging purposes, for that "where'd all my items go?" moment.
 
-* Insertion
+* Insertion:
 The Insertion Pipe will choose to add items to the ender
 chest before anything else. If you don't like that, don't put an ender
 chest next to an insertion pipe. It is the only pipe that will connect
@@ -82,16 +82,15 @@ to them now.
    * Recipe:
 
       ![StoneTransportPipe Gravel](recipes/EnderExtraction.png)
-
-* Usage
+      *The Pipe is an Extraction Pipe
+* Usage:
 Stole/borrowed the gui from the emerald pipe in buildcraft, along with
 all the logic and everything but the item extraction, which only pulls
 from the ender storage. I doubt BC will sue me, and they can have it. I
 just wanted a way to transport items 6000 blocks without making all that
 pipe and then keeping it loaded. Yes, this works across dimensions.
 
-Power it with an engine, it'll extract just like an emerald but doesn't
-need to be connected to a chest.
+Power it with an engine, it'll extract just like an emerald but connects to an ender chest.
 
 ## Pipes
 
@@ -119,6 +118,12 @@ need to be connected to a chest.
 
       ![IronTransportPipe CactusGreen](recipes/InsertionTransportPipe.png)
 
+#### Fluid Insertion Pipe
+   Same as insertion pipe but for fluids. With the way the fluid system is set up in Buildcraft, the fluids will distribute equally to all attached tank blocks.
+
+   * Recipe:
+
+      ![IronTransportPipe CactusGreen](recipes/FluidInsertion.png)
 
 
 #### Extraction Transport Pipe
@@ -205,7 +210,7 @@ need to be connected to a chest.
 
    * Recipe:
 
-      ![GoldenKinesisPipe IronANDGate](recipes/DirectedKinesisPipe.png)
+      ![GoldenKinesisPipe IronANDGate](recipes/Diode.png)
 
 #### Distribution Kinesis Pipe
    acts as a power distributor - every filter line which has an item in it is 
