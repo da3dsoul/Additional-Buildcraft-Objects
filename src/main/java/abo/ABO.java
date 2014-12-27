@@ -39,7 +39,6 @@ import abo.gui.ABOGuiHandler;
 import abo.network.ABOPacketHandler;
 import abo.pipes.BlockRedstonePipe;
 import abo.pipes.fluids.PipeFluidsBalance;
-import abo.pipes.fluids.PipeFluidsDistribution;
 import abo.pipes.fluids.PipeFluidsInsertion;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
 import abo.pipes.fluids.PipeFluidsReinforcedGolden;
@@ -120,8 +119,6 @@ public class ABO {
 	public static Item							pipeFluidsInsertion				= null;
 
 	public static Item							pipeFluidsBalance				= null;
-
-	public static Item							pipeFluidsDiamond				= null;
 
 	public static Item							pipeItemsRoundRobin				= null;
 
@@ -216,9 +213,6 @@ public class ABO {
 			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1,
 					BuildCraftTransport.pipeFluidsWood, new ItemStack(BuildCraftEnergy.engineBlock, 1, 0),
 					BuildCraftTransport.pipeFluidsWood);
-
-			pipeFluidsDiamond = buildPipe(PipeFluidsDistribution.class, 1,
-					BuildCraftTransport.pipeItemsDiamond, BuildCraftTransport.pipeWaterproof);
 
 			pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1,
 					BuildCraftTransport.pipeItemsStone, Blocks.gravel);

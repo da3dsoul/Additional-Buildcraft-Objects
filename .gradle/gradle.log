@@ -10,10 +10,12 @@ The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..
 :compileApiJava UP-TO-DATE
 :processApiResources UP-TO-DATE
 :apiClasses UP-TO-DATE
-:sourceMainJava UP-TO-DATE
-:compileJava UP-TO-DATE
-:processResources UP-TO-DATE
-:classes UP-TO-DATE
+:sourceMainJava
+:compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+1 warning
+
+:processResources
+:classes
 :jar
 :extractMcpData UP-TO-DATE
 :getVersionJson
@@ -24,4 +26,4 @@ The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..
 
 BUILD SUCCESSFUL
 
-Total time: 14.337 secs
+Total time: 30.591 secs

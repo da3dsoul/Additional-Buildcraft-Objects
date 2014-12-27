@@ -4,8 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import abo.pipes.fluids.gui.ContainerPipeFluidsDiamond;
-import abo.pipes.fluids.gui.GuiPipeFluidsDiamond;
 import abo.pipes.items.PipeItemsEnderExtraction;
 import abo.pipes.items.gui.ContainerPipeItemsEnderExtraction;
 import abo.pipes.items.gui.GuiPipeItemsEnderExtraction;
@@ -29,9 +27,6 @@ public class ABOGuiHandler implements IGuiHandler {
 		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-			case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
-				return new ContainerPipeFluidsDiamond(player.inventory, pipe);
-
 			case ABOGuiIds.PIPE_DIAMOND_POWER:
 				return new ContainerPipePowerDiamond(player.inventory, pipe);
 
@@ -55,9 +50,6 @@ public class ABOGuiHandler implements IGuiHandler {
 		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-			case ABOGuiIds.PIPE_DIAMOND_LIQUIDS:
-				return new GuiPipeFluidsDiamond(player.inventory, pipe);
-
 			case ABOGuiIds.PIPE_DIAMOND_POWER:
 				return new GuiPipePowerDiamond(player.inventory, pipe);
 

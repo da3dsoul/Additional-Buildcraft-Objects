@@ -15,8 +15,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 public class ABOPacketHandler extends FMLIndexedMessageToMessageCodec<ABOPacket> {
 
 	public ABOPacketHandler() {
-		addDiscriminator(0, PacketFluidSlotChange.class);
-		addDiscriminator(1, PacketYesNoChange.class);
+		addDiscriminator(0, PacketYesNoChange.class);
 	}
 
 	@Override
@@ -38,11 +37,6 @@ public class ABOPacketHandler extends FMLIndexedMessageToMessageCodec<ABOPacket>
 				case ABOPacketIds.YesNoChange: {
 					PacketYesNoChange yesNoPacket = (PacketYesNoChange) packet;
 					yesNoPacket.update((EntityPlayer) player);
-					break;
-				}
-				case ABOPacketIds.LiquidSlotChange: {
-					PacketFluidSlotChange liquidSlotPacket = (PacketFluidSlotChange) packet;
-					liquidSlotPacket.update((EntityPlayer) player);
 					break;
 				}
 				default:

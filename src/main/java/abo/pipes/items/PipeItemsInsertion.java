@@ -16,7 +16,6 @@ import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.api.transport.IPipeTile;
 import buildcraft.core.inventory.InvUtils;
-import buildcraft.core.inventory.Transactor;
 import buildcraft.core.inventory.TransactorSimple;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
@@ -74,10 +73,11 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 
 		for (ForgeDirection o : result) {
 			TileEntity entity = container.getTile(o);
-			if (entity instanceof IPipeTile)
+			if (entity instanceof IPipeTile) {
 				pipesList.add(o);
-			else
+			} else if (entity instanceof TileEntityEnderChest) {
 				nonPipesList.add(o);
+			}
 		}
 
 		if (!nonPipesList.isEmpty()) {
@@ -124,8 +124,6 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 			TileGenericPipe pipe = (TileGenericPipe) entity;
 
 			return pipe.pipe.transport instanceof PipeTransportItems;
-		} else if (entity instanceof IInventory && item.getInsertionHandler().canInsertItem(item, (IInventory) entity)) {
-			if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
 		} else if (entity instanceof TileEntityEnderChest) {
 			if (new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance.getInventoryEnderChest())).add(
 					item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
