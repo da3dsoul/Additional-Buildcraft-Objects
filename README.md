@@ -40,8 +40,6 @@ Windmills gain two types of boosts: Biome and Height.
 If a windmill is placed in a biome with low height variation (flat), it
 will follow the Plains rule set.
 
-**Bonuses:
-
 * Biome:
 Windmills gain a bonus for simply being placed in the plains section,
 the amount of bonus depends on the biome. Flatter is better.
@@ -63,7 +61,7 @@ at a height of 124 meters.
 
 All windmills gain an extra a boost in the rain.
 
-The maximum output for windmills is 1.375 MJ/t without rain and 1.5 MJ/t
+The maximum output for windmills is 13.75 RF/t without rain and 15 RF/t
 with rain.
 
 ### Ender Storage
