@@ -1,0 +1,21 @@
+# Arquivo de linguagem: Português Brasileiro
+item.PipeFluidsValve.name=Válvula de Tubo
+item.PipeFluidsGoldenIron.name=Tubo de Ferro Dourado de Flúidos
+item.PipeFluidsReinforcedGoldenIron.name=Tubo de Fluidos Reforçado de Ferro Dourado
+item.PipeFluidsReinforcedGolden.name=Tubo Reforçado de Ferro Dourado
+item.PipeFluidsBalance.name=Tubo de Balanceamento de Flúidos
+item.PipeFluidsInsertion.name=Tubo de Inserção de Flúidos
+item.PipeItemsRoundRobin.name=Tubo de Transporte ´Round-Robin´
+item.PipeItemsInsertion.name=Tubo de Inserção do Ender
+item.PipeItemsDivide.name=Tubo Divisor de Transporte
+item.PipeItemsExtraction.name=Tubo de Transporte Extrator
+item.PipeItemsCrossover.name=Tubo de Cruzamento de Transporte
+item.PipeItemsCompactor.name=Tubo de Compactação de Transporte
+item.PipePowerSwitch.name=Interruptor de Tubo ´Kinesis´
+item.PipePowerDirected.name=Diodo de Tubo ´Kinesis´
+item.PipePowerDistribution.name=Tubo de Distribuição ´Kinesis´
+item.PipeItemsEnderExtraction.name=Tubo de Estração do Ender
+item.MobBottleFull.name=Garrafa de Mob (Cheia)
+item.MobBottleEmpty.name=Garrafa de Mob (Vazia)
+item.GoldenStaff.name=Corante Amarelo em uma Vara
+tile.windmillBlock.name=Moinho de Vento
