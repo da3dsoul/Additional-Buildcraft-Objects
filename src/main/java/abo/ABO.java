@@ -37,7 +37,6 @@ import abo.energy.BlockNull;
 import abo.energy.BlockWindmill;
 import abo.gui.ABOGuiHandler;
 import abo.network.ABOPacketHandler;
-import abo.pipes.BlockRedstonePipe;
 import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsInsertion;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
@@ -198,7 +197,7 @@ public class ABO {
 
 			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true).getBoolean(true);
 
-			pipeFluidsValve = buildRedstonePipe(PipeFluidsValve.class, 1,
+			pipeFluidsValve = buildPipe(PipeFluidsValve.class, 1,
 					BuildCraftTransport.pipeFluidsWood, BuildCraftTransport.pipeGate);
 
 			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1,
@@ -247,7 +246,7 @@ public class ABO {
 			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, 1,
 					BuildCraftTransport.pipeItemsStone, BuildCraftTransport.pipeItemsIron);
 
-			pipePowerSwitch = buildRedstonePipe(PipePowerSwitch.class, 1,
+			pipePowerSwitch = buildPipe(PipePowerSwitch.class, 1,
 					BuildCraftTransport.pipePowerGold, Blocks.lever);
 
 			pipePowerIron = buildPipe(PipePowerDirected.class, 1, new ItemStack(
@@ -437,23 +436,6 @@ public class ABO {
 		ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
 		res.setUnlocalizedName(clas.getSimpleName());
 		ABOProxy.proxy.registerPipe(res);
-
-		return res;
-	}
-
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas) {
-
-		ItemPipe res = BlockRedstonePipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
-		res.setUnlocalizedName(clas.getSimpleName());
-		ABOProxy.proxy.registerPipe(res);
-
-		return res;
-	}
-
-	public static ItemPipe buildRedstonePipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
-		ItemPipe res = buildRedstonePipe(clas);
-
-		addRecipe(res, count, ingredients);
 
 		return res;
 	}

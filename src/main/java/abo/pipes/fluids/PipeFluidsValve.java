@@ -22,11 +22,11 @@ import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
 import abo.pipes.PipeLogicValve;
 import buildcraft.BuildCraftTransport;
+import buildcraft.api.core.ISerializable;
 import buildcraft.api.core.Position;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatement;
 import buildcraft.api.transport.PipeManager;
-import buildcraft.core.network.IClientState;
 import buildcraft.factory.BlockTank;
 import buildcraft.factory.TileTank;
 import buildcraft.transport.BlockGenericPipe;
@@ -35,7 +35,7 @@ import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.StatementSlot;
 
-public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile, IClientState {
+public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile, ISerializable {
 
 	private boolean			powered;
 	private boolean			switched;

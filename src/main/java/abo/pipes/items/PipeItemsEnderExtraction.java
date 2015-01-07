@@ -18,11 +18,11 @@ import abo.ABO;
 import abo.PipeIcons;
 import abo.gui.ABOGuiIds;
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.core.ISerializable;
 import buildcraft.api.core.Position;
 import buildcraft.core.RFBattery;
 import buildcraft.core.inventory.SimpleInventory;
 import buildcraft.core.inventory.StackHelper;
-import buildcraft.core.network.IClientState;
 import buildcraft.core.network.IGuiReturnHandler;
 import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
@@ -36,7 +36,7 @@ import buildcraft.transport.pipes.PipeItemsEmerald.FilterMode;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IEnergyHandler, IClientState,
+public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IEnergyHandler, ISerializable,
 		IGuiReturnHandler {
 	private final int		standardIconIndex	= PipeIcons.PipeItemsEnderExtraction.ordinal();
 

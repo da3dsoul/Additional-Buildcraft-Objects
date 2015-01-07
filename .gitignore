@@ -21,3 +21,5 @@ build
 #runtime
 run
 .gradle/gradle.log
+/gradle/
+/eclipse/
