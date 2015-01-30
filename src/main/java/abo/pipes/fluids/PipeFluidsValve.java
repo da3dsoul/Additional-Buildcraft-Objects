@@ -26,7 +26,6 @@ import buildcraft.api.core.ISerializable;
 import buildcraft.api.core.Position;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatement;
-import buildcraft.api.transport.PipeManager;
 import buildcraft.factory.BlockTank;
 import buildcraft.factory.TileTank;
 import buildcraft.transport.BlockGenericPipe;
@@ -227,8 +226,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 			TileEntity tile = container.getTile(ForgeDirection.getOrientation(meta));
 
 			if (tile instanceof IFluidHandler) {
-				if (!PipeManager.canExtractFluids(this, tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord)) { return; }
-
 				if (liquidToExtract <= FluidContainerRegistry.BUCKET_VOLUME) {
 					liquidToExtract += FluidContainerRegistry.BUCKET_VOLUME;
 				}

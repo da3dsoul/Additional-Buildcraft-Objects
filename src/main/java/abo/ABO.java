@@ -1,5 +1,3 @@
-
-
 package abo;
 
 import java.io.File;
@@ -34,6 +32,7 @@ import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.energy.BlockNull;
+import abo.energy.BlockWaterwheel;
 import abo.energy.BlockWindmill;
 import abo.gui.ABOGuiHandler;
 import abo.network.ABOPacketHandler;
@@ -88,15 +87,15 @@ import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders")
 public class ABO {
 	public static final String					VERSION							= "2.0.2+";
 
 	public static final String					MINECRAFT_VERSION				= "1.7.10";
 
-	public static final String					BUILDCRAFT_VERSION				= "6.0.17";
+	public static final String					BUILDCRAFT_VERSION				= "6.3.0";
 
-	public static final String					FORGE_VERSION					= "10.12.1.1085";
+	public static final String					FORGE_VERSION					= "10.13.2.1277";
 
 	public IIconProvider						itemIconProvider				= new ItemIconProvider();
 	public IIconProvider						pipeIconProvider				= new PipeIconProvider();
@@ -143,17 +142,19 @@ public class ABO {
 	public static Item							goldenstaff						= null;
 
 	public static BlockWindmill					windmillBlock;
-	
-	public static Block	blockNull;
+
+	public static BlockWaterwheel				waterwheelBlock;
+
+	public static Block							blockNull;
 
 	public static int							actionSwitchOnPipeID			= 128;
-	public static IActionInternal						actionSwitchOnPipe				= null;
+	public static IActionInternal				actionSwitchOnPipe				= null;
 
 	public static int							actionToggleOnPipeID			= 129;
-	public static IActionInternal						actionToggleOnPipe				= null;
+	public static IActionInternal				actionToggleOnPipe				= null;
 
 	public static int							actionToggleOffPipeID			= 130;
-	public static IActionInternal						actionToggleOffPipe				= null;
+	public static IActionInternal				actionToggleOffPipe				= null;
 
 	public static boolean						windmillAnimations;
 	public static byte							windmillAnimDist;
@@ -181,15 +182,15 @@ public class ABO {
 		aboLog.info("Copyright (c) Flow86, 2011-2013");
 
 		aboConfiguration = new ABOConfiguration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
-		
+
 		float windmillScalar = 1;
-		
+
 		try {
 			aboConfiguration.load();
 
 			windmillAnimations = aboConfiguration.get("Misc", "WindmillAnimations", true).getBoolean(true);
 			windmillAnimDist = (byte) aboConfiguration.get("Misc", "AnimateWindmillDistance", 64).getInt(64);
-			
+
 			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
@@ -197,24 +198,23 @@ public class ABO {
 
 			valvePhysics = aboConfiguration.get("Misc", "ValvePipeUsesGravityPhysics", true).getBoolean(true);
 
-			pipeFluidsValve = buildPipe(PipeFluidsValve.class, 1,
-					BuildCraftTransport.pipeFluidsWood, BuildCraftTransport.pipeGate);
+			pipeFluidsValve = buildPipe(PipeFluidsValve.class, 1, BuildCraftTransport.pipeFluidsWood,
+					BuildCraftTransport.pipeGate);
 
-			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1,
-					BuildCraftTransport.pipeFluidsGold, BuildCraftTransport.pipeFluidsIron);
+			pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1, BuildCraftTransport.pipeFluidsGold,
+					BuildCraftTransport.pipeFluidsIron);
 
-			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class,
-					1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
+			pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class, 1,
+					BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
 
-			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class,
-					1, pipeFluidsGoldenIron, Blocks.obsidian);
+			pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class, 1, pipeFluidsGoldenIron,
+					Blocks.obsidian);
 
-			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1,
-					BuildCraftTransport.pipeFluidsWood, new ItemStack(BuildCraftEnergy.engineBlock, 1, 0),
-					BuildCraftTransport.pipeFluidsWood);
+			pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
+					new ItemStack(BuildCraftEnergy.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
 
-			pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1,
-					BuildCraftTransport.pipeItemsStone, Blocks.gravel);
+			pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1, BuildCraftTransport.pipeItemsStone,
+					Blocks.gravel);
 
 			pipeItemsDivide = buildPipe(PipeItemsDivide.class);
 
@@ -223,14 +223,14 @@ public class ABO {
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.golden_sword);
 			addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.diamond_sword);
 
-			pipeItemsCompactor = buildPipe(PipeItemsCompactor.class, 1,
-					BuildCraftTransport.pipeItemsStone, Blocks.piston);
+			pipeItemsCompactor = buildPipe(PipeItemsCompactor.class, 1, BuildCraftTransport.pipeItemsStone,
+					Blocks.piston);
 
-			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, 1,
-					BuildCraftTransport.pipeItemsIron, new ItemStack(Items.dye, 1, 2));
+			pipeItemsInsertion = buildPipe(PipeItemsInsertion.class, 1, BuildCraftTransport.pipeItemsIron,
+					new ItemStack(Items.dye, 1, 2));
 
-			pipeFluidsInsertion = buildPipe(PipeFluidsInsertion.class, 1,
-					BuildCraftTransport.pipeFluidsIron, new ItemStack(Items.dye, 1, 2));
+			pipeFluidsInsertion = buildPipe(PipeFluidsInsertion.class, 1, BuildCraftTransport.pipeFluidsIron,
+					new ItemStack(Items.dye, 1, 2));
 
 			pipeItemsExtraction = buildPipe(PipeItemsExtraction.class);
 			ArrayList<ItemStack> list = OreDictionary.getOres("plankWood");
@@ -240,30 +240,32 @@ public class ABO {
 				}
 			}
 
-			pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, 1,
-					ABO.pipeItemsExtraction, Items.ender_pearl);
+			pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, 1, ABO.pipeItemsExtraction,
+					Items.ender_pearl);
 
-			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, 1,
-					BuildCraftTransport.pipeItemsStone, BuildCraftTransport.pipeItemsIron);
+			pipeItemsCrossover = buildPipe(PipeItemsCrossover.class, 1, BuildCraftTransport.pipeItemsStone,
+					BuildCraftTransport.pipeItemsIron);
 
-			pipePowerSwitch = buildPipe(PipePowerSwitch.class, 1,
-					BuildCraftTransport.pipePowerGold, Blocks.lever);
+			pipePowerSwitch = buildPipe(PipePowerSwitch.class, 1, BuildCraftTransport.pipePowerGold, Blocks.lever);
 
-			pipePowerIron = buildPipe(PipePowerDirected.class, 1, new ItemStack(
-					BuildCraftTransport.pipeGate, 1), BuildCraftTransport.pipePowerGold);
+			pipePowerIron = buildPipe(PipePowerDirected.class, 1, new ItemStack(BuildCraftTransport.pipeGate, 1),
+					BuildCraftTransport.pipePowerGold);
 
-			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, 2,
-					pipePowerIron, BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
+			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, 2, pipePowerIron,
+					BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
 
-			blockNull = new BlockNull().setLightOpacity(0).setBlockUnbreakable().setStepSound(Block.soundTypePiston).setBlockName("null").setBlockTextureName("additional-buildcraft-objects:null");
+			blockNull = new BlockNull().setLightOpacity(0).setBlockUnbreakable().setStepSound(Block.soundTypePiston)
+					.setBlockName("null").setBlockTextureName("additional-buildcraft-objects:null");
 			windmillBlock = new BlockWindmill(windmillScalar);
-			
+			waterwheelBlock = new BlockWaterwheel(windmillScalar);
+
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
+			GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
 			GameRegistry.registerBlock(blockNull, "null");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
 					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
 							Character.valueOf('B'), Items.iron_ingot });
-			
+
 			// scaryGen
 
 			bottle = new ItemBottle();
@@ -274,21 +276,20 @@ public class ABO {
 			GameRegistry.registerItem(bottle, "MobBottle");
 
 			goldenstaff = new ItemGoldenStaff();
-			
-			
 
 			GameRegistry.addShapedRecipe(new ItemStack(goldenstaff),
 					new Object[] { "B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
 							new ItemStack(Items.dye, 1, 11) });
 			GameRegistry.registerItem(goldenstaff, "GoldenStaff");
-			
+
 			int id = 0;
-			
+
 			addEntity(FollowableEntity.class, "FollowableItem", ++id, false);
 			addEntity(EntityItemBat.class, "ItemBat", ++id, true);
-			
-			LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name", "Item Bat");
-			
+
+			LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name",
+					"Item Bat");
+
 			// end scaryGen
 
 			actionSwitchOnPipe = new ActionSwitchOnPipe(actionSwitchOnPipeID);
@@ -321,7 +322,7 @@ public class ABO {
 
 	@SuppressWarnings("unchecked")
 	private void addEntity(Class<? extends Entity> entityClass, String name, int entityID, boolean addEgg) {
-		
+
 		EntityRegistry.registerModEntity(entityClass, name, entityID, instance, 128, 3, true);
 		if (addEgg) {
 			long seed = name.hashCode();
@@ -450,18 +451,17 @@ public class ABO {
 
 	private static LinkedList<ABORecipe>	aboRecipes	= new LinkedList<ABORecipe>();
 
-	private static void addRecipe(Item item, int count, Object... ingredients) {		
-		
+	private static void addRecipe(Item item, int count, Object... ingredients) {
+
 		if (ingredients.length == 3) {
 			for (int i = 0; i < 17; i++) {
 				ABORecipe recipe = new ABORecipe();
 				recipe.result = new ItemStack(item, count, i);
-				if(ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe)
-				{
-					recipe.input = new Object[]{"ABC", 'A', new ItemStack((ItemPipe)ingredients[0], 1, i), 'B', ingredients[1], 'C', new ItemStack((ItemPipe)ingredients[2], 1, i)};
-				}else
-				{
-					recipe.input = new Object[]{"ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2]};
+				if (ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe) {
+					recipe.input = new Object[] { "ABC", 'A', new ItemStack((ItemPipe) ingredients[0], 1, i), 'B',
+							ingredients[1], 'C', new ItemStack((ItemPipe) ingredients[2], 1, i) };
+				} else {
+					recipe.input = new Object[] { "ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2] };
 				}
 
 				aboRecipes.add(recipe);
@@ -469,21 +469,21 @@ public class ABO {
 		} else if (ingredients.length == 2) {
 			for (int i = 0; i < 17; i++) {
 				ABORecipe recipe = new ABORecipe();
-				
+
 				Object left = ingredients[0];
 				Object right = ingredients[1];
 
 				if (ingredients[0] instanceof ItemPipe) {
 					left = new ItemStack((Item) left, 1, i);
 				}
-				
+
 				if (ingredients[1] instanceof ItemPipe) {
 					right = new ItemStack((Item) right, 1, i);
 				}
-				
+
 				recipe.isShapeless = true;
 				recipe.result = new ItemStack(item, 1, i);
-				recipe.input = new Object[]{left, right};
+				recipe.input = new Object[] { left, right };
 
 				aboRecipes.add(recipe);
 			}

@@ -20,6 +20,7 @@ public class ABOProxy {
 
 	public void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileWindmill.class, "net.minecraft.src.abo.energy.TileWindmill");
+		GameRegistry.registerTileEntity(TileWindmill.class, "net.minecraft.src.abo.energy.TileWaterwheel");
 	}
 	
 	public void registerEntities(){}

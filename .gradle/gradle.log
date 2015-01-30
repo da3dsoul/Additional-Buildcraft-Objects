@@ -1,5 +1,3 @@
-The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..
-
 ****************************
  Powered By MCP:             
  http://mcp.ocean-labs.de/   
@@ -14,7 +12,7 @@ The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..
 :compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
 1 warning
 
-:processResources
+:processResources UP-TO-DATE
 :classes
 :jar
 :extractMcpData UP-TO-DATE
@@ -26,4 +24,4 @@ The assetDir is deprecated!  Use runDir instead! runDir set to eclipse/assets/..
 
 BUILD SUCCESSFUL
 
-Total time: 30.591 secs
+Total time: 30.839 secs

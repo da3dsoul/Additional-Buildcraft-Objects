@@ -84,7 +84,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glColor3f(1, 1, 1);
 
-		GL11.glTranslatef((float) x + 0.5F, (float) y + 1.5F, (float) z + 0.5F);
+		GL11.glTranslated(x + 0.5D,y + 1.5D,z + 0.5D);
 
 		float factor = (float) (0.0625);
 

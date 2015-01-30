@@ -3,7 +3,6 @@ package da3dsoul.scaryGen.mod_ScaryGen;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
@@ -15,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
@@ -41,7 +41,8 @@ public class ItemGoldenStaff extends Item {
 		ListIterator it = list.listIterator();
 
 		int i = 0;
-		int range = (int) Math.round(Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 3.5);
+		
+		int range = (int) Math.round(FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks * 3.5);
 		do
 		{
 			if (!it.hasNext() || i > 64)

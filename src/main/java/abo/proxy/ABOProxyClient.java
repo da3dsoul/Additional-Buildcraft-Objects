@@ -1,8 +1,10 @@
 package abo.proxy;
 
 import abo.ABO;
+import abo.energy.TileWaterwheel;
 import abo.energy.TileWindmill;
 import abo.network.ABOPacket;
+import abo.render.RenderWaterwheel;
 import abo.render.RenderWindmill;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -30,12 +32,15 @@ public class ABOProxyClient extends ABOProxy {
 	public void registerTileEntities() {
 		super.registerTileEntities();
 		ClientRegistry.bindTileEntitySpecialRenderer(TileWindmill.class, new RenderWindmill());
+		ClientRegistry.bindTileEntitySpecialRenderer(TileWaterwheel.class, new RenderWaterwheel());
 
 	}
 
 	public void registerBlockRenderers() {
 		RenderingEntityBlocks.blockByEntityRenders.put(new EntityRenderIndex(ABO.windmillBlock, 0),
 				new RenderWindmill());
+		//RenderingEntityBlocks.blockByEntityRenders.put(new EntityRenderIndex(ABO.waterwheelBlock, 0),
+		//		new RenderWaterwheel());
 	}
 	
 	public void registerEntities()

@@ -7,7 +7,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.IFluidHandler;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.api.transport.PipeManager;
 import buildcraft.core.TileBuffer;
 import buildcraft.transport.Pipe;
 
@@ -64,7 +63,6 @@ public class PipeLogicValve {
 	protected boolean isValidConnectingTile(TileEntity tile) {
 		if (tile instanceof IPipeTile) { return false; }
 		if (!(tile instanceof IFluidHandler)) { return false; }
-		if (!PipeManager.canExtractFluids(pipe, tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord)) { return false; }
 		// if(container.getBlockMetadata() !=
 		// getDirectionToTile(tile).ordinal()) return false;
 		return true;
