@@ -42,7 +42,11 @@ public class ItemGoldenStaff extends Item {
 
 		int i = 0;
 		
-		int range = (int) Math.round(FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks * 3.5);
+		int range = 48;
+		try
+		{
+			range = (int) Math.round(FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks * 3.5);
+		}catch(Exception e) {}
 		do
 		{
 			if (!it.hasNext() || i > 64)

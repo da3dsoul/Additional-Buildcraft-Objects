@@ -130,7 +130,7 @@ public class TileWaterwheel extends TileEngine {
 	@Override
 	public int calculateCurrentOutput() {
 		updateTargetOutput();
-		realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - currentOutput) / 200;
+		realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200;
 		return Math.round(realCurrentOutput);
 	}
 
