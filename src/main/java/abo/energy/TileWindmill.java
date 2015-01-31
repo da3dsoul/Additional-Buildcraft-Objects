@@ -20,8 +20,8 @@ public class TileWindmill extends TileEngine {
 	public float							TARGET_OUTPUT			= 0.1f;
 	private float							BIOME_OUTPUT			= 0.175f;
 	private float							HEIGHT_OUTPUT			= 0f;
-	
-	public static float windmillScalar;
+
+	public static float						windmillScalar;
 	// final float kp = 1f;
 	// final float ki = 0.05f;
 	// final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
@@ -40,12 +40,12 @@ public class TileWindmill extends TileEngine {
 	public static final ResourceLocation	TRUNK_RED_TEXTURE		= new ResourceLocation(
 																			"additional-buildcraft-objects:textures/blocks/trunk_red.png");
 
-	public float realCurrentOutput = 0;
-	
+	public float							realCurrentOutput		= 0;
+
 	public TileWindmill() {
 		super();
 	}
-	
+
 	public TileWindmill(float scalar) {
 		this();
 		windmillScalar = scalar;
@@ -60,8 +60,6 @@ public class TileWindmill extends TileEngine {
 	public ResourceLocation getChamberTexture() {
 		return CHAMBER_TEXTURES[0];
 	}
-	
-	
 
 	public ResourceLocation getTrunkTexture(EnergyStage stage) {
 		switch (stage) {
@@ -96,7 +94,7 @@ public class TileWindmill extends TileEngine {
 
 	@Override
 	public int maxEnergyExtracted() {
-		return getMaxEnergy()/10;
+		return getMaxEnergy() / 10;
 	}
 
 	@Override
@@ -113,8 +111,8 @@ public class TileWindmill extends TileEngine {
 
 	private void updateTargetOutput() {
 		if (isRedstonePowered) {
-			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f)
-					+ (getWorldObj().rainingStrength / 8f)) * 10000 * windmillScalar;
+			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f) + (getWorldObj().rainingStrength / 8f))
+					* 10000 * windmillScalar;
 		} else {
 			TARGET_OUTPUT = 0;
 		}
@@ -150,11 +148,11 @@ public class TileWindmill extends TileEngine {
 			return EnergyStage.RED;
 		}
 	}
-	
+
 	public float getPistonSpeed() {
-		if (!worldObj.isRemote) {
-			return Math.max(0.16f * ((realCurrentOutput != 0 ? realCurrentOutput : TARGET_OUTPUT) / 15000F / windmillScalar), 0.01f);
-		}
+		if (!worldObj.isRemote) { return Math
+				.max(0.16f * ((realCurrentOutput != 0 ? realCurrentOutput : TARGET_OUTPUT) / 15000F / windmillScalar),
+						0.01f); }
 
 		switch (getEnergyStage()) {
 			case BLUE:
@@ -172,11 +170,9 @@ public class TileWindmill extends TileEngine {
 
 	@Override
 	public double getMaxRenderDistanceSquared() {
-		if(ABO.windmillAnimations && ABO.windmillAnimDist > 64)
-		{
+		if (ABO.windmillAnimations && ABO.windmillAnimDist > 64) {
 			return ABO.windmillAnimDist * ABO.windmillAnimDist;
-		}else
-		{
+		} else {
 			return 4096.0D;
 		}
 	}
@@ -186,18 +182,14 @@ public class TileWindmill extends TileEngine {
 
 		if (tile instanceof IEnergyHandler) {
 			IEnergyHandler handler = (IEnergyHandler) tile;
-			int maxEnergy = handler.receiveEnergy(
-					orientation.getOpposite(),
-					Math.round(this.energy), true);
+			int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), Math.round(this.energy), true);
 			return extractEnergy(in(maxEnergy * 1000 * windmillScalar), false);
-		}else
-		{
+		} else {
 			return 0;
 		}
 	}
-	
-	private int in(float a)
-	{
+
+	private int in(float a) {
 		return Math.round(a);
 	}
 
@@ -209,8 +201,7 @@ public class TileWindmill extends TileEngine {
 			if (tile instanceof IEnergyHandler) {
 				IEnergyHandler handler = (IEnergyHandler) tile;
 				if (extracted > 0) {
-					int neededRF = handler.receiveEnergy(
-							orientation.getOpposite(),
+					int neededRF = handler.receiveEnergy(orientation.getOpposite(),
 							(int) Math.round(extracted * windmillScalar) / 1000, false);
 
 					extractEnergy(neededRF / 1000, true);
@@ -229,9 +220,8 @@ public class TileWindmill extends TileEngine {
 		}
 		return true;
 	}
-	
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-	}
+
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {}
 
 	public boolean isOrientationValid() {
 		if (orientation == ForgeDirection.EAST) return false;
@@ -262,10 +252,9 @@ public class TileWindmill extends TileEngine {
 				getWorldObj().notifyBlocksOfNeighborChange(xCoord + o.offsetX, yCoord + o.offsetY, zCoord + o.offsetZ,
 						worldObj.getBlock(xCoord, yCoord, zCoord));
 
-				if(tile instanceof TileGenericPipe)
-				{
-					((TileGenericPipe)tile).scheduleNeighborChange();
-					((TileGenericPipe)tile).updateEntity();
+				if (tile instanceof TileGenericPipe) {
+					((TileGenericPipe) tile).scheduleNeighborChange();
+					((TileGenericPipe) tile).updateEntity();
 				}
 
 				return true;
@@ -277,57 +266,58 @@ public class TileWindmill extends TileEngine {
 
 	@Override
 	public void burn() {
-		if (burnTime > 0) {
-			burnTime = burnTime - 1;
+		if (isRedstonePowered) {
+			if (burnTime > 0) {
+				burnTime = burnTime - 1;
 
-			int output = calculateCurrentOutput();
-			currentOutput = output; // Comment out for constant power
-			addEnergy(output);
-		}
-		
-		if(tickCount % 60 == 0)
-		{
-			checkRedstonePower();
-		}
-
-		if (burnTime == 0 && isRedstonePowered) {
-			burnTime = totalBurnTime = 1200;
-			updateTargetOutput();
-		} else {
-			if (tickCount >= 1198) {
-				updateTargetOutput();
-
-				tickCount = 0;
-			} else {
-				tickCount++;
+				int output = calculateCurrentOutput();
+				currentOutput = output; // Comment out for constant power
+				addEnergy(output);
 			}
 
+			if (tickCount % 60 == 0) {
+				checkRedstonePower();
+			}
+
+			if (burnTime == 0 && isRedstonePowered) {
+				burnTime = totalBurnTime = 1200;
+				updateTargetOutput();
+			} else {
+				if (tickCount >= 1198) {
+					updateTargetOutput();
+
+					tickCount = 0;
+				} else {
+					tickCount++;
+				}
+
+			}
+
+		} else {
+			currentOutput -= 1;
+			if (currentOutput < 0) currentOutput = 0;
 		}
 	}
 
 	public int getScaledBurnTime(int i) {
 		return (int) (((float) burnTime / (float) totalBurnTime) * i);
 	}
-	
-	//RF
-	
+
+	// RF
+
 	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive,
-			boolean simulate) {
+	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
 		return 0;
 	}
 
 	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract,
-			boolean simulate) {
+	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
 		return this.extractEnergy(maxExtract, !simulate);
 	}
 
 	@Override
 	public int getEnergyStored(ForgeDirection from) {
-		if (!(from == orientation)) {
-			return 0;
-		}
+		if (!(from == orientation)) { return 0; }
 
 		return energy;
 	}

@@ -16,14 +16,13 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.common.util.ForgeDirection;
 import buildcraft.BuildCraftCore;
 import buildcraft.core.BlockBuildCraft;
-import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.ICustomHighlight;
 import buildcraft.core.IItemPipe;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight {
 
@@ -39,7 +38,6 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 	public BlockWaterwheel() {
 		super(Material.iron);
 		setBlockName("waterwheelBlock");
-		setCreativeTab(CreativeTabBuildCraft.BLOCKS.get());
 	}
 	
 	public BlockWaterwheel(float s)
@@ -137,7 +135,7 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void addCollisionBoxesToList(World wrd, int x, int y, int z, AxisAlignedBB mask, List list, Entity ent) {
+	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB mask, List list, Entity ent) {
 		for (AxisAlignedBB aabb : boxes) {
 			AxisAlignedBB aabbTmp = aabb.getOffsetBoundingBox(x + 0.5, y + 0.5, z);
 			if (aabbTmp.intersectsWith(mask)) {
@@ -147,7 +145,7 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 	}
 
 	@Override
-	public MovingObjectPosition collisionRayTrace(World wrd, int x, int y, int z, Vec3 origin, Vec3 direction) {
+	public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 origin, Vec3 direction) {
 		MovingObjectPosition closest = null;
 		for (AxisAlignedBB aabb : boxes) {
 			MovingObjectPosition mop = aabb.getOffsetBoundingBox(x + 0.5, y + 0.5, z).calculateIntercept(origin, direction);

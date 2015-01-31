@@ -17,9 +17,9 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.0"
+version = "beta3"
 group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Additional-Buildcraft-Objects"
+archivesBaseName = "ABO-MC1.7.10-BC6.3"
 
 minecraft {
     version = "1.7.10-10.13.2.1277"

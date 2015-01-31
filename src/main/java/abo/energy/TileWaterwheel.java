@@ -35,7 +35,7 @@ public class TileWaterwheel extends TileEngine {
 	// double esum = 0;
 
 	private int								tickCount				= 0;
-	
+
 	public float							animProgress			= 0;
 
 	public static final ResourceLocation	TRUNK_BLUE_TEXTURE		= new ResourceLocation(
@@ -91,18 +91,15 @@ public class TileWaterwheel extends TileEngine {
 	private void initDirection() {
 
 	}
-	
+
 	@Override
-	public void updateEntity()
-	{
-		if(!isActive())
-		{
+	public void updateEntity() {
+		if (!isActive()) {
 			animProgress -= 0.166666;
-			if(animProgress < 0) animProgress = 0;
-		}else
-		{
+			if (animProgress < 0) animProgress = 0;
+		} else {
 			animProgress += getPistonSpeed() / 6;
-			if(animProgress >= 1) animProgress = 0;
+			if (animProgress >= 1) animProgress = 0;
 		}
 		super.updateEntity();
 	}
@@ -191,7 +188,7 @@ public class TileWaterwheel extends TileEngine {
 			return 4096.0D;
 		}
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
 		return AxisAlignedBB.getBoundingBox(-3, -3, 0, 3, 3, 1).offset(xCoord, yCoord, zCoord);
@@ -241,8 +238,7 @@ public class TileWaterwheel extends TileEngine {
 		return true;
 	}
 
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-	}
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {}
 
 	public boolean isOrientationValid() {
 		if (orientation == ForgeDirection.EAST) return false;
@@ -287,30 +283,36 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public void burn() {
-		if (burnTime > 0) {
-			burnTime = burnTime - 1;
+		if (isRedstonePowered) {
+			if (burnTime > 0) {
+				burnTime = burnTime - 1;
 
-			int output = calculateCurrentOutput();
-			currentOutput = output; // Comment out for constant power
-			addEnergy(output);
-		}
-
-		if (tickCount % 60 == 0) {
-			checkRedstonePower();
-		}
-
-		if (burnTime == 0 && isRedstonePowered) {
-			burnTime = totalBurnTime = 1200;
-			updateTargetOutput();
-		} else {
-			if (tickCount >= 1198) {
-				updateTargetOutput();
-
-				tickCount = 0;
-			} else {
-				tickCount++;
+				int output = calculateCurrentOutput();
+				currentOutput = output; // Comment out for constant power
+				addEnergy(output);
 			}
 
+			if (tickCount % 60 == 0) {
+				checkRedstonePower();
+			}
+
+			if (burnTime == 0 && isRedstonePowered) {
+				burnTime = totalBurnTime = 1200;
+				updateTargetOutput();
+			} else {
+				if (tickCount >= 1198) {
+					updateTargetOutput();
+
+					tickCount = 0;
+				} else {
+					tickCount++;
+				}
+
+			}
+
+		} else {
+			currentOutput -= 1;
+			if (currentOutput < 0) currentOutput = 0;
 		}
 	}
 
