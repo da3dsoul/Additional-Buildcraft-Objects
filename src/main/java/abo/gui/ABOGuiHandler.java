@@ -7,9 +7,6 @@ import net.minecraft.world.World;
 import abo.pipes.items.PipeItemsEnderExtraction;
 import abo.pipes.items.gui.ContainerPipeItemsEnderExtraction;
 import abo.pipes.items.gui.GuiPipeItemsEnderExtraction;
-import abo.pipes.power.gui.ContainerPipePowerDiamond;
-import abo.pipes.power.gui.GuiPipePowerDiamond;
-
 import buildcraft.transport.TileGenericPipe;
 import cpw.mods.fml.common.network.IGuiHandler;
 
@@ -27,8 +24,6 @@ public class ABOGuiHandler implements IGuiHandler {
 		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-			case ABOGuiIds.PIPE_DIAMOND_POWER:
-				return new ContainerPipePowerDiamond(player.inventory, pipe);
 
 			case ABOGuiIds.PIPE_ENDER_EXTRACTION:
 				return new ContainerPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);
@@ -50,8 +45,6 @@ public class ABOGuiHandler implements IGuiHandler {
 		if (pipe.pipe == null) return null;
 
 		switch (ID) {
-			case ABOGuiIds.PIPE_DIAMOND_POWER:
-				return new GuiPipePowerDiamond(player.inventory, pipe);
 
 			case ABOGuiIds.PIPE_ENDER_EXTRACTION:
 				return new GuiPipeItemsEnderExtraction(player.inventory, (PipeItemsEnderExtraction) pipe.pipe);

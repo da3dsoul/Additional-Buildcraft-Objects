@@ -3,7 +3,6 @@ package abo.proxy;
 import abo.ABO;
 import abo.energy.TileWaterwheel;
 import abo.energy.TileWindmill;
-import abo.network.ABOPacket;
 import abo.render.RenderWaterwheel;
 import abo.render.RenderWindmill;
 import net.minecraft.item.Item;
@@ -22,11 +21,6 @@ public class ABOProxyClient extends ABOProxy {
 		super.registerPipe(itemID);
 
 		MinecraftForgeClient.registerItemRenderer(itemID, TransportProxyClient.pipeItemRenderer);
-	}
-
-	@Override
-	public void sendToServer(ABOPacket packet) {
-		ABO.instance.sendToServer(packet);
 	}
 
 	public void registerTileEntities() {

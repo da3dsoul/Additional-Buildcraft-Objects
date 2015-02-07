@@ -3,6 +3,7 @@ package abo.energy;
 import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -80,6 +81,7 @@ public class TileWindmill extends TileEngine {
 	public void initialize() {
 		super.initialize();
 		updateTargetOutputFirst();
+		sendNetworkUpdate();
 	}
 
 	@Override
@@ -171,10 +173,15 @@ public class TileWindmill extends TileEngine {
 	@Override
 	public double getMaxRenderDistanceSquared() {
 		if (ABO.windmillAnimations && ABO.windmillAnimDist > 64) {
-			return ABO.windmillAnimDist * ABO.windmillAnimDist;
+			return (double) (ABO.windmillAnimDist * ABO.windmillAnimDist);
 		} else {
 			return 4096.0D;
 		}
+	}
+	
+	@Override
+	public AxisAlignedBB getRenderBoundingBox() {
+		return (INFINITE_EXTENT_AABB);
 	}
 
 	private int getPowerToExtract() {
@@ -266,7 +273,6 @@ public class TileWindmill extends TileEngine {
 
 	@Override
 	public void burn() {
-		if (isRedstonePowered) {
 			if (burnTime > 0) {
 				burnTime = burnTime - 1;
 
@@ -292,11 +298,6 @@ public class TileWindmill extends TileEngine {
 				}
 
 			}
-
-		} else {
-			currentOutput -= 1;
-			if (currentOutput < 0) currentOutput = 0;
-		}
 	}
 
 	public int getScaledBurnTime(int i) {

@@ -3,11 +3,9 @@ package abo;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,10 +30,10 @@ import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.energy.BlockNull;
+import abo.energy.BlockNullCollide;
 import abo.energy.BlockWaterwheel;
 import abo.energy.BlockWindmill;
 import abo.gui.ABOGuiHandler;
-import abo.network.ABOPacketHandler;
 import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsInsertion;
 import abo.pipes.fluids.PipeFluidsGoldenIron;
@@ -50,19 +48,16 @@ import abo.pipes.items.PipeItemsExtraction;
 import abo.pipes.items.PipeItemsInsertion;
 import abo.pipes.items.PipeItemsRoundRobin;
 import abo.pipes.power.PipePowerDirected;
-import abo.pipes.power.PipePowerDistribution;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftEnergy;
 import buildcraft.BuildCraftTransport;
-import buildcraft.api.core.BCLog;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.InterModComms;
-import buildcraft.core.network.BuildCraftPacket;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
@@ -73,16 +68,14 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.FMLEmbeddedChannel;
-import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.entity.EntityItemBat;
+import da3dsoul.scaryGen.generate.WorldTypeScary;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
 import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
@@ -145,7 +138,8 @@ public class ABO {
 
 	public static BlockWaterwheel				waterwheelBlock;
 
-	public static Block							blockNull;
+	public static Block							blockNull						= null;
+	public static Block							blockNullCollide				= null;
 
 	public static int							actionSwitchOnPipeID			= 128;
 	public static IActionInternal				actionSwitchOnPipe				= null;
@@ -166,10 +160,12 @@ public class ABO {
 	@Instance("Additional-Buildcraft-Objects")
 	public static ABO							instance;
 
-	public EnumMap<Side, FMLEmbeddedChannel>	channels;
-
 	public static boolean						valveConnectsStraight;
 	public static boolean						valvePhysics;
+
+	public static int							scaryGenHeightLimit;
+	public static int							scaryGenWaterLevel;
+	public static Block							scaryGenWaterLevelReplacement;
 
 	// Mod Init Handling
 
@@ -188,8 +184,12 @@ public class ABO {
 		try {
 			aboConfiguration.load();
 
-			windmillAnimations = aboConfiguration.get("Misc", "WindmillAnimations", true).getBoolean(true);
-			windmillAnimDist = (byte) aboConfiguration.get("Misc", "AnimateWindmillDistance", 64).getInt(64);
+			windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
+			windmillAnimDist = (byte) aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt(64);
+
+			// scarygen
+			scaryGenHeightLimit = aboConfiguration.get("ScaryGen", "ScaryGenHeightLimit", 144).getInt();
+			scaryGenWaterLevel = aboConfiguration.get("ScaryGen", "ScaryGenOceanLevel", 63).getInt();
 
 			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
 
@@ -251,17 +251,18 @@ public class ABO {
 			pipePowerIron = buildPipe(PipePowerDirected.class, 1, new ItemStack(BuildCraftTransport.pipeGate, 1),
 					BuildCraftTransport.pipePowerGold);
 
-			pipeDistributionConductive = buildPipe(PipePowerDistribution.class, 2, pipePowerIron,
-					BuildCraftTransport.pipeItemsDiamond, pipePowerIron);
-
 			blockNull = new BlockNull().setLightOpacity(0).setBlockUnbreakable().setStepSound(Block.soundTypePiston)
 					.setBlockName("null").setBlockTextureName("additional-buildcraft-objects:null");
+			blockNullCollide = new BlockNullCollide().setLightOpacity(0).setBlockUnbreakable()
+					.setStepSound(Block.soundTypePiston).setBlockName("null")
+					.setBlockTextureName("additional-buildcraft-objects:null");
 			windmillBlock = new BlockWindmill(windmillScalar);
 			waterwheelBlock = new BlockWaterwheel(windmillScalar);
 
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
 			GameRegistry.registerBlock(blockNull, "null");
+			GameRegistry.registerBlock(blockNullCollide, "nullCollide");
 			GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
 					new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
 							Character.valueOf('B'), Items.iron_ingot });
@@ -296,6 +297,10 @@ public class ABO {
 			actionToggleOnPipe = new ActionToggleOnPipe(actionToggleOnPipeID);
 			actionToggleOffPipe = new ActionToggleOffPipe(actionToggleOffPipeID);
 
+			for (byte i = 1; i <= 6; i++) {
+				new WorldTypeScary(i);
+			}
+
 			StatementManager.registerActionProvider(new ABOActionProvider());
 
 			FMLCommonHandler.instance().bus().register(this);
@@ -308,8 +313,13 @@ public class ABO {
 	@EventHandler
 	public void load(FMLInitializationEvent evt) {
 
-		channels = NetworkRegistry.INSTANCE.newChannel("ABO", new ABOPacketHandler());
-
+		try {
+			scaryGenWaterLevelReplacement = Block.getBlockFromName(aboConfiguration.get("ScaryGen",
+					"ScaryGenOceanLevelBlock", "water").getString());
+		} catch (Exception e) {
+			scaryGenWaterLevelReplacement = Blocks.water;
+		}
+		
 		loadRecipes();
 
 		ABOProxy.proxy.registerTileEntities();
@@ -361,15 +371,6 @@ public class ABO {
 	public void textureHook(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() == 1) {
 			itemIconProvider.registerIcons(event.map);
-		}
-	}
-
-	public void sendToServer(BuildCraftPacket packet) {
-		try {
-			channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(OutboundTarget.TOSERVER);
-			channels.get(Side.CLIENT).writeOutbound(packet);
-		} catch (Throwable t) {
-			BCLog.logger.log(Level.WARN, "sentToServer crash", t);
 		}
 	}
 

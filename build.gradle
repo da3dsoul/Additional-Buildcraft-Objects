@@ -17,6 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
+jar {
+        manifest {
+        attributes 'FMLAT': 'accessTransformer.cfg'
+    }
+}
+
 version = "beta3"
 group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ABO-MC1.7.10-BC6.3"

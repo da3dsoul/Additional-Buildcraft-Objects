@@ -1,47 +1,44 @@
 package abo.energy;
 
 import java.text.DecimalFormat;
-import java.util.List;
-
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.IFluidBlock;
+import abo.ABO;
 import buildcraft.BuildCraftCore;
 import buildcraft.core.BlockBuildCraft;
 import buildcraft.core.ICustomHighlight;
-import buildcraft.core.IItemPipe;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight {
 
-	private static final AxisAlignedBB[]	boxes	= {
-			AxisAlignedBB.getBoundingBox(-3, -1.75, 0, 3, 1.75, 1),
-			AxisAlignedBB.getBoundingBox(-1.75, -3, 0, 1.75, -1.75, 1),
-			AxisAlignedBB.getBoundingBox(-1.75, 1.75, 0, 1.75, 3, 1) };
+	private static final AxisAlignedBB[]	boxes	= { AxisAlignedBB.getBoundingBox(-2.5, -1.5, 0, 2.5, 1.5, 1),
+			AxisAlignedBB.getBoundingBox(-1.5, -2.5, 0, 1.5, -1.5, 1),
+			AxisAlignedBB.getBoundingBox(-1.5, 1.5, 0, 1.5, 2.5, 1) };
 
 	private static IIcon					texture;
-	
-	private float scalar = 1;
+
+	private float							scalar	= 1;
 
 	public BlockWaterwheel() {
 		super(Material.iron);
 		setBlockName("waterwheelBlock");
 	}
-	
-	public BlockWaterwheel(float s)
-	{
+
+	public BlockWaterwheel(float s) {
 		this();
 		scalar = s;
 	}
@@ -57,23 +54,13 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 
 		TileEntity tile = world.getTileEntity(i, j, k);
 
-		// REMOVED DUE TO CREATIVE ENGINE REQUIREMENTS - dmillerw
-		// Drop through if the player is sneaking
-		// if (player.isSneaking()) {
-		// return false;
-		// }
-
-		// Do not open guis when having a pipe in hand
-		if (player.getCurrentEquippedItem() != null) {
-			if (player.getCurrentEquippedItem().getItem() instanceof IItemPipe) { return false; }
-		}
-
 		if (tile instanceof TileWaterwheel) {
 			if (!world.isRemote) {
 				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).realCurrentOutput/1000) + "RF/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).realCurrentOutput / 1000)
+						+ "RF/t"));
 				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).TARGET_OUTPUT/1000) + "RF/t"));
+						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).TARGET_OUTPUT / 1000) + "RF/t"));
 			}
 			return ((TileWaterwheel) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
@@ -117,12 +104,11 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 			return false;
 		}
 	}
-	
+
 	@Override
 	public AxisAlignedBB[] getBoxes(World wrd, int x, int y, int z, EntityPlayer player) {
 		AxisAlignedBB[] box = new AxisAlignedBB[boxes.length];
-		for(int i = 0; i < boxes.length; i++)
-		{
+		for (int i = 0; i < boxes.length; i++) {
 			box[i] = boxes[i].getOffsetBoundingBox(0.5, 0.5, 0);
 		}
 		return box;
@@ -134,41 +120,11 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB mask, List list, Entity ent) {
-		for (AxisAlignedBB aabb : boxes) {
-			AxisAlignedBB aabbTmp = aabb.getOffsetBoundingBox(x + 0.5, y + 0.5, z);
-			if (aabbTmp.intersectsWith(mask)) {
-				list.add(aabbTmp);
-			}
-		}
-	}
-
-	@Override
-	public MovingObjectPosition collisionRayTrace(World world, int x, int y, int z, Vec3 origin, Vec3 direction) {
-		MovingObjectPosition closest = null;
-		for (AxisAlignedBB aabb : boxes) {
-			MovingObjectPosition mop = aabb.getOffsetBoundingBox(x + 0.5, y + 0.5, z).calculateIntercept(origin, direction);
-			if (mop != null) {
-				if (closest != null && mop.hitVec.distanceTo(origin) < closest.hitVec.distanceTo(origin)) {
-					closest = mop;
-				} else {
-					closest = mop;
-				}
-			}
-		}
-
-		if (closest != null) {
-			closest.blockX = x;
-			closest.blockY = y;
-			closest.blockZ = z;
-		}
-		return closest;
-	}
-
-	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if (!checkBBClear(world, x, y, z)) { world.func_147480_a(x, y, z, true); return;}
+		if (!checkBBClear(world, x, y, z)) {
+			this.dropBlockAsItemWithChance(world, x, y, z, 0, 1, 0);
+			return;
+		}
 		try {
 			TileWaterwheel tile = (TileWaterwheel) world.getTileEntity(x, y, z);
 			tile.onNeighborBlockChange(world, x, y, z, block);
@@ -176,8 +132,23 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 		} catch (Exception e) {};
 	}
 
-	private boolean checkBBClear(World world, int x, int y, int z) {
-		return true;
+	private boolean checkBBClear(World world, int i, int j, int k) {
+		boolean flag = true;
+		Block block;
+		for (int x = -3; x <= 3; x++) {
+			for (int y = -3; y <= 3; y++) {
+				if (x == -3 && y == -3) continue;
+				if (x == -3 && y == 3) continue;
+				if (x == 3 && y == -3) continue;
+				if (x == 3 && y == 3) continue;
+				if (x == 0 && y == 0) continue;
+				block = world.getBlock(i + x, j + y, k);
+				if (block != Blocks.air && block != ABO.blockNullCollide && !(block instanceof IFluidBlock) && !(block instanceof BlockFluidBase)
+						&& !(block instanceof BlockLiquid) && !block.getMaterial().isLiquid()
+						&& !block.getMaterial().isReplaceable()) flag = false;
+			}
+		}
+		return flag;
 	}
 
 	@Override
@@ -199,14 +170,32 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 	@Override
 	public void onBlockAdded(World world, int i, int j, int k) {
 		super.onBlockAdded(world, i, j, k);
-		
+		for (int x = -2; x <= 2; x++) {
+			for (int y = -2; y <= 2; y++) {
+				if (x == -2 && y == -2) continue;
+				if (x == -2 && y == 2) continue;
+				if (x == 2 && y == -2) continue;
+				if (x == 2 && y == 2) continue;
+				if (x == 0 && y == 0) continue;
+				if (world.getBlock(i + x, j + y, k) != ABO.blockNullCollide)
+					world.setBlock(i + x, j + y, k, ABO.blockNullCollide);
+			}
+		}
 	}
 
 	@Override
 	public void onBlockPreDestroy(World world, int i, int j, int k, int oldMeta) {
-		
+		for (int x = -2; x <= 2; x++) {
+			for (int y = -2; y <= 2; y++) {
+				if (x == -2 && y == -2) continue;
+				if (x == -2 && y == 2) continue;
+				if (x == 2 && y == -2) continue;
+				if (x == 2 && y == 2) continue;
+				if (x == 0 && y == 0) continue;
+				if (world.getBlock(i + x, j + y, k) == ABO.blockNullCollide)
+					world.setBlock(i + x, j + y, k, Blocks.air);
+			}
+		}
 	}
-
-	
 
 }

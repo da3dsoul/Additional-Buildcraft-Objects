@@ -1,15 +1,18 @@
 package abo.energy;
 
+import io.netty.buffer.ByteBuf;
 import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import buildcraft.api.transport.IPipeTile;
+import buildcraft.core.utils.BlockUtils;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
@@ -86,6 +89,21 @@ public class TileWaterwheel extends TileEngine {
 		super.initialize();
 		updateTargetOutputFirst();
 		initDirection();
+		sendNetworkUpdate();
+	}
+	
+	@Override
+	public void readData(ByteBuf stream) {
+		int flags = stream.readUnsignedByte();
+		energyStage = EnergyStage.values()[flags & 0x07];
+		isRedstonePowered = (flags & 0x08) != 0;
+		orientation = ForgeDirection.getOrientation(stream.readByte());
+	}
+
+	@Override
+	public void writeData(ByteBuf stream) {
+		stream.writeByte(energyStage.ordinal() | (isRedstonePowered ? 8 : 0));
+		stream.writeByte(orientation.ordinal());
 	}
 
 	private void initDirection() {
@@ -94,13 +112,8 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public void updateEntity() {
-		if (!isActive()) {
-			animProgress -= 0.166666;
-			if (animProgress < 0) animProgress = 0;
-		} else {
 			animProgress += getPistonSpeed() / 6;
 			if (animProgress >= 1) animProgress = 0;
-		}
 		super.updateEntity();
 	}
 
@@ -133,6 +146,8 @@ public class TileWaterwheel extends TileEngine {
 
 	private void updateTargetOutput() {
 		if (isRedstonePowered) {
+			float x = getLiquidDensity();
+			DESIGN_OUTPUT = MathHelper.clamp_float((float) (-2.021 * x * x + 2.021 * x), 0, 0.5f);
 			TARGET_OUTPUT = (float) (0.125f + BIOME_OUTPUT + DESIGN_OUTPUT + (getWorldObj().rainingStrength / 8f))
 					* 10000 * windmillScalar;
 		} else {
@@ -154,11 +169,11 @@ public class TileWaterwheel extends TileEngine {
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;
-		if (energyLevel < 3750f * windmillScalar) {
+		if (energyLevel < 3500f * windmillScalar) {
 			return EnergyStage.BLUE;
-		} else if (energyLevel < 7500f * windmillScalar) {
+		} else if (energyLevel < 5000f * windmillScalar) {
 			return EnergyStage.GREEN;
-		} else if (energyLevel < 13740f * windmillScalar) {
+		} else if (energyLevel < 7450f * windmillScalar) {
 			return EnergyStage.YELLOW;
 		} else {
 			return EnergyStage.RED;
@@ -166,15 +181,16 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	public float getPistonSpeed() {
+		if(!isRedstonePowered) return 0;
 		switch (getEnergyStage()) {
 			case BLUE:
-				return 0.02F;
+				return 0.01F;
 			case GREEN:
-				return 0.04F;
+				return 0.02F;
 			case YELLOW:
-				return 0.08F;
+				return 0.03F;
 			case RED:
-				return 0.16F;
+				return 0.04F;
 			default:
 				return 0.01F;
 		}
@@ -183,7 +199,7 @@ public class TileWaterwheel extends TileEngine {
 	@Override
 	public double getMaxRenderDistanceSquared() {
 		if (ABO.windmillAnimations && ABO.windmillAnimDist > 64) {
-			return ABO.windmillAnimDist * ABO.windmillAnimDist;
+			return (double) (ABO.windmillAnimDist * ABO.windmillAnimDist);
 		} else {
 			return 4096.0D;
 		}
@@ -191,7 +207,7 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-		return AxisAlignedBB.getBoundingBox(-3, -3, 0, 3, 3, 1).offset(xCoord, yCoord, zCoord);
+		return (INFINITE_EXTENT_AABB);
 	}
 
 	private int getPowerToExtract() {
@@ -228,20 +244,29 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	private boolean canGetWind() {
-		for (int i = -1; i < 2; i++) {
-			for (int j = -2; j <= 2; j++) {
-				for (int k = -2; k <= 2; k++) {
-					if (getWorldObj().getBlock(xCoord + j, yCoord + i, zCoord + k).isOpaqueCube()) return false;
+		float liquidDensity = getLiquidDensity();
+		return liquidDensity < 0.55 && liquidDensity > 0.1;
+	}
+	
+	private float getLiquidDensity()
+	{
+		int numBlocks=0;
+		for (int x = -3; x <= 3; x++) {
+			for (int y = -3; y <= 3; y++) {
+				if (BlockUtils.getFluid(worldObj.getBlock(xCoord + x, yCoord + y, zCoord)) != null)
+				{
+					numBlocks++;
 				}
 			}
 		}
-		return true;
+		return (float) (numBlocks / 28.0f);
 	}
 
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {}
+	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+		if(!isOrientationValid()) switchOrientation(true);
+	}
 
 	public boolean isOrientationValid() {
-		if (orientation == ForgeDirection.EAST) return false;
 		TileEntity tile = getTile(orientation);
 
 		return isPoweredTile(tile, orientation);
@@ -283,7 +308,6 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public void burn() {
-		if (isRedstonePowered) {
 			if (burnTime > 0) {
 				burnTime = burnTime - 1;
 
@@ -309,11 +333,6 @@ public class TileWaterwheel extends TileEngine {
 				}
 
 			}
-
-		} else {
-			currentOutput -= 1;
-			if (currentOutput < 0) currentOutput = 0;
-		}
 	}
 
 	public int getScaledBurnTime(int i) {

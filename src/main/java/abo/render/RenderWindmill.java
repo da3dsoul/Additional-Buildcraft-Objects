@@ -110,9 +110,9 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		try {
 			if (!(xCoord == -1 && yCoord == -1 && zCoord == -1)) {
 				EntityClientPlayerMP player = FMLClientHandler.instance().getClientPlayerEntity();
-				double dist = Math.sqrt((xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
-						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ));
-				if (dist > ABO.windmillAnimDist) inDist = false;
+				double dist = (xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
+						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ);
+				if (dist > (double) (ABO.windmillAnimDist * ABO.windmillAnimDist)) inDist = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

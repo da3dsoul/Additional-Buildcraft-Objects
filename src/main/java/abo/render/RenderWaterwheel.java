@@ -2,6 +2,8 @@ package abo.render;
 
 import org.lwjgl.opengl.GL11;
 
+import buildcraft.BuildCraftCore;
+import buildcraft.BuildCraftCore.RenderMode;
 import cpw.mods.fml.client.FMLClientHandler;
 import abo.ABO;
 import abo.energy.TileWaterwheel;
@@ -27,10 +29,18 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 	public void renderTileEntityAt(TileEntity tileentity, double x, double y, double z,
 			float partialTick) {
 		if(!(tileentity instanceof TileWaterwheel)) return;
+		if (BuildCraftCore.render == RenderMode.NoDynamic) { return; }
 		
 		TileWaterwheel tile = (TileWaterwheel)tileentity;
 		
+		
+
 		GL11.glPushMatrix();
+		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
+		GL11.glEnable(GL11.GL_LIGHTING);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glColor3f(1, 1, 1);
 
 		GL11.glTranslated(x + 0.5D,y + 0.5D,z);
 		GL11.glRotatef(90F, 1.0F, 0.0F, 0.0F);
@@ -50,9 +60,9 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 			
 			if (!(xCoord == -1 && yCoord == -1 && zCoord == -1)) {
 				EntityClientPlayerMP player = FMLClientHandler.instance().getClientPlayerEntity();
-				double dist = Math.sqrt((xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
-						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ));
-				if (dist > ABO.windmillAnimDist) inDist = false;
+				double dist = (xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
+						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ);
+				if (dist > (double) (ABO.windmillAnimDist * ABO.windmillAnimDist)) inDist = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,6 +95,7 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 		waterwheelModel.renderAll();
 		
 		GL11.glPopMatrix();
+		GL11.glPopAttrib();
 		GL11.glPopMatrix();
 	}
 

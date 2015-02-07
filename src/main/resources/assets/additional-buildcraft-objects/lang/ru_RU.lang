@@ -14,7 +14,6 @@ item.PipeItemsCrossover.name=Перекрёстная транспортная �
 item.PipeItemsCompactor.name=Уплотняющая транспортная труба
 item.PipePowerSwitch.name=Переключающая энергетическая труба
 item.PipePowerDirected.name=Диодная энергетическая труба
-item.PipePowerDistribution.name=Распределяющая энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
 item.MobBottleFull.name=Бутылка (Полная)
 item.MobBottleEmpty.name=Бутылка (Пустая)

@@ -1,8 +1,7 @@
 package abo.proxy;
 
+import abo.energy.TileWaterwheel;
 import abo.energy.TileWindmill;
-import abo.network.ABOPacket;
-
 import net.minecraft.item.Item;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -14,13 +13,11 @@ public class ABOProxy {
 
 	public void registerPipe(Item itemID) {}
 
-	public void sendToServer(ABOPacket packet) {}
-
 	public void registerBlockRenderers() {}
 
 	public void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileWindmill.class, "net.minecraft.src.abo.energy.TileWindmill");
-		GameRegistry.registerTileEntity(TileWindmill.class, "net.minecraft.src.abo.energy.TileWaterwheel");
+		GameRegistry.registerTileEntity(TileWaterwheel.class, "net.minecraft.src.abo.energy.TileWaterwheel");
 	}
 	
 	public void registerEntities(){}
