@@ -5,7 +5,7 @@ import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
+import da3dsoul.scaryGen.items.ItemBottle;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;

@@ -1,4 +1,4 @@
-package da3dsoul.scaryGen.mod_ScaryGen;
+package da3dsoul.scaryGen.items;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
@@ -45,8 +46,10 @@ public class ItemGoldenStaff extends Item {
 		int range = 48;
 		try
 		{
-			range = (int) Math.round(FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks * 3.5);
-		}catch(Exception e) {}
+			range = (int) Math.round(FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks * 5.5);
+		}catch(Throwable t) {
+			range = (int) Math.round(FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getViewDistance() * 5.5);	
+		}
 		do
 		{
 			if (!it.hasNext() || i > 64)
@@ -64,22 +67,19 @@ public class ItemGoldenStaff extends Item {
 
 				if(item instanceof EntityItem)
 				{
-					/*List<EntityItem> list2 = world.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(item.posX - 0.5D, item.posY - 0.5D, item.posZ - 0.5D, item.posX + 0.5D, item.posY + 0.5D, item.posZ + 0.5D).expand(10D, 10D, 10D));
+					List<EntityItem> list2 = world.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(item.posX - 0.5D, item.posY - 0.5D, item.posZ - 0.5D, item.posX + 0.5D, item.posY + 0.5D, item.posZ + 0.5D).expand(10D, 10D, 10D));
 					for(EntityItem item2 : list2)
 					{
 						if(item2 == item) continue;
 						if(item2.getEntityItem().isItemEqual(((EntityItem) item).getEntityItem()))
 						{
 							((EntityItem) item).combineItems(item2);
-							if(item == null || item.isDead)
+							if(item2 == null || item2.isDead)
 							{
-								if((item2 == null || item2.isDead))
-								{
-									item = item2;
-								}
+								item = item2;
 							}
 						}
-					}*/
+					}
 					FollowableEntity item1 = new FollowableEntity((EntityItem)item);
 					item1.setFollowTarget(entityplayer);
 					item.setDead();

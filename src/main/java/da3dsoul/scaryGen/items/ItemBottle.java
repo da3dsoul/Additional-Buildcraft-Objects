@@ -1,4 +1,4 @@
-package da3dsoul.scaryGen.mod_ScaryGen;
+package da3dsoul.scaryGen.items;
 
 import java.util.ArrayList;
 

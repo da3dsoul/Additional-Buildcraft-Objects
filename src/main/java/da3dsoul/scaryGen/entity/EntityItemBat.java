@@ -17,7 +17,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
+import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.EntityAIAStarFollow;
 import da3dsoul.scaryGen.pathfinding_astar.FollowPathNavigate;
 import da3dsoul.scaryGen.pathfinding_astar.IFollowable;

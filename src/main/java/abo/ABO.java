@@ -76,8 +76,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.scaryGen.entity.EntityItemBat;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
-import da3dsoul.scaryGen.mod_ScaryGen.ItemBottle;
-import da3dsoul.scaryGen.mod_ScaryGen.ItemGoldenStaff;
+import da3dsoul.scaryGen.items.ItemBottle;
+import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders")
