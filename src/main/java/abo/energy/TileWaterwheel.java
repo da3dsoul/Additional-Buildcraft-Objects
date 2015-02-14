@@ -27,8 +27,6 @@ public class TileWaterwheel extends TileEngine {
 
 	public float							realCurrentOutput		= 0;
 
-	public ForgeDirection					facingDirection;
-
 	public static float						windmillScalar;
 	// final float kp = 1f;
 	// final float ki = 0.05f;
@@ -251,11 +249,25 @@ public class TileWaterwheel extends TileEngine {
 	private float getLiquidDensity()
 	{
 		int numBlocks=0;
+		int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+		if(l == 0)
+		{
 		for (int x = -3; x <= 3; x++) {
 			for (int y = -3; y <= 3; y++) {
 				if (BlockUtils.getFluid(worldObj.getBlock(xCoord + x, yCoord + y, zCoord)) != null)
 				{
 					numBlocks++;
+				}
+			}
+		}
+		} else if(l == 1)
+		{
+			for (int x = -3; x <= 3; x++) {
+				for (int y = -3; y <= 3; y++) {
+					if (BlockUtils.getFluid(worldObj.getBlock(xCoord, yCoord + y, zCoord + x)) != null)
+					{
+						numBlocks++;
+					}
 				}
 			}
 		}
@@ -281,9 +293,12 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	private boolean switchOrientationDo(boolean pipesOnly) {
+		int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
 		for (int i = orientation.ordinal() + 1; i <= orientation.ordinal() + 6; ++i) {
 			ForgeDirection o = ForgeDirection.VALID_DIRECTIONS[i % 6];
-			if (o == ForgeDirection.EAST) continue;
+			if (o == ForgeDirection.UP || o == ForgeDirection.DOWN) continue;
+			if (l == 0 && (o == ForgeDirection.EAST || o == ForgeDirection.WEST)) continue;
+			if (l == 1 && (o == ForgeDirection.NORTH || o == ForgeDirection.SOUTH)) continue;
 			TileEntity tile = getTile(o);
 
 			if ((!pipesOnly || tile instanceof IPipeTile) && isPoweredTile(tile, o)) {

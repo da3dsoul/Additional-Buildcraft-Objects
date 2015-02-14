@@ -32,8 +32,6 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 		if (BuildCraftCore.render == RenderMode.NoDynamic) { return; }
 		
 		TileWaterwheel tile = (TileWaterwheel)tileentity;
-		
-		
 
 		GL11.glPushMatrix();
 		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
@@ -41,13 +39,22 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glColor3f(1, 1, 1);
-
-		GL11.glTranslated(x + 0.5D,y + 0.5D,z);
-		GL11.glRotatef(90F, 1.0F, 0.0F, 0.0F);
 		
 		int xCoord = tile.xCoord;
 		int yCoord = tile.yCoord;
 		int zCoord = tile.zCoord;
+		
+		int l = tile.getWorldObj().getBlockMetadata(xCoord, yCoord, zCoord);
+		
+		if(l == 0)
+		{
+			GL11.glTranslated(x + 0.5D,y + 0.5D,z);
+			GL11.glRotatef(90F, 1.0F, 0.0F, 0.0F);
+		} else if(l == 1)
+		{
+			GL11.glTranslated(x,y + 0.5D,z + 0.5D);
+			GL11.glRotatef(-90F, 0.0F, 0.0F, 1.0F);
+		}
 		
 		float progress = tile.animProgress;
 		

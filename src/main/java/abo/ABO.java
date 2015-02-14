@@ -33,6 +33,7 @@ import abo.energy.BlockNull;
 import abo.energy.BlockNullCollide;
 import abo.energy.BlockWaterwheel;
 import abo.energy.BlockWindmill;
+import abo.energy.ItemWaterwheel;
 import abo.gui.ABOGuiHandler;
 import abo.pipes.fluids.PipeFluidsBalance;
 import abo.pipes.fluids.PipeFluidsInsertion;
@@ -97,8 +98,6 @@ public class ABO {
 	public static Logger						aboLog							= LogManager
 																						.getLogger("Additional-Buildcraft-Objects");
 
-	public static Item							itemGateSettingsDuplicator		= null;
-
 	public static Item							pipeFluidsValve					= null;
 
 	public static Item							pipeFluidsGoldenIron			= null;
@@ -129,8 +128,6 @@ public class ABO {
 
 	public static Item							pipePowerIron					= null;
 
-	public static Item							pipeDistributionConductive		= null;
-
 	public static Item							bottle							= null;
 	public static Item							goldenstaff						= null;
 
@@ -152,6 +149,8 @@ public class ABO {
 
 	public static boolean						windmillAnimations;
 	public static byte							windmillAnimDist;
+	
+	public static Item							waterwheelItem;
 
 	public static String						loadedEnderInventory			= "";
 
@@ -162,10 +161,6 @@ public class ABO {
 
 	public static boolean						valveConnectsStraight;
 	public static boolean						valvePhysics;
-
-	public static int							scaryGenHeightLimit;
-	public static int							scaryGenWaterLevel;
-	public static Block							scaryGenWaterLevelReplacement;
 
 	// Mod Init Handling
 
@@ -186,10 +181,6 @@ public class ABO {
 
 			windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
 			windmillAnimDist = (byte) aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt(64);
-
-			// scarygen
-			scaryGenHeightLimit = aboConfiguration.get("ScaryGen", "ScaryGenHeightLimit", 144).getInt();
-			scaryGenWaterLevel = aboConfiguration.get("ScaryGen", "ScaryGenOceanLevel", 63).getInt();
 
 			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
 
@@ -258,6 +249,12 @@ public class ABO {
 					.setBlockTextureName("additional-buildcraft-objects:null");
 			windmillBlock = new BlockWindmill(windmillScalar);
 			waterwheelBlock = new BlockWaterwheel(windmillScalar);
+			waterwheelItem = new ItemWaterwheel();
+			GameRegistry.registerItem(waterwheelItem, "waterwheelItem");
+			
+			GameRegistry.addShapedRecipe(new ItemStack(waterwheelItem),
+					new Object[] { "CBC", "BAB", "CBC", Character.valueOf('A'), BuildCraftCore.ironGearItem,
+							Character.valueOf('B'), Blocks.stone, Character.valueOf('C'), Items.stick });
 
 			GameRegistry.registerBlock(windmillBlock, "windmillBlock");
 			GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
@@ -297,9 +294,7 @@ public class ABO {
 			actionToggleOnPipe = new ActionToggleOnPipe(actionToggleOnPipeID);
 			actionToggleOffPipe = new ActionToggleOffPipe(actionToggleOffPipeID);
 
-			for (byte i = 1; i <= 6; i++) {
-				new WorldTypeScary(i);
-			}
+			new WorldTypeScary();
 
 			StatementManager.registerActionProvider(new ABOActionProvider());
 
@@ -312,13 +307,6 @@ public class ABO {
 
 	@EventHandler
 	public void load(FMLInitializationEvent evt) {
-
-		try {
-			scaryGenWaterLevelReplacement = Block.getBlockFromName(aboConfiguration.get("ScaryGen",
-					"ScaryGenOceanLevelBlock", "water").getString());
-		} catch (Exception e) {
-			scaryGenWaterLevelReplacement = Blocks.water;
-		}
 		
 		loadRecipes();
 

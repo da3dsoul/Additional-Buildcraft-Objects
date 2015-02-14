@@ -5,20 +5,16 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import buildcraft.BuildCraftCore;
@@ -33,8 +29,6 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 			AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625),
 			AxisAlignedBB.getBoundingBox(0, 0.25, 0.25, 0.375, 0.75, 0.75),
 			AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) };
-
-	private static IIcon					texture;
 	
 	private float scalar = 1;
 
@@ -88,12 +82,6 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	@Override
 	public boolean renderAsNormalBlock() {
 		return false;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister par1IconRegister) {
-		texture = par1IconRegister.registerIcon("additional-buildcraft-objects:windmillIcon");
 	}
 
 	@Override
@@ -187,12 +175,6 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	@Override
 	public boolean canPlaceBlockAt(World world, int x, int y, int z) {
 		return super.canPlaceBlockAt(world, x, y, z) && checkBBClear(world, x, y, z);
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int meta) {
-		return texture;
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package da3dsoul.scaryGen.generate;
 
-import abo.ABO;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
@@ -11,15 +10,21 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class ChunkProviderScary extends ChunkProviderGenDummy {
 
 	private byte	index;
+	private int heightLevel;
+	private int oceanLevel;
+	private Block oceanReplacement;
 
-	public ChunkProviderScary(World par1World, long par2, boolean par4, byte i) {
+	public ChunkProviderScary(World par1World, long par2, boolean par4, byte i, int hLevel, int oLevel, Block oReplace) {
 		super(par1World, par2, par4);
 		index = i;
+		heightLevel = hLevel;
+		oceanLevel = oLevel;
+		oceanReplacement = oReplace;
 	}
 
 	@Override
 	public void generateTerrain(int par1, int par2, Block[] blockArray) {
-		byte b0 = (byte) ABO.scaryGenWaterLevel;
+		int b0 = oceanLevel;
 		this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(
 				this.biomesForGeneration, par1 * 4 - 2, par2 * 4 - 2, 10, 10);
 		this.func_147423_a(par1 * 4, 0, par2 * 4);
@@ -62,14 +67,14 @@ public class ChunkProviderScary extends ChunkProviderGenDummy {
 
 							for (int k3 = 0; k3 < 4; ++k3) {
 								if ((d15 += d16) > 0.0D) {
-									if(k2 * 8 + l2 < ABO.scaryGenHeightLimit)
+									if(k2 * 8 + l2 < heightLevel)
 									{
 										blockArray[j3 += short1] = Blocks.stone;
 									} else {
 										blockArray[j3 += short1] = null;
 									}
 								} else if (k2 * 8 + l2 < b0) {
-									blockArray[j3 += short1] = ABO.scaryGenWaterLevelReplacement;
+									blockArray[j3 += short1] = oceanReplacement;
 								} else {
 									blockArray[j3 += short1] = null;
 								}
