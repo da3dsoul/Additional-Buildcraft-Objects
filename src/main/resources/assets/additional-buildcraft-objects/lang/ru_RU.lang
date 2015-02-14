@@ -1,6 +1,6 @@
 # Russian language file
 
-item.PipeFluidsValve.name=Клапанная труба
+item.PipeFluidsValve.name=Вентильная труба
 item.PipeFluidsGoldenIron.name=Золотисто-железная жидкостная труба
 item.PipeFluidsReinforcedGoldenIron.name=Усиленная золотисто-железная жидкостная труба
 item.PipeFluidsReinforcedGolden.name=Усиленная золотая жидкостная труба
@@ -15,7 +15,11 @@ item.PipeItemsCompactor.name=Уплотняющая транспортная т�
 item.PipePowerSwitch.name=Переключающая энергетическая труба
 item.PipePowerDirected.name=Диодная энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
+item.waterwheelItem.name=Водяное колесо
 item.MobBottleFull.name=Бутылка (Полная)
 item.MobBottleEmpty.name=Бутылка (Пустая)
 item.GoldenStaff.name=Жёлтая краска на палочке
 tile.windmillBlock.name=Мельница
+tile.waterwheelBlock.name=Водяное колесо
+
+generator.scaryGen=Жуткая генерация
