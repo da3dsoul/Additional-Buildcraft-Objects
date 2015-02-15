@@ -1,12 +1,12 @@
 package abo.energy;
 
 import io.netty.buffer.ByteBuf;
-import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -16,6 +16,7 @@ import buildcraft.core.utils.BlockUtils;
 import buildcraft.core.utils.MathUtils;
 import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
+import cofh.api.energy.IEnergyHandler;
 
 public class TileWaterwheel extends TileEngine {
 
@@ -28,16 +29,15 @@ public class TileWaterwheel extends TileEngine {
 	public float							realCurrentOutput		= 0;
 
 	public static float						windmillScalar;
-	// final float kp = 1f;
-	// final float ki = 0.05f;
-	// final double eLimit = (MAX_OUTPUT - MIN_OUTPUT) / ki;
+
 	private int								burnTime				= 0;
 	private int								totalBurnTime			= 0;
-	// double esum = 0;
 
 	private int								tickCount				= 0;
 
 	public float							animProgress			= 0;
+
+	public boolean							renderBackwards			= false;
 
 	public static final ResourceLocation	TRUNK_BLUE_TEXTURE		= new ResourceLocation(
 																			"additional-buildcraft-objects:textures/blocks/trunk_blue.png");
@@ -89,19 +89,21 @@ public class TileWaterwheel extends TileEngine {
 		initDirection();
 		sendNetworkUpdate();
 	}
-	
+
 	@Override
 	public void readData(ByteBuf stream) {
 		int flags = stream.readUnsignedByte();
 		energyStage = EnergyStage.values()[flags & 0x07];
 		isRedstonePowered = (flags & 0x08) != 0;
 		orientation = ForgeDirection.getOrientation(stream.readByte());
+		renderBackwards = stream.readBoolean();
 	}
 
 	@Override
 	public void writeData(ByteBuf stream) {
 		stream.writeByte(energyStage.ordinal() | (isRedstonePowered ? 8 : 0));
 		stream.writeByte(orientation.ordinal());
+		stream.writeBoolean(renderBackwards);
 	}
 
 	private void initDirection() {
@@ -110,8 +112,8 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public void updateEntity() {
-			animProgress += getPistonSpeed() / 6;
-			if (animProgress >= 1) animProgress = 0;
+		animProgress += getPistonSpeed() / 6;
+		if (animProgress >= 1) animProgress = 0;
 		super.updateEntity();
 	}
 
@@ -179,7 +181,7 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	public float getPistonSpeed() {
-		if(!isRedstonePowered) return 0;
+		if (!isRedstonePowered) return 0;
 		switch (getEnergyStage()) {
 			case BLUE:
 				return 0.01F;
@@ -242,31 +244,94 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	private boolean canGetWind() {
+		calculateBackwardsness();
 		float liquidDensity = getLiquidDensity();
 		return liquidDensity < 0.55 && liquidDensity > 0.1;
 	}
-	
-	private float getLiquidDensity()
-	{
-		int numBlocks=0;
+
+	private void calculateBackwardsness() {
+		Block block;
+		int prevdir = 0;
 		int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-		if(l == 0)
-		{
-		for (int x = -3; x <= 3; x++) {
-			for (int y = -3; y <= 3; y++) {
-				if (BlockUtils.getFluid(worldObj.getBlock(xCoord + x, yCoord + y, zCoord)) != null)
-				{
-					numBlocks++;
+		if (l == 0) {
+			for (int x = -3; x <= 3; x++) {
+				block = worldObj.getBlock(xCoord + x, yCoord - 3, zCoord);
+				if (BlockUtils.getFluid(block) != null) {
+					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+					block.velocityToAddToEntity(worldObj, xCoord + x, yCoord - 3, zCoord, null, vec);
+
+					if (vec.xCoord != 0) {
+						if (vec.xCoord < 0 && (prevdir == 0 || prevdir < 0)) {
+							prevdir = -1;
+						} else if (vec.xCoord > 0 && (prevdir == 0 || prevdir > 0)) {
+							prevdir = 1;
+						}
+					}
+				}
+			}
+		} else if (l == 1) {
+			for (int x = -3; x <= 3; x++) {
+				block = worldObj.getBlock(xCoord, yCoord - 3, zCoord + x);
+				if (BlockUtils.getFluid(block) != null) {
+					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+					block.velocityToAddToEntity(worldObj, xCoord, yCoord - 3, zCoord + x, null, vec);
+
+					if (vec.zCoord != 0) {
+						if (vec.zCoord < 0 && (prevdir == 0 || prevdir < 0)) {
+							prevdir = -1;
+						} else if (vec.zCoord > 0 && (prevdir == 0 || prevdir > 0)) {
+							prevdir = 1;
+						}
+					}
 				}
 			}
 		}
-		} else if(l == 1)
-		{
+
+		if (prevdir > 0) {
+			renderBackwards = true;
+		} else if (prevdir < 0) {
+			renderBackwards = false;
+		}
+	}
+
+	private boolean isFlowInProperDirection(int rX, int rY, int rZ, int meta, Vec3 vec) {
+		if (rY != -3 && vec.yCoord < 0) return true;
+		if (meta == 0) {
+			if (rY == -3) {
+				if (vec.xCoord != 0) return true;
+			}
+
+		} else if (meta == 1) {
+			if (rY == -3) {
+				if (vec.zCoord != 0) return true;
+			}
+		}
+		return false;
+	}
+
+	private float getLiquidDensity() {
+		int numBlocks = 0;
+		Block block;
+		int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+		if (l == 0) {
 			for (int x = -3; x <= 3; x++) {
 				for (int y = -3; y <= 3; y++) {
-					if (BlockUtils.getFluid(worldObj.getBlock(xCoord, yCoord + y, zCoord + x)) != null)
-					{
-						numBlocks++;
+					block = worldObj.getBlock(xCoord + x, yCoord + y, zCoord);
+					if (BlockUtils.getFluid(block) != null) {
+						Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+						block.velocityToAddToEntity(worldObj, xCoord + x, yCoord + y, zCoord, null, vec);
+						if (isFlowInProperDirection(x, y, l, 0, vec)) numBlocks++;
+					}
+				}
+			}
+		} else if (l == 1) {
+			for (int x = -3; x <= 3; x++) {
+				for (int y = -3; y <= 3; y++) {
+					block = worldObj.getBlock(xCoord, yCoord + y, zCoord + x);
+					if (BlockUtils.getFluid(block) != null) {
+						Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+						block.velocityToAddToEntity(worldObj, xCoord, yCoord + y, zCoord + x, null, vec);
+						if (isFlowInProperDirection(0, y, x, l, vec)) numBlocks++;
 					}
 				}
 			}
@@ -275,7 +340,7 @@ public class TileWaterwheel extends TileEngine {
 	}
 
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if(!isOrientationValid()) switchOrientation(true);
+		if (!isOrientationValid()) switchOrientation(true);
 	}
 
 	public boolean isOrientationValid() {
@@ -323,31 +388,29 @@ public class TileWaterwheel extends TileEngine {
 
 	@Override
 	public void burn() {
-			if (burnTime > 0) {
-				burnTime = burnTime - 1;
+		if (burnTime > 0) {
+			burnTime = burnTime - 1;
 
-				int output = calculateCurrentOutput();
-				currentOutput = output; // Comment out for constant power
-				addEnergy(output);
-			}
+			int output = calculateCurrentOutput();
+			currentOutput = output; // Comment out for constant power
+			addEnergy(output);
+		}
 
-			if (tickCount % 60 == 0) {
-				checkRedstonePower();
-			}
+		if (tickCount % 60 == 0) {
+			checkRedstonePower();
+		}
 
-			if (burnTime == 0 && isRedstonePowered) {
-				burnTime = totalBurnTime = 1200;
+		if (burnTime == 0 && isRedstonePowered) {
+			burnTime = totalBurnTime = 1200;
+		} else {
+			if (tickCount >= 1199) {
 				updateTargetOutput();
+				tickCount = 0;
 			} else {
-				if (tickCount >= 1198) {
-					updateTargetOutput();
-
-					tickCount = 0;
-				} else {
-					tickCount++;
-				}
-
+				tickCount++;
 			}
+
+		}
 	}
 
 	public int getScaledBurnTime(int i) {

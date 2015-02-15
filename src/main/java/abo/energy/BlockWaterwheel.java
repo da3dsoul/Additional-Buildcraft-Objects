@@ -125,8 +125,8 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 	@Override
 	public AxisAlignedBB[] getBoxes(World world, int i, int j, int k, EntityPlayer player) {
 		int l = world.getBlockMetadata(i, j, k);
-		AxisAlignedBB[] box = new AxisAlignedBB[boxes.length];
-		for (int m = 0; m < boxes.length; m++) {
+		AxisAlignedBB[] box = new AxisAlignedBB[boxes[l].length];
+		for (int m = 0; m < boxes[l].length; m++) {
 			box[m] = boxes[l][m];
 		}
 		return box;

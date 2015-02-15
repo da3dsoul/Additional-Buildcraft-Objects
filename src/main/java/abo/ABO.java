@@ -81,13 +81,13 @@ import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "2.0.2+", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.12.1.1079,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC"+ABO.MINECRAFT_VERSION+"-BC"+ABO.BUILDCRAFT_VERSION+ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders")
 public class ABO {
-	public static final String					VERSION							= "2.0.2+";
+	public static final String					VERSION							= "release2.1";
 
 	public static final String					MINECRAFT_VERSION				= "1.7.10";
 
-	public static final String					BUILDCRAFT_VERSION				= "6.3.0";
+	public static final String					BUILDCRAFT_VERSION				= "6.3";
 
 	public static final String					FORGE_VERSION					= "10.13.2.1277";
 
@@ -168,13 +168,12 @@ public class ABO {
 	@EventHandler
 	public void preInitialize(FMLPreInitializationEvent evt) {
 
-		aboLog.info("Starting Additional-Buildcraft-Objects #@BUILD_NUMBER@ " + VERSION + " (Built for Minecraft"
-				+ MINECRAFT_VERSION + " with Buildcraft " + BUILDCRAFT_VERSION + " and Forge " + FORGE_VERSION);
-		aboLog.info("Copyright (c) Flow86, 2011-2013");
+		aboLog.info("Starting Additional-Buildcraft-Objects " + "MC" + MINECRAFT_VERSION + "-BC" + BUILDCRAFT_VERSION + VERSION);
 
 		aboConfiguration = new ABOConfiguration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
 
 		float windmillScalar = 1;
+		float waterwheelScalar = 1;
 
 		try {
 			aboConfiguration.load();
@@ -183,6 +182,7 @@ public class ABO {
 			windmillAnimDist = (byte) aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt(64);
 
 			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
+			windmillScalar = (float) aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
 					.getBoolean(true);
@@ -248,7 +248,7 @@ public class ABO {
 					.setStepSound(Block.soundTypePiston).setBlockName("null")
 					.setBlockTextureName("additional-buildcraft-objects:null");
 			windmillBlock = new BlockWindmill(windmillScalar);
-			waterwheelBlock = new BlockWaterwheel(windmillScalar);
+			waterwheelBlock = new BlockWaterwheel(waterwheelScalar);
 			waterwheelItem = new ItemWaterwheel();
 			GameRegistry.registerItem(waterwheelItem, "waterwheelItem");
 			
@@ -288,13 +288,13 @@ public class ABO {
 			LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name",
 					"Item Bat");
 
+			new WorldTypeScary();
+			
 			// end scaryGen
 
 			actionSwitchOnPipe = new ActionSwitchOnPipe(actionSwitchOnPipeID);
 			actionToggleOnPipe = new ActionToggleOnPipe(actionToggleOnPipeID);
 			actionToggleOffPipe = new ActionToggleOffPipe(actionToggleOffPipeID);
-
-			new WorldTypeScary();
 
 			StatementManager.registerActionProvider(new ABOActionProvider());
 
