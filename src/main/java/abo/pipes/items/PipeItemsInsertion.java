@@ -24,112 +24,112 @@ import buildcraft.transport.pipes.events.PipeEventItem;
 
 public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 
-	public PipeItemsInsertion(Item itemID) {
-		super(new PipeTransportItems(), itemID);
+    public PipeItemsInsertion(Item itemID) {
+        super(new PipeTransportItems(), itemID);
 
-		transport.allowBouncing = true;
-	}
+        transport.allowBouncing = true;
+    }
 
-	@Override
-	public int getIconIndex(ForgeDirection direction) {
-		return PipeIcons.PipeItemsInsertion.ordinal();
-	}
+    @Override
+    public int getIconIndex(ForgeDirection direction) {
+        return PipeIcons.PipeItemsInsertion.ordinal();
+    }
 
-	@Override
-	public boolean blockActivated(EntityPlayer entityplayer) {
-		TileEntity tile = null;
-		for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
-			tile = getWorld().getTileEntity(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
-					container.zCoord + side.offsetZ);
-			if (tile != null && tile instanceof TileEntityEnderChest) break;
-		}
-		if (tile == null || !(tile instanceof TileEntityEnderChest)) { return false; }
-		if (getWorld().isRemote) {
-			return true;
-		} else {
-			ABO.instance.getInventoryEnderChest().func_146031_a((TileEntityEnderChest) tile);
-			entityplayer.displayGUIChest(ABO.instance.getInventoryEnderChest());
-			return true;
-		}
-	}
+    @Override
+    public boolean blockActivated(EntityPlayer entityplayer) {
+        TileEntity tile = null;
+        for (ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
+            tile = getWorld().getTileEntity(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
+                    container.zCoord + side.offsetZ);
+            if (tile != null && tile instanceof TileEntityEnderChest) break;
+        }
+        if (tile == null || !(tile instanceof TileEntityEnderChest)) { return false; }
+        if (getWorld().isRemote) {
+            return true;
+        } else {
+            ABO.instance.getInventoryEnderChest().func_146031_a((TileEntityEnderChest) tile);
+            entityplayer.displayGUIChest(ABO.instance.getInventoryEnderChest());
+            return true;
+        }
+    }
 
-	public void eventHandler(PipeEventItem.FindDest event) {
-		LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
-		LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
+    public void eventHandler(PipeEventItem.FindDest event) {
+        LinkedList<ForgeDirection> nonPipesList = new LinkedList<ForgeDirection>();
+        LinkedList<ForgeDirection> pipesList = new LinkedList<ForgeDirection>();
 
-		List<ForgeDirection> result = event.destinations;
-		TravelingItem item = event.item;
+        List<ForgeDirection> result = event.destinations;
+        TravelingItem item = event.item;
 
-		result.clear();
+        result.clear();
 
-		EnumSet<ForgeDirection> sides = EnumSet.complementOf(item.blacklist);
-		sides.remove(ForgeDirection.UNKNOWN);
+        EnumSet<ForgeDirection> sides = EnumSet.complementOf(item.blacklist);
+        sides.remove(ForgeDirection.UNKNOWN);
 
-		for (ForgeDirection o : sides) {
-			if (outputOpen(o) && canReceivePipeObjects(o, item)) {
-				result.add(o);
-			}
-		}
+        for (ForgeDirection o : sides) {
+            if (outputOpen(o) && canReceivePipeObjects(o, item)) {
+                result.add(o);
+            }
+        }
 
-		for (ForgeDirection o : result) {
-			TileEntity entity = container.getTile(o);
-			if (entity instanceof IPipeTile) {
-				pipesList.add(o);
-			} else if (entity instanceof TileEntityEnderChest) {
-				nonPipesList.add(o);
-			}
-		}
+        for (ForgeDirection o : result) {
+            TileEntity entity = container.getTile(o);
+            if (entity instanceof IPipeTile) {
+                pipesList.add(o);
+            } else if (entity instanceof TileEntityEnderChest) {
+                nonPipesList.add(o);
+            }
+        }
 
-		if (!nonPipesList.isEmpty()) {
-			result.clear();
-			result.addAll(nonPipesList);
-			return;
-		}
-		result.clear();
-		result.addAll(pipesList);
-		return;
-	}
+        if (!nonPipesList.isEmpty()) {
+            result.clear();
+            result.addAll(nonPipesList);
+            return;
+        }
+        result.clear();
+        result.addAll(pipesList);
+        return;
+    }
 
-	@Override
-	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		if (tile instanceof TileEntityEnderChest) return true;
-		return super.canPipeConnect(tile, side);
-	}
+    @Override
+    public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
+        if (tile instanceof TileEntityEnderChest) return true;
+        return super.canPipeConnect(tile, side);
+    }
 
-	public void eventHandler(PipeEventItem.ReachedEnd event) {
-		TileEntity tile = null;
-		TravelingItem item = event.item;
-		tile = event.dest;
-		if (tile == null) { return; }
-		if (tile instanceof TileEntityEnderChest) {
-			if (!container.getWorldObj().isRemote) {
-				ItemStack added = new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance
-						.getInventoryEnderChest())).add(item.getItemStack(), item.output.getOpposite(), true);
-				item.getItemStack().stackSize -= added.stackSize;
+    public void eventHandler(PipeEventItem.ReachedEnd event) {
+        TileEntity tile = null;
+        TravelingItem item = event.item;
+        tile = event.dest;
+        if (tile == null) { return; }
+        if (tile instanceof TileEntityEnderChest) {
+            if (!container.getWorldObj().isRemote) {
+                ItemStack added = new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance
+                        .getInventoryEnderChest())).add(item.getItemStack(), item.output.getOpposite(), true);
+                item.getItemStack().stackSize -= added.stackSize;
 
-				if (item.getItemStack().stackSize <= 0) {
-					transport.items.scheduleRemoval(item);
-				}
-				event.handled = true;
-			}
-		}
-	}
+                if (item.getItemStack().stackSize <= 0) {
+                    transport.items.scheduleRemoval(item);
+                }
+                event.handled = true;
+            }
+        }
+    }
 
-	private boolean canReceivePipeObjects(ForgeDirection o, TravelingItem item) {
-		TileEntity entity = container.getTile(o);
+    private boolean canReceivePipeObjects(ForgeDirection o, TravelingItem item) {
+        TileEntity entity = container.getTile(o);
 
-		if (!container.isPipeConnected(o)) { return false; }
+        if (!container.isPipeConnected(o)) { return false; }
 
-		if (entity instanceof TileGenericPipe) {
-			TileGenericPipe pipe = (TileGenericPipe) entity;
+        if (entity instanceof TileGenericPipe) {
+            TileGenericPipe pipe = (TileGenericPipe) entity;
 
-			return pipe.pipe.transport instanceof PipeTransportItems;
-		} else if (entity instanceof TileEntityEnderChest) {
-			if (new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance.getInventoryEnderChest())).add(
-					item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
-		}
+            return pipe.pipe.transport instanceof PipeTransportItems;
+        } else if (entity instanceof TileEntityEnderChest) {
+            if (new TransactorSimple(InvUtils.getInventory((IInventory) ABO.instance.getInventoryEnderChest())).add(
+                    item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }
