@@ -19,7 +19,7 @@ item.waterwheelItem.name=Водяное колесо
 item.MobBottleFull.name=Бутылка (Полная)
 item.MobBottleEmpty.name=Бутылка (Пустая)
 item.GoldenStaff.name=Жёлтая краска на палочке
-tile.windmillBlock.name=Мельница
+tile.windmillBlock.name=Гидрогенератор
 tile.waterwheelBlock.name=Водяное колесо
 
 generator.scaryGen=Жуткая генерация

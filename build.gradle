@@ -1,5 +1,8 @@
 buildscript {
     repositories {
+    flatDir {
+       dirs 'libs'
+   }
         mavenCentral()
         maven {
             name = "forge"
@@ -17,19 +20,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "release2.1"
+version = "release2.3"
 group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ABO-MC1.7.10-BC6.3"
+archivesBaseName = "ABO-MC1.7.10-BC6.4"
 
 minecraft {
     version = "1.7.10-10.13.2.1277"
     runDir = "eclipse/assets"
-}
-
-repositories {
-    flatDir {
-       dirs 'libs'
-   }
 }
 
 dependencies {
@@ -42,7 +39,7 @@ dependencies {
     //if buildcraft maven is not updated again, replace this with buildcraft-version-dev and uncomment it
     //compile name: 'buildcraft-6.1.4-dev'
     //if buildcraft maven is not updated, comment out this line
-    compile 'com.mod-buildcraft:buildcraft:6.3.1:dev'  // adds buildcraft to the dev env
+    //compile 'com.mod-buildcraft:buildcraft:6.4.0:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
     // for more info...
