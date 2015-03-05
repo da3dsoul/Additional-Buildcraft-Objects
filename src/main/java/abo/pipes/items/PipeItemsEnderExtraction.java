@@ -106,8 +106,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			if (transport.getNumberOfStacks() < PipeTransportItems.MAX_PIPE_STACKS) {
 				extractItems();
 			}
-
-			battery.setEnergy(0);
 		}
 	}
 
@@ -155,8 +153,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 			ItemStack stack = inventory.getStackInSlot(k);
 
 			if (stack == null || stack.stackSize <= 0) {
-				
-				battery.useEnergy(10, 10, false);
 				continue;
 			}
 
@@ -196,6 +192,7 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 					// In Round Robin mode, extract only 1 item regardless of
 					// power level.
 					stack = inventory.decrStackSize(i, 1);
+                    battery.useEnergy(10,10,false);
 					incrementFilter();
 				}
 
@@ -268,7 +265,6 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 
 		for (ItemStack stack : extracted) {
 			if (stack == null || stack.stackSize == 0) {
-
 				continue;
 			}
 

@@ -83,11 +83,11 @@ import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC"+ABO.MINECRAFT_VERSION+"-BC"+ABO.BUILDCRAFT_VERSION+ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders")
 public class ABO {
-	public static final String					VERSION							= "release2.1";
+	public static final String					VERSION							= "release2.4";
 
 	public static final String					MINECRAFT_VERSION				= "1.7.10";
 
-	public static final String					BUILDCRAFT_VERSION				= "6.3";
+	public static final String					BUILDCRAFT_VERSION				= "6.4";
 
 	public static final String					FORGE_VERSION					= "10.13.2.1277";
 
