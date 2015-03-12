@@ -148,7 +148,7 @@ public class ABO {
 	public static IActionInternal				actionToggleOffPipe				= null;
 
 	public static boolean						windmillAnimations;
-	public static byte							windmillAnimDist;
+	public static int							windmillAnimDist;
 	
 	public static Item							waterwheelItem;
 
@@ -179,10 +179,10 @@ public class ABO {
 			aboConfiguration.load();
 
 			windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
-			windmillAnimDist = (byte) aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt(64);
+			windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
 
 			windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
-			windmillScalar = (float) aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
+			waterwheelScalar = (float) aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
 
 			valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
 					.getBoolean(true);

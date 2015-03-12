@@ -112,7 +112,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 				EntityClientPlayerMP player = FMLClientHandler.instance().getClientPlayerEntity();
 				double dist = (xCoord - player.posX) * (xCoord - player.posX) + (yCoord - player.posY)
 						* (yCoord - player.posY) + (zCoord - player.posZ) * (zCoord - player.posZ);
-				if (dist > (double) (ABO.windmillAnimDist * ABO.windmillAnimDist)) inDist = false;
+				if (dist > ((double) ABO.windmillAnimDist * (double) ABO.windmillAnimDist)) inDist = false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -13,8 +13,6 @@ public class ABOConfiguration extends Configuration {
 	public void save() {
 		// Property versionProp = null;
 
-		get(CATEGORY_GENERAL, "version", ABO.VERSION);
-
 		super.save();
 	}
 }

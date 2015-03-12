@@ -5,6 +5,7 @@ import buildcraft.api.transport.IPipeTile;
 import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
 import cofh.api.energy.IEnergyHandler;
+import cpw.mods.fml.client.FMLClientHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
@@ -149,12 +150,15 @@ public abstract class TileConstantPowerProvider extends TileEngine {
 
     protected abstract boolean canGetWind();
 
+    // make all carriages render as far as the render distance
     @Override
     public double getMaxRenderDistanceSquared() {
-        if (ABO.windmillAnimations && ABO.windmillAnimDist > 64) {
-            return (double) (ABO.windmillAnimDist * ABO.windmillAnimDist);
-        } else {
-            return 4096.0D;
+        if(ABO.windmillAnimations && ABO.windmillAnimDist > 64)
+        {
+            return (double) ABO.windmillAnimDist * (double) ABO.windmillAnimDist;
+        }else {
+            return (16 * FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks)
+                    * (16 * FMLClientHandler.instance().getClient().gameSettings.renderDistanceChunks);
         }
     }
 
