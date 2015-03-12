@@ -67,7 +67,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		TileWindmill engine = (TileWindmill) tileentity;
 
 		if (engine != null) {
-			render(engine.progress, x, y, z, engine.getTrunkTexture(engine.getEnergyStage()), tileentity.xCoord,
+			render(engine.animProgress, x, y, z, engine.getTrunkTexture(engine.getEnergyStage()), tileentity.xCoord,
 					tileentity.yCoord, tileentity.zCoord);
 		}
 	}
@@ -119,7 +119,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		}
 
 		if (ABO.windmillAnimations && inDist) {
-			float step = (float) Math.toRadians(progress * 90);
+			float step = (float) Math.toRadians(progress * 360);
 			WingsY.rotateAngleX = step;
 			WingsZ.rotateAngleX = step;
 		}

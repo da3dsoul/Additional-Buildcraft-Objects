@@ -8,9 +8,11 @@
 :compileApiJava UP-TO-DATE
 :processApiResources UP-TO-DATE
 :apiClasses UP-TO-DATE
-:sourceMainJava UP-TO-DATE
-:compileJava UP-TO-DATE
-:processResources
+:sourceMainJava
+:compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+1 warning
+
+:processResources UP-TO-DATE
 :classes
 :jar
 :extractMcpData UP-TO-DATE
@@ -22,4 +24,4 @@
 
 BUILD SUCCESSFUL
 
-Total time: 4.096 secs
+Total time: 6.512 secs

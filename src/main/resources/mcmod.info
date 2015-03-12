@@ -3,17 +3,17 @@
   "modid": "Additional-Buildcraft-Objects",
   "name": "Additional Buildcraft Objects",
   "description": "Extending Buildcraft with additional pipes and machines.",
-  "version": "release2.4",
+  "version": "$version",
   "credits": "Created by Flow86, DA3DSOUL",
   "logoFile": "/gfx/abo/logo.png",
-  "mcversion": "",
+  "mcversion": "$mcversion",
   "url": "http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2310397",
   "updateUrl": "",
   "authors": [ "DA3DSOUL", "Flow86", "blakmajik", "Others" ],
   "parent":"",
   "screenshots": [],
   "dependencies": [
-     "BuildCraft|Transport", "BuildCraft|Silicon"
+     "BuildCraft|Transport", "BuildCraft|Silicon", "BuildCraft|Energy"
   ]
 }
 ]
