@@ -162,7 +162,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 			int liquidToExtract = neighbor.getFluidAmount() - liquidAverage;
 
 			if (liquidToExtract > 1) {
-				// drain tank (read available liquid)
+				// drain tank (read available liquidXP)
 				FluidStack liquidExtracted = neighbor.getTankEntity().drain(neighbor.getOrientation(),
 						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
 				if (liquidExtracted != null) {
@@ -175,7 +175,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 				}
 
 			} else if (liquidToExtract < 1) {
-				// drain pipe (read available liquid)
+				// drain pipe (read available liquidXP)
 				FluidStack liquidExtracted = transport.drain(neighbor.getOrientation().getOpposite(),
 						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
 				if (liquidExtracted != null) {

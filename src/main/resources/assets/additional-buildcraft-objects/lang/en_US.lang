@@ -21,5 +21,6 @@ item.MobBottleEmpty.name=Mob Bottle (Empty)
 item.GoldenStaff.name=Yellow Dye on a Stick
 tile.windmillBlock.name=Windmill
 tile.waterwheelBlock.name=Waterwheel
+tile.blockLiquidXP.name=Liquid Experience
 
 generator.scaryGen=ScaryGen

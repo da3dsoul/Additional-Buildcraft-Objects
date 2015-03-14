@@ -28,8 +28,8 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 		{
 			this.moveHelper = new FollowEntityMoveHelper(this);
 			this.navigator = new FollowPathNavigate(this, par1World, (float)128);
-			setAIMoveSpeed(1.75F);
 		}
+        setAIMoveSpeed(1.75F);
 	}
 
 	public FollowableEntity(World par1World) {
@@ -48,6 +48,15 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 		this.setPosition(item.posX, item.posY, item.posZ);
 		this.rotationYaw = item.rotationYaw;
 	}
+
+    public FollowableEntity(EntityItem item, boolean useLegacy)
+    {
+        this(item.worldObj, useLegacy);
+        this.setEntityItemStack(item.getEntityItem());
+        this.lifespan = item.lifespan;
+        this.setPosition(item.posX, item.posY, item.posZ);
+        this.rotationYaw = item.rotationYaw;
+    }
 
 	protected boolean follows;
 
@@ -404,32 +413,29 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 
 	protected void updateLegacy()
 	{
-
-		if(follows)
-		{
 			if(followTarget != null)
 			{
-				double followMotionXModifier = 0;
-				double followMotionZModifier = 0;
+                if(!follows) follows = true;
+				double followMotionXModifier = 0.01D;
+				double followMotionZModifier = 0.01D;
 				if(!isCollided)
 				{
 					motionY -= 0.080000000000000003D;
-				}
-				else
-					if(!onGround && !isCollidedHorizontally && isCollidedVertically)
-					{
-						motionY = -0.3D;
-						motionX = -followMotionXModifier * 6D;
-						motionZ = -followMotionZModifier * 6D;
-					} else
-						if(isCollidedHorizontally && !isCollidedVertically)
-						{
-							motionY += 0.059999999999999998D;
-							motionX = -followMotionXModifier * 6D;
-							motionZ = -followMotionZModifier * 6D;
-						} else
-							if(!onGround && isCollidedHorizontally && isCollidedVertically)
-								motionY -= 0.059999999999999998D;
+				} else if(!onGround && !isCollidedHorizontally && isCollidedVertically)
+				{
+					motionY = -0.3D;
+                    motionX = -followMotionXModifier * 6D;
+					motionZ = -followMotionZModifier * 6D;
+				} else if(isCollidedHorizontally && !isCollidedVertically)
+                {
+					motionY += 0.059999999999999998D;
+					motionX = -followMotionXModifier * 6D;
+					motionZ = -followMotionZModifier * 6D;
+				} else	if(!onGround && isCollidedHorizontally && isCollidedVertically) {
+                    motionY -= 0.059999999999999998D;
+                    motionX = -followMotionXModifier * 6D;
+                    motionZ = -followMotionZModifier * 6D;
+                }
 
 				double d = 1024D;
 				double d1 = (followTarget.posX - posX) / d;
@@ -440,8 +446,8 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 				if(d5 >= 0.0D)
 				{
 					d5 *= d5;
-					followMotionXModifier = (d1 / d4) * this.AIMoveSpeed * 0.10000000000000001D;
-					followMotionZModifier = (d3 / d4) * this.AIMoveSpeed * 0.10000000000000001D;
+					followMotionXModifier = (d1 / d4) * this.AIMoveSpeed / 10D;
+					followMotionZModifier = (d3 / d4) * this.AIMoveSpeed / 10D;
 					motionX += followMotionXModifier;
 					motionY += (d2 / d4) * 2D * 0.10000000000000001D;
 					motionZ += followMotionZModifier;
@@ -452,10 +458,6 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 			{
 				follows = false;
 			}
-		} else
-		{
-			followTarget = null;
-		}
 	}
 
 	@Override

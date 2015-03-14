@@ -57,11 +57,28 @@ public class ItemGoldenStaff extends Item {
 				break;
 			}
 			Entity item = (Entity) it.next();
-			if(!hasRespiration(itemstack))
+			if(hasFireProtection(itemstack))
 			{
-				item.onCollideWithPlayer(entityplayer);
-				entityplayer.xpCooldown = 0;
-			}else
+                if(Math.sqrt(item.posX - entityplayer.posX * item.posX - entityplayer.posX + item.posY - entityplayer.posY * item.posY - entityplayer.posY + item.posZ - entityplayer.posZ * item.posZ - entityplayer.posZ) > range) continue;
+
+                if(item instanceof EntityItem)
+                {
+                    List<EntityItem> list2 = world.getEntitiesWithinAABB(EntityItem.class, AxisAlignedBB.getBoundingBox(item.posX - 0.5D, item.posY - 0.5D, item.posZ - 0.5D, item.posX + 0.5D, item.posY + 0.5D, item.posZ + 0.5D).expand(10D, 10D, 10D));
+                    for(EntityItem item2 : list2)
+                    {
+                        if(item2 == item) continue;
+                    }
+                    FollowableEntity item1 = new FollowableEntity((EntityItem)item, true);
+                    item1.setFollowTarget(entityplayer);
+                    item.setDead();
+                    if(!world.isRemote) world.spawnEntityInWorld(item1);
+                }else
+                {
+                    item.onCollideWithPlayer(entityplayer);
+                    entityplayer.xpCooldown = 0;
+                }
+                i++;
+			}else if(hasRespiration(itemstack))
 			{
 				if(Math.sqrt(item.posX - entityplayer.posX * item.posX - entityplayer.posX + item.posY - entityplayer.posY * item.posY - entityplayer.posY + item.posZ - entityplayer.posZ * item.posZ - entityplayer.posZ) > range) continue;
 
@@ -71,14 +88,6 @@ public class ItemGoldenStaff extends Item {
 					for(EntityItem item2 : list2)
 					{
 						if(item2 == item) continue;
-						if(item2.getEntityItem().isItemEqual(((EntityItem) item).getEntityItem()))
-						{
-							((EntityItem) item).combineItems(item2);
-							if(item2 == null || item2.isDead)
-							{
-								item = item2;
-							}
-						}
 					}
 					FollowableEntity item1 = new FollowableEntity((EntityItem)item);
 					item1.setFollowTarget(entityplayer);
@@ -90,17 +99,27 @@ public class ItemGoldenStaff extends Item {
 					entityplayer.xpCooldown = 0;
 				}
 				i++;
-			}
+			} else {
+                item.onCollideWithPlayer(entityplayer);
+                entityplayer.xpCooldown = 0;
+            }
 		}
 		while (true);
 		return itemstack;
 	}
 
 	private boolean hasRespiration(ItemStack itemstack)
-	{
-		if(!itemstack.isItemEnchanted()) return false;
-		if(EnchantmentHelper.getEnchantmentLevel(Enchantment.respiration.effectId, itemstack) <= 0) return false;
-		return true;
-	}
+    {
+        if(!itemstack.isItemEnchanted()) return false;
+        if(EnchantmentHelper.getEnchantmentLevel(Enchantment.respiration.effectId, itemstack) <= 0) return false;
+        return true;
+    }
+
+    private boolean hasFireProtection(ItemStack itemstack)
+    {
+        if(!itemstack.isItemEnchanted()) return false;
+        if(EnchantmentHelper.getEnchantmentLevel(Enchantment.fireProtection.effectId, itemstack) <= 0) return false;
+        return true;
+    }
 
 }
