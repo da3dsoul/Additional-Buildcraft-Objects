@@ -9,10 +9,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -194,5 +197,28 @@ public class BlockLiquidXP extends BlockFluidClassic {
     private boolean canDrainBlock(World world, Block block, int x, int y, int z, Fluid fluid) {
         FluidStack fluidStack = BlockUtils.drainBlock(block, world, x, y, z, false);
         return fluidStack != null && fluidStack.amount > 0?fluidStack.getFluid() == fluid:false;
+    }
+
+    public static boolean tryToPlaceFromBucket(EntityPlayer player, int x, int y, int z, int face) {
+        ItemStack itemStack = player.getCurrentEquippedItem();
+        World world = player.worldObj;
+        if(itemStack != null && itemStack.getItem() == LiquidXPMod.bucket) {
+            if(world.getBlock(x,y,z).getMaterial().isReplaceable()){
+                if(world.setBlock(x,y,z, ABO.blockLiquidXP, 0, 3)) {
+                    player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
+                    if(!world.isRemote) player.swingItem();
+                    return true;
+                }
+            } else {
+                if(face < 0 || face > 5) return false;
+                ForgeDirection dir = ForgeDirection.values()[face];
+                if(world.setBlock(x+dir.offsetX,y+dir.offsetY,z+dir.offsetZ, ABO.blockLiquidXP, 0, 3)) {
+                    player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
+                    if(!world.isRemote) player.swingItem();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

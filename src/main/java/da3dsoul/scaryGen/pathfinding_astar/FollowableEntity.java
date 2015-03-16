@@ -446,8 +446,8 @@ public class FollowableEntity extends EntityItem implements Comparable<Followabl
 				if(d5 >= 0.0D)
 				{
 					d5 *= d5;
-					followMotionXModifier = (d1 / d4) * this.AIMoveSpeed / 10D;
-					followMotionZModifier = (d3 / d4) * this.AIMoveSpeed / 10D;
+					followMotionXModifier = (d1 / d4) * this.AIMoveSpeed / 7.5D;
+					followMotionZModifier = (d3 / d4) * this.AIMoveSpeed / 7.5D;
 					motionX += followMotionXModifier;
 					motionY += (d2 / d4) * 2D * 0.10000000000000001D;
 					motionZ += followMotionZModifier;

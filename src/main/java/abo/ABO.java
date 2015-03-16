@@ -7,11 +7,18 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.gen.feature.WorldGenXPLake;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.FillBucketEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 import org.apache.logging.log4j.LogManager;
@@ -149,6 +156,8 @@ public class ABO {
 
     public static Block                       blockLiquidXP;
 
+    public static DamageSource experience = (new DamageSource("experience")).setDamageBypassesArmor().setMagicDamage().setDamageIsAbsolute();
+
     public static int							actionSwitchOnPipeID			= 128;
     public static IActionInternal				actionSwitchOnPipe				= null;
 
@@ -172,6 +181,7 @@ public class ABO {
 
     public static boolean						valveConnectsStraight;
     public static boolean						valvePhysics;
+    private boolean bucketEventCanceled = false;
 
     // Mod Init Handling
 
@@ -343,12 +353,36 @@ public class ABO {
         if(ABO.blockLiquidXP != null) {
             if (event.entityLiving instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) event.entityLiving;
-                if (player.worldObj.rand.nextInt(100) == 0) {
-                    int x = (int) Math.floor(player.posX);
-                    int y = (int) Math.floor(player.posY);
-                    int z = (int) Math.floor(player.posZ);
-                    if (y < 256 && y > 0) {
-                        if (player.worldObj.getBlock(x, y, z) == ABO.blockLiquidXP) {
+
+                int L = player.experienceLevel;
+                int x = (int) Math.floor(player.posX);
+                int y = (int) Math.floor(player.posY);
+                int z = (int) Math.floor(player.posZ);
+                if (y < 256 && y > 0) {
+                    if (player.worldObj.getBlock(x, y, z) == ABO.blockLiquidXP) {
+                        int quanta = ((BlockLiquidXP) blockLiquidXP).getQuantaValue(player.worldObj,x,y,z);
+                        if(player.ticksExisted % 20 == 0) {
+                            if (!player.capabilities.isCreativeMode) {
+                                if (L < 120 && quanta > 7) {
+                                    player.attackEntityFrom(experience, 120 - L);
+                                } else if (L < 100 && quanta > 6) {
+                                    player.attackEntityFrom(experience, 100 - L);
+                                } else if (L < 80 && quanta > 5) {
+                                    player.attackEntityFrom(experience, 80 - L);
+                                } else if (L < 60 && quanta > 4) {
+                                    player.attackEntityFrom(experience, 60 - L);
+                                } else if (L < 40 && quanta > 3) {
+                                    player.attackEntityFrom(experience, 40 - L);
+                                } else if (L < 20 && quanta > 2) {
+                                    player.attackEntityFrom(experience, 30 - L);
+                                } else if (L < 10 && quanta > 1) {
+                                    player.attackEntityFrom(experience, 10 - L);
+                                }
+                                player.addExhaustion(1.0F);
+                            }
+                        }
+                        if(player.isDead) return;
+                        if (player.worldObj.rand.nextInt(100) == 0) {
                             if (((BlockLiquidXP) blockLiquidXP).useXP(player.worldObj, x, y, z)) {
                                 player.addExperience(2477);
                                 if (!player.worldObj.isRemote)
@@ -358,6 +392,24 @@ public class ABO {
                     }
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRightClick(PlayerInteractEvent event){
+        if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            if(event.entityLiving instanceof EntityPlayer){
+                if(ABO.blockLiquidXP != null) {
+                    if(BlockLiquidXP.tryToPlaceFromBucket((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
+                        event.setCanceled(false);
+                        bucketEventCanceled = true;
+                    }
+                }
+            }
+        }
+        if(bucketEventCanceled && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            event.setCanceled(true);
+            bucketEventCanceled = false;
         }
     }
 

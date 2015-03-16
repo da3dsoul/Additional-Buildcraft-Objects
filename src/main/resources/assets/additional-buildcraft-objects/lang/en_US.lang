@@ -16,11 +16,18 @@ item.PipePowerSwitch.name=Kinesis Switch Pipe
 item.PipePowerDirected.name=Diode Kinesis Pipe
 item.PipeItemsEnderExtraction.name=Ender Extraction Pipe
 item.waterwheelItem.name=Waterwheel
+
+# da3dsoul, might eventually be moved
+
+tile.windmillBlock.name=Windmill
+tile.waterwheelBlock.name=Waterwheel
+
 item.MobBottleFull.name=Mob Bottle (Full)
 item.MobBottleEmpty.name=Mob Bottle (Empty)
 item.GoldenStaff.name=Yellow Dye on a Stick
-tile.windmillBlock.name=Windmill
-tile.waterwheelBlock.name=Waterwheel
+
 tile.blockLiquidXP.name=Liquid Experience
 
 generator.scaryGen=ScaryGen
+
+death.attack.experience=%1$s十分な経験を持っていない。たぶん、彼奴が学んでいる？
