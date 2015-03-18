@@ -1,6 +1,7 @@
 package da3dsoul.scaryGen.items;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.Block;
@@ -14,10 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemGlassBottle;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Facing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 public class ItemBottle extends ItemGlassBottle {
@@ -105,16 +103,6 @@ public class ItemBottle extends ItemGlassBottle {
 			NBTTagCompound item = itemstack.stackTagCompound;
 			if (item == null) item = new NBTTagCompound();
 			item.setTag("mob", mob);
-			if (usedon instanceof EntityLiving) {
-				if (((EntityLiving) usedon).getCustomNameTag() != null
-						&& ((EntityLiving) usedon).getCustomNameTag().length() > 0) {
-					if (!item.hasKey("display")) {
-						item.setTag("display", new NBTTagCompound());
-					}
-
-					item.getCompoundTag("display").setString("Name", ((EntityLiving) usedon).getCustomNameTag());
-				}
-			}
 			itemstack.setTagCompound(item);
 			usedon.setDead();
 
@@ -130,6 +118,46 @@ public class ItemBottle extends ItemGlassBottle {
 		}
 		return false;
 	}
+
+    public String getUnlocalizedMobName(ItemStack itemstack) {
+        if (itemstack == null) return "";
+        if (hasCaptured(itemstack)) {
+            NBTTagCompound mob = itemstack.stackTagCompound.getCompoundTag("mob");
+
+            return mob.getString("id");
+        }
+        return "";
+    }
+
+    public String getLocalizedMobName(ItemStack itemstack) {
+        if (hasCaptured(itemstack)) {
+            NBTTagCompound mob = itemstack.stackTagCompound.getCompoundTag("mob");
+
+            String s = "entity." + mob.getString("id") + ".name";
+            String s1 = t("entity." + mob.getString("id"));
+            if(s.equals(s1)) return "";
+            return s1;
+        }
+        return "";
+    }
+
+    public boolean mobHasCustomName(ItemStack itemstack) {
+        if(!hasCaptured(itemstack)) return false;
+        NBTTagCompound tag = itemstack.stackTagCompound.getCompoundTag("mob");
+        if (tag.hasKey("CustomName") && tag.getString("CustomName").length() > 0){
+            return true;
+        }
+        return false;
+    }
+
+    public String getMobCustomName(ItemStack itemstack) {
+        if(!hasCaptured(itemstack)) return "";
+        NBTTagCompound tag = itemstack.stackTagCompound.getCompoundTag("mob");
+        if (tag.hasKey("CustomName") && tag.getString("CustomName").length() > 0){
+            return tag.getString("CustomName");
+        }
+        return "";
+    }
 
 	public static boolean tryPlace(ItemStack itemstack, World world, int i, int j, int k, int l) {
 		if (itemstack == null) return false;
@@ -227,7 +255,8 @@ public class ItemBottle extends ItemGlassBottle {
 
 				if (var2.hasKey("Name")) {
 					((EntityLiving) ent).setCustomNameTag(var2.getString("Name"));
-					((EntityLiving) ent).setAlwaysRenderNameTag(itemstack.stackTagCompound.hasKey("display"));
+					((EntityLiving) ent).setAlwaysRenderNameTag(true);
+                    ((EntityLiving) ent).func_110163_bv();
 				}
 
 				itemstack.stackTagCompound.removeTag("display");
@@ -249,7 +278,40 @@ public class ItemBottle extends ItemGlassBottle {
 
 	@Override
 	public String getUnlocalizedName(ItemStack par1ItemStack) {
-		return hasCaptured(par1ItemStack) ? "item.MobBottleFull" : "item.MobBottleEmpty";
+        return "item.MobBottleEmpty";
 	}
 
+    @Override
+    public String getItemStackDisplayName(ItemStack par1ItemStack) {
+        if(hasCaptured(par1ItemStack)){
+            if(!getLocalizedMobName(par1ItemStack).isEmpty()) {
+                if(mobHasCustomName(par1ItemStack)){
+                    return t("item.MobBottleEmpty") + " (" + getMobCustomName(par1ItemStack) + ")";
+                } else {
+                    return t("item.MobBottleEmpty") + " (" + getLocalizedMobName(par1ItemStack) + ")";
+                }
+            }else{
+                if(mobHasCustomName(par1ItemStack)){
+                    return t("item.MobBottleEmpty") + " (" + getMobCustomName(par1ItemStack) + ")";
+                } else {
+                    return t("item.MobBottleFull");
+                }
+            }
+        }else{
+            return t("item.MobBottleEmpty");
+        }
+    }
+
+    @Override
+    public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean isAdvanced) {
+        if(player.isSneaking()) {
+            if(getLocalizedMobName(itemstack) == ""){
+                list.add(t("item.MobBottleNoEntityName"));
+            }
+        }
+    }
+
+    private String t(String s) {
+        return ("" + StatCollector.translateToLocal(s + ".name")).trim();
+    }
 }

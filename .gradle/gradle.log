@@ -8,10 +8,55 @@
 :compileApiJava UP-TO-DATE
 :processApiResources UP-TO-DATE
 :apiClasses UP-TO-DATE
-:sourceMainJava UP-TO-DATE
-:compileJava UP-TO-DATE
+:sourceMainJava
+:compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tiles()' in type 'CobaltiteMod': class file for mods.immibis.cobaltite.CobaltiteMod not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile': class file for mods.immibis.cobaltite.CobaltiteMod$RegisteredTile not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'tile()' in type 'RegisteredTile'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'description()' in type 'FMLModInfo': class file for mods.immibis.core.api.FMLModInfo not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'url()' in type 'FMLModInfo'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'authors()' in type 'FMLModInfo'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'AssignedItem': class file for mods.immibis.cobaltite.AssignedItem not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'AssignedItem'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'id()' in type 'AssignedBlock': class file for mods.immibis.cobaltite.AssignedBlock not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'item()' in type 'AssignedBlock'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'container()' in type 'TileGUI': class file for mods.immibis.cobaltite.TileGUI not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'gui()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'container()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'gui()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'container()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'gui()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'container()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'gui()' in type 'TileGUI'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable': class file for mods.immibis.cobaltite.Configurable not found
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+C:\Users\Tom.MadMoxxy\Documents\GitHub\Additional-Buildcraft-Objects\libs\liquid-xp-59.0.0.jar(mods/immibis/lxp/LiquidXPMod.class): warning: Cannot find annotation method 'value()' in type 'Configurable'
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+42 warnings
+
 :processResources UP-TO-DATE
-:classes UP-TO-DATE
+:classes
 :jar
 :extractMcpData UP-TO-DATE
 :getVersionJson
@@ -22,4 +67,4 @@
 
 BUILD SUCCESSFUL
 
-Total time: 8.086 secs
+Total time: 20.514 secs

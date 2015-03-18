@@ -5,14 +5,17 @@ import buildcraft.api.core.BlockIndex;
 import buildcraft.core.utils.BlockUtils;
 import mods.immibis.lxp.LiquidXPMod;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialLiquid;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -49,6 +52,63 @@ public class BlockLiquidXP extends BlockFluidClassic {
     @Override
     public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
         return LiquidXPMod.fluid.getIcon((World)world,x,y,z);
+    }
+
+    public int getGreatestQuantaValue(Entity entity)
+    {
+        World world = entity.worldObj;
+        AxisAlignedBB aaBB = entity.boundingBox.expand(-0.1D, -0.4D, -0.1D);
+        int i = MathHelper.floor_double(aaBB.minX);
+        int i1 = MathHelper.floor_double(aaBB.maxX + 1.0D);
+        int j = MathHelper.floor_double(aaBB.minY);
+        int j1 = MathHelper.floor_double(aaBB.maxY + 1.0D);
+        int k = MathHelper.floor_double(aaBB.minZ);
+        int k1 = MathHelper.floor_double(aaBB.maxZ + 1.0D);
+        int greatestQuanta = 0;
+
+        for (int i2 = i; i2 < i1; ++i2)
+        {
+            for (int j2 = j; j2 < j1; ++j2)
+            {
+                for (int k2 = k; k2 < k1; ++k2)
+                {
+                    if (world.getBlock(i2, j2, k2) == ABO.blockLiquidXP)
+                    {
+                        greatestQuanta = Math.max(greatestQuanta, ((BlockLiquidXP)ABO.blockLiquidXP).getQuantaValue(world, i2,j2,k2));
+                    }
+                }
+            }
+        }
+
+        return greatestQuanta;
+    }
+
+    public boolean isInXP(Entity entity)
+    {
+        World world = entity.worldObj;
+        AxisAlignedBB aaBB = entity.boundingBox.expand(-0.1D, -0.4D, -0.1D);
+        int i = MathHelper.floor_double(aaBB.minX);
+        int j = MathHelper.floor_double(aaBB.maxX + 1.0D);
+        int k = MathHelper.floor_double(aaBB.minY);
+        int l = MathHelper.floor_double(aaBB.maxY + 1.0D);
+        int i1 = MathHelper.floor_double(aaBB.minZ);
+        int j1 = MathHelper.floor_double(aaBB.maxZ + 1.0D);
+
+        for (int k1 = i; k1 < j; ++k1)
+        {
+            for (int l1 = k; l1 < l; ++l1)
+            {
+                for (int i2 = i1; i2 < j1; ++i2)
+                {
+                    if (world.getBlock(k1, l1, i2) == ABO.blockLiquidXP)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -205,7 +265,7 @@ public class BlockLiquidXP extends BlockFluidClassic {
         if(itemStack != null && itemStack.getItem() == LiquidXPMod.bucket) {
             if(world.getBlock(x,y,z).getMaterial().isReplaceable()){
                 if(world.setBlock(x,y,z, ABO.blockLiquidXP, 0, 3)) {
-                    player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
+                    if(!player.capabilities.isCreativeMode) player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
                     if(!world.isRemote) player.swingItem();
                     return true;
                 }
@@ -213,9 +273,66 @@ public class BlockLiquidXP extends BlockFluidClassic {
                 if(face < 0 || face > 5) return false;
                 ForgeDirection dir = ForgeDirection.values()[face];
                 if(world.setBlock(x+dir.offsetX,y+dir.offsetY,z+dir.offsetZ, ABO.blockLiquidXP, 0, 3)) {
-                    player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
+                    if(!player.capabilities.isCreativeMode) player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
                     if(!world.isRemote) player.swingItem();
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected static MovingObjectPosition getMovingObjectPositionFromPlayer(World p_77621_1_, EntityPlayer p_77621_2_, boolean p_77621_3_)
+    {
+        float f = 1.0F;
+        float f1 = p_77621_2_.prevRotationPitch + (p_77621_2_.rotationPitch - p_77621_2_.prevRotationPitch) * f;
+        float f2 = p_77621_2_.prevRotationYaw + (p_77621_2_.rotationYaw - p_77621_2_.prevRotationYaw) * f;
+        double d0 = p_77621_2_.prevPosX + (p_77621_2_.posX - p_77621_2_.prevPosX) * (double)f;
+        double d1 = p_77621_2_.prevPosY + (p_77621_2_.posY - p_77621_2_.prevPosY) * (double)f + (double)(p_77621_1_.isRemote ? p_77621_2_.getEyeHeight() - p_77621_2_.getDefaultEyeHeight() : p_77621_2_.getEyeHeight()); // isRemote check to revert changes to ray trace position due to adding the eye height clientside and player yOffset differences
+        double d2 = p_77621_2_.prevPosZ + (p_77621_2_.posZ - p_77621_2_.prevPosZ) * (double)f;
+        Vec3 vec3 = Vec3.createVectorHelper(d0, d1, d2);
+        float f3 = MathHelper.cos(-f2 * 0.017453292F - (float)Math.PI);
+        float f4 = MathHelper.sin(-f2 * 0.017453292F - (float)Math.PI);
+        float f5 = -MathHelper.cos(-f1 * 0.017453292F);
+        float f6 = MathHelper.sin(-f1 * 0.017453292F);
+        float f7 = f4 * f5;
+        float f8 = f3 * f5;
+        double d3 = 5.0D;
+        if (p_77621_2_ instanceof EntityPlayerMP)
+        {
+            d3 = ((EntityPlayerMP)p_77621_2_).theItemInWorldManager.getBlockReachDistance();
+        }
+        Vec3 vec31 = vec3.addVector((double)f7 * d3, (double)f6 * d3, (double)f8 * d3);
+        return p_77621_1_.func_147447_a(vec3, vec31, p_77621_3_, !p_77621_3_, false);
+    }
+
+    public static boolean onTryToUseBottle(EntityPlayer player, int x, int y, int z, int face) {
+        ItemStack itemStack = player.getCurrentEquippedItem();
+        World world = player.worldObj;
+        if(itemStack != null && itemStack.getItem() == Items.glass_bottle) {
+            MovingObjectPosition movingobjectposition = getMovingObjectPositionFromPlayer(world, player, true);
+
+            if (movingobjectposition == null)
+            {
+                return false;
+            }
+            else {
+                if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                    int i = movingobjectposition.blockX;
+                    int j = movingobjectposition.blockY;
+                    int k = movingobjectposition.blockZ;
+
+                    if (!world.canMineBlock(player, i, j, k)) {
+                        return false;
+                    }
+
+                    if (!player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, itemStack)) {
+                        return false;
+                    }
+
+                    if (world.getBlock(i, j, k) == ABO.blockLiquidXP) {
+                        return true;
+                    }
                 }
             }
         }

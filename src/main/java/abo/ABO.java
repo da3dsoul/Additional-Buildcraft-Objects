@@ -11,6 +11,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.gen.feature.WorldGenXPLake;
@@ -359,8 +360,8 @@ public class ABO {
                 int y = (int) Math.floor(player.posY);
                 int z = (int) Math.floor(player.posZ);
                 if (y < 256 && y > 0) {
-                    if (player.worldObj.getBlock(x, y, z) == ABO.blockLiquidXP) {
-                        int quanta = ((BlockLiquidXP) blockLiquidXP).getQuantaValue(player.worldObj,x,y,z);
+                    if (((BlockLiquidXP)blockLiquidXP).isInXP(player)) {
+                        int quanta = ((BlockLiquidXP) blockLiquidXP).getGreatestQuantaValue(player);
                         if(player.ticksExisted % 20 == 0) {
                             if (!player.capabilities.isCreativeMode) {
                                 if (L < 120 && quanta > 7) {
@@ -374,7 +375,7 @@ public class ABO {
                                 } else if (L < 40 && quanta > 3) {
                                     player.attackEntityFrom(experience, 40 - L);
                                 } else if (L < 20 && quanta > 2) {
-                                    player.attackEntityFrom(experience, 30 - L);
+                                    player.attackEntityFrom(experience, 20 - L);
                                 } else if (L < 10 && quanta > 1) {
                                     player.attackEntityFrom(experience, 10 - L);
                                 }
@@ -401,15 +402,24 @@ public class ABO {
             if(event.entityLiving instanceof EntityPlayer){
                 if(ABO.blockLiquidXP != null) {
                     if(BlockLiquidXP.tryToPlaceFromBucket((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
-                        event.setCanceled(false);
+                        bucketEventCanceled = true;
+                    }
+                    if(BlockLiquidXP.onTryToUseBottle((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
                         bucketEventCanceled = true;
                     }
                 }
             }
         }
-        if(bucketEventCanceled && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            event.setCanceled(true);
-            bucketEventCanceled = false;
+        if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            if(blockLiquidXP != null) {
+                if(BlockLiquidXP.onTryToUseBottle((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
+                    bucketEventCanceled = true;
+                }
+            }
+            if(bucketEventCanceled) {
+                event.setCanceled(true);
+                bucketEventCanceled = false;
+            }
         }
     }
 

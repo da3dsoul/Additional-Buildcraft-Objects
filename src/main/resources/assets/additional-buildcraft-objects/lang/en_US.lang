@@ -23,7 +23,8 @@ tile.windmillBlock.name=Windmill
 tile.waterwheelBlock.name=Waterwheel
 
 item.MobBottleFull.name=Mob Bottle (Full)
-item.MobBottleEmpty.name=Mob Bottle (Empty)
+item.MobBottleEmpty.name=Mob Bottle
+item.MobBottleNoEntityName=The entity does not have a localized name. Contact the mod developer and they 'might' fix it.
 item.GoldenStaff.name=Yellow Dye on a Stick
 
 tile.blockLiquidXP.name=Liquid Experience
