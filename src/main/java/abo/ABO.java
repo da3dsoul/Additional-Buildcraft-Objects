@@ -2,6 +2,7 @@ package abo;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -10,11 +11,13 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
+import da3dsoul.scaryGen.liquidXP.BucketItem;
+import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
-import net.minecraft.world.gen.feature.WorldGenXPLake;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -22,6 +25,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
+import net.minecraftforge.fluids.BlockFluidClassic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,93 +102,119 @@ import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC"+ABO.MINECRAFT_VERSION+"-BC"+ABO.BUILDCRAFT_VERSION+ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String					VERSION							= "release2.5";
+    public static final String VERSION = "release2.5";
 
-    public static final String					MINECRAFT_VERSION				= "1.7.10";
+    public static final String MINECRAFT_VERSION = "1.7.10";
 
-    public static final String					BUILDCRAFT_VERSION				= "6.4";
+    public static final String BUILDCRAFT_VERSION = "6.4";
 
-    public static final String					FORGE_VERSION					= "10.13.2.1277";
-
-    public IIconProvider						itemIconProvider				= new ItemIconProvider();
-    public IIconProvider						pipeIconProvider				= new PipeIconProvider();
-
-    public static ABOConfiguration				aboConfiguration;
-    public static Logger						aboLog							= LogManager
+    public static final String FORGE_VERSION = "10.13.2.1277";
+    public static ABOConfiguration aboConfiguration;
+    public static Logger aboLog = LogManager
             .getLogger("Additional-Buildcraft-Objects");
-
-    public static Item							pipeFluidsValve					= null;
-
-    public static Item							pipeFluidsGoldenIron			= null;
-
-    public static Item							pipeFluidsReinforcedGolden		= null;
-
-    public static Item							pipeFluidsReinforcedGoldenIron	= null;
-
-    public static Item							pipeFluidsInsertion				= null;
-
-    public static Item							pipeFluidsBalance				= null;
-
-    public static Item							pipeItemsRoundRobin				= null;
-
-    public static Item							pipeItemsDivide					= null;
-
-    public static Item							pipeItemsCompactor				= null;
-
-    public static Item							pipeItemsInsertion				= null;
-
-    public static Item							pipeItemsExtraction				= null;
-
-    public static Item							pipeItemsEnderExtraction		= null;
-
-    public static Item							pipeItemsCrossover				= null;
-
-    public static Item							pipePowerSwitch					= null;
-
-    public static Item							pipePowerIron					= null;
-
-    public static Item							bottle							= null;
-    public static Item							goldenstaff						= null;
-
-    public static BlockWindmill					windmillBlock;
-
-    public static BlockWaterwheel				waterwheelBlock;
-
-    public static Block							blockNull						= null;
-    public static Block							blockNullCollide				= null;
-
-    public static Block                       blockLiquidXP;
-
+    public static Item pipeFluidsValve = null;
+    public static Item pipeFluidsGoldenIron = null;
+    public static Item pipeFluidsReinforcedGolden = null;
+    public static Item pipeFluidsReinforcedGoldenIron = null;
+    public static Item pipeFluidsInsertion = null;
+    public static Item pipeFluidsBalance = null;
+    public static Item pipeItemsRoundRobin = null;
+    public static Item pipeItemsDivide = null;
+    public static Item pipeItemsCompactor = null;
+    public static Item pipeItemsInsertion = null;
+    public static Item pipeItemsExtraction = null;
+    public static Item pipeItemsEnderExtraction = null;
+    public static Item pipeItemsCrossover = null;
+    public static Item pipePowerSwitch = null;
+    public static Item pipePowerIron = null;
+    public static Item bottle = null;
+    public static Item goldenstaff = null;
+    public static BlockWindmill windmillBlock;
+    public static BlockWaterwheel waterwheelBlock;
+    public static Block blockNull = null;
+    public static Block blockNullCollide = null;
+    public static BlockLiquidXP blockLiquidXP;
     public static DamageSource experience = (new DamageSource("experience")).setDamageBypassesArmor().setMagicDamage().setDamageIsAbsolute();
-
-    public static int							actionSwitchOnPipeID			= 128;
-    public static IActionInternal				actionSwitchOnPipe				= null;
-
-    public static int							actionToggleOnPipeID			= 129;
-    public static IActionInternal				actionToggleOnPipe				= null;
-
-    public static int							actionToggleOffPipeID			= 130;
-    public static IActionInternal				actionToggleOffPipe				= null;
-
-    public static boolean						windmillAnimations;
-    public static int							windmillAnimDist;
-
-    public static Item							waterwheelItem;
-
-    public static String						loadedEnderInventory			= "";
-
-    private InventoryEnderChest					theInventoryEnderChest			= new InventoryEnderChest();
-
+    public static int actionSwitchOnPipeID = 128;
+    public static IActionInternal actionSwitchOnPipe = null;
+    public static int actionToggleOnPipeID = 129;
+    public static IActionInternal actionToggleOnPipe = null;
+    public static int actionToggleOffPipeID = 130;
+    public static IActionInternal actionToggleOffPipe = null;
+    public static boolean windmillAnimations;
+    public static int windmillAnimDist;
+    public static Item waterwheelItem;
+    public static String loadedEnderInventory = "";
     @Instance("Additional-Buildcraft-Objects")
-    public static ABO							instance;
-
-    public static boolean						valveConnectsStraight;
-    public static boolean						valvePhysics;
-    private boolean bucketEventCanceled = false;
+    public static ABO instance;
+    public static boolean valveConnectsStraight;
+    public static boolean valvePhysics;
+    private static LinkedList<ABORecipe> aboRecipes = new LinkedList<ABORecipe>();
+    public static BucketItem bucket;
+    public IIconProvider itemIconProvider = new ItemIconProvider();
+    public IIconProvider pipeIconProvider = new PipeIconProvider();
+    private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
 
     // Mod Init Handling
+    private boolean bucketEventCanceled = false;
+
+    public static ItemPipe buildPipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
+        ItemPipe res = buildPipe(clas);
+
+        addRecipe(res, count, ingredients);
+
+        return res;
+    }
+
+    public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
+
+        ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
+        res.setUnlocalizedName(clas.getSimpleName());
+        ABOProxy.proxy.registerPipe(res);
+
+        return res;
+    }
+
+    private static void addRecipe(Item item, int count, Object... ingredients) {
+
+        if (ingredients.length == 3) {
+            for (int i = 0; i < 17; i++) {
+                ABORecipe recipe = new ABORecipe();
+                recipe.result = new ItemStack(item, count, i);
+                if (ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe) {
+                    recipe.input = new Object[]{"ABC", 'A', new ItemStack((ItemPipe) ingredients[0], 1, i), 'B',
+                            ingredients[1], 'C', new ItemStack((ItemPipe) ingredients[2], 1, i)};
+                } else {
+                    recipe.input = new Object[]{"ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2]};
+                }
+
+                aboRecipes.add(recipe);
+            }
+        } else if (ingredients.length == 2) {
+            for (int i = 0; i < 17; i++) {
+                ABORecipe recipe = new ABORecipe();
+
+                Object left = ingredients[0];
+                Object right = ingredients[1];
+
+                if (ingredients[0] instanceof ItemPipe) {
+                    left = new ItemStack((Item) left, 1, i);
+                }
+
+                if (ingredients[1] instanceof ItemPipe) {
+                    right = new ItemStack((Item) right, 1, i);
+                }
+
+                recipe.isShapeless = true;
+                recipe.result = new ItemStack(item, 1, i);
+                recipe.input = new Object[]{left, right};
+
+                aboRecipes.add(recipe);
+            }
+        }
+    }
 
     @SuppressWarnings("deprecation")
     @EventHandler
@@ -273,7 +303,8 @@ public class ABO {
             waterwheelBlock = new BlockWaterwheel(waterwheelScalar);
             waterwheelItem = new ItemWaterwheel();
 
-            if(Loader.isModLoaded("LiquidXP")) {
+            if (Loader.isModLoaded("LiquidXP")) {
+                bucket = new BucketItem();
                 blockLiquidXP = BlockLiquidXP.init();
                 GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
             } else {
@@ -283,31 +314,31 @@ public class ABO {
             GameRegistry.registerItem(waterwheelItem, "waterwheelItem");
 
             GameRegistry.addShapedRecipe(new ItemStack(waterwheelItem),
-                    new Object[] { "CBC", "BAB", "CBC", Character.valueOf('A'), BuildCraftCore.ironGearItem,
-                            Character.valueOf('B'), Blocks.stone, Character.valueOf('C'), Items.stick });
+                    new Object[]{"CBC", "BAB", "CBC", Character.valueOf('A'), BuildCraftCore.ironGearItem,
+                            Character.valueOf('B'), Blocks.stone, Character.valueOf('C'), Items.stick});
 
             GameRegistry.registerBlock(windmillBlock, "windmillBlock");
             GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
             GameRegistry.registerBlock(blockNull, "null");
             GameRegistry.registerBlock(blockNullCollide, "nullCollide");
             GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
-                    new Object[] { "ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
-                            Character.valueOf('B'), Items.iron_ingot });
+                    new Object[]{"ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
+                            Character.valueOf('B'), Items.iron_ingot});
 
             // scaryGen
 
             bottle = new ItemBottle();
 
             GameRegistry.addShapedRecipe(new ItemStack(bottle, 3),
-                    new Object[] { " B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'),
-                            Blocks.planks });
+                    new Object[]{" B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'),
+                            Blocks.planks});
             GameRegistry.registerItem(bottle, "MobBottle");
 
             goldenstaff = new ItemGoldenStaff();
 
             GameRegistry.addShapedRecipe(new ItemStack(goldenstaff),
-                    new Object[] { "B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
-                            new ItemStack(Items.dye, 1, 11) });
+                    new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
+                            new ItemStack(Items.dye, 1, 11)});
             GameRegistry.registerItem(goldenstaff, "GoldenStaff");
 
             int id = 0;
@@ -337,8 +368,8 @@ public class ABO {
 
     @SubscribeEvent
     public void generate(PopulateChunkEvent.Pre event) {
-        if(ABO.blockLiquidXP == null) return;
-        if(event.rand.nextInt(16) == 0
+        if (ABO.blockLiquidXP == null) return;
+        if (event.rand.nextInt(16) == 0
                 && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, LAKE)) {
             int k1 = event.chunkX + event.rand.nextInt(16) + 8;
             int l1 = 45 + event.rand.nextInt(211);
@@ -350,8 +381,8 @@ public class ABO {
     }
 
     @SubscribeEvent
-    public void playerUpdate(LivingEvent.LivingUpdateEvent event){
-        if(ABO.blockLiquidXP != null) {
+    public void playerUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (ABO.blockLiquidXP != null) {
             if (event.entityLiving instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) event.entityLiving;
 
@@ -360,32 +391,21 @@ public class ABO {
                 int y = (int) Math.floor(player.posY);
                 int z = (int) Math.floor(player.posZ);
                 if (y < 256 && y > 0) {
-                    if (((BlockLiquidXP)blockLiquidXP).isInXP(player)) {
+                    if (((BlockLiquidXP) blockLiquidXP).isInXP(player)) {
                         int quanta = ((BlockLiquidXP) blockLiquidXP).getGreatestQuantaValue(player);
-                        if(player.ticksExisted % 20 == 0) {
+                        if (player.ticksExisted % 20 == 0) {
                             if (!player.capabilities.isCreativeMode) {
-                                if (L < 120 && quanta > 7) {
-                                    player.attackEntityFrom(experience, 120 - L);
-                                } else if (L < 100 && quanta > 6) {
-                                    player.attackEntityFrom(experience, 100 - L);
-                                } else if (L < 80 && quanta > 5) {
-                                    player.attackEntityFrom(experience, 80 - L);
-                                } else if (L < 60 && quanta > 4) {
-                                    player.attackEntityFrom(experience, 60 - L);
-                                } else if (L < 40 && quanta > 3) {
-                                    player.attackEntityFrom(experience, 40 - L);
-                                } else if (L < 20 && quanta > 2) {
-                                    player.attackEntityFrom(experience, 20 - L);
-                                } else if (L < 10 && quanta > 1) {
-                                    player.attackEntityFrom(experience, 10 - L);
+                                int targetLevel = blockLiquidXP.getLevelTarget(player.worldObj, x, y, z, quanta);
+                                if (L < targetLevel) {
+                                    player.attackEntityFrom(experience, targetLevel - L);
                                 }
                                 player.addExhaustion(1.0F);
                             }
                         }
-                        if(player.isDead) return;
+                        if (player.isDead) return;
                         if (player.worldObj.rand.nextInt(100) == 0) {
                             if (((BlockLiquidXP) blockLiquidXP).useXP(player.worldObj, x, y, z)) {
-                                player.addExperience(2477);
+                                player.addExperience(1000);
                                 if (!player.worldObj.isRemote)
                                     player.worldObj.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 1.8F));
                             }
@@ -397,26 +417,23 @@ public class ABO {
     }
 
     @SubscribeEvent
-    public void onRightClick(PlayerInteractEvent event){
-        if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            if(event.entityLiving instanceof EntityPlayer){
-                if(ABO.blockLiquidXP != null) {
-                    if(BlockLiquidXP.tryToPlaceFromBucket((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
-                        bucketEventCanceled = true;
-                    }
-                    if(BlockLiquidXP.onTryToUseBottle((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
+    public void onRightClick(PlayerInteractEvent event) {
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            if (event.entityLiving instanceof EntityPlayer) {
+                if (ABO.blockLiquidXP != null) {
+                    if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
                         bucketEventCanceled = true;
                     }
                 }
             }
         }
-        if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if(blockLiquidXP != null) {
-                if(BlockLiquidXP.onTryToUseBottle((EntityPlayer)event.entityLiving, event.x, event.y, event.z, event.face)){
+        if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            if (blockLiquidXP != null) {
+                if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
                     bucketEventCanceled = true;
                 }
             }
-            if(bucketEventCanceled) {
+            if (bucketEventCanceled) {
                 event.setCanceled(true);
                 bucketEventCanceled = false;
             }
@@ -435,6 +452,8 @@ public class ABO {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
     }
+
+    // Side Handling
 
     @SuppressWarnings("unchecked")
     private void addEntity(Class<? extends Entity> entityClass, String name, int entityID, boolean addEgg) {
@@ -455,6 +474,8 @@ public class ABO {
         saveEnderInventory(event.world.isRemote);
     }
 
+    // Ender Pipe Handling
+
     @SubscribeEvent
     public void stop(WorldEvent.Unload event) {
         saveEnderInventory(event.world.isRemote);
@@ -470,8 +491,6 @@ public class ABO {
 
     }
 
-    // Side Handling
-
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void textureHook(TextureStitchEvent.Pre event) {
@@ -485,7 +504,7 @@ public class ABO {
         InterModComms.processIMC(event);
     }
 
-    // Ender Pipe Handling
+    // Item Init Handling
 
     private void loadEnderInventory(boolean isRemote) {
         if (!isRemote) {
@@ -516,6 +535,8 @@ public class ABO {
         }
     }
 
+    // Recipe Handling
+
     public InventoryEnderChest getInventoryEnderChest() {
         return this.theInventoryEnderChest;
     }
@@ -529,74 +550,6 @@ public class ABO {
 
     }
 
-    // Item Init Handling
-
-    public static ItemPipe buildPipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
-        ItemPipe res = buildPipe(clas);
-
-        addRecipe(res, count, ingredients);
-
-        return res;
-    }
-
-    public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
-
-        ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
-        res.setUnlocalizedName(clas.getSimpleName());
-        ABOProxy.proxy.registerPipe(res);
-
-        return res;
-    }
-
-    // Recipe Handling
-
-    private static class ABORecipe {
-        boolean		isShapeless	= false;
-        ItemStack	result;
-        Object[]	input;
-    }
-
-    private static LinkedList<ABORecipe>	aboRecipes	= new LinkedList<ABORecipe>();
-
-    private static void addRecipe(Item item, int count, Object... ingredients) {
-
-        if (ingredients.length == 3) {
-            for (int i = 0; i < 17; i++) {
-                ABORecipe recipe = new ABORecipe();
-                recipe.result = new ItemStack(item, count, i);
-                if (ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe) {
-                    recipe.input = new Object[] { "ABC", 'A', new ItemStack((ItemPipe) ingredients[0], 1, i), 'B',
-                            ingredients[1], 'C', new ItemStack((ItemPipe) ingredients[2], 1, i) };
-                } else {
-                    recipe.input = new Object[] { "ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2] };
-                }
-
-                aboRecipes.add(recipe);
-            }
-        } else if (ingredients.length == 2) {
-            for (int i = 0; i < 17; i++) {
-                ABORecipe recipe = new ABORecipe();
-
-                Object left = ingredients[0];
-                Object right = ingredients[1];
-
-                if (ingredients[0] instanceof ItemPipe) {
-                    left = new ItemStack((Item) left, 1, i);
-                }
-
-                if (ingredients[1] instanceof ItemPipe) {
-                    right = new ItemStack((Item) right, 1, i);
-                }
-
-                recipe.isShapeless = true;
-                recipe.result = new ItemStack(item, 1, i);
-                recipe.input = new Object[] { left, right };
-
-                aboRecipes.add(recipe);
-            }
-        }
-    }
-
     public void loadRecipes() {
         // Add pipe recipes
         for (ABORecipe recipe : aboRecipes) {
@@ -607,6 +560,12 @@ public class ABO {
             }
 
         }
+    }
+
+    private static class ABORecipe {
+        boolean isShapeless = false;
+        ItemStack result;
+        Object[] input;
     }
 
 }

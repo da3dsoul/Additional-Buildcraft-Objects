@@ -12,7 +12,9 @@ public class ItemIconProvider implements IIconProvider {
 	public static final int	ActionToggleOnPipe	= 1;
 	public static final int	ActionToggleOffPipe	= 2;
 
-	public static final int	MAX					= 3;
+    public static final int	bucket	= 3;
+
+	public static final int	MAX					= 4;
 
 	@SideOnly(Side.CLIENT)
 	private IIcon[]			_icons;
@@ -26,7 +28,11 @@ public class ItemIconProvider implements IIconProvider {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister iconRegister) {
-		_icons = new IIcon[MAX];
+        if(ABO.blockLiquidXP != null) {
+            _icons = new IIcon[MAX];
+        }else {
+            _icons = new IIcon[MAX - 1];
+        }
 
 		_icons[ActionSwitchOnPipe] = iconRegister
 				.registerIcon("additional-buildcraft-objects:actions/ActionSwitchOnPipe");
@@ -34,5 +40,11 @@ public class ItemIconProvider implements IIconProvider {
 				.registerIcon("additional-buildcraft-objects:actions/ActionToggleOnPipe");
 		_icons[ActionToggleOffPipe] = iconRegister
 				.registerIcon("additional-buildcraft-objects:actions/ActionToggleOffPipe");
-	}
+
+        if(ABO.blockLiquidXP != null) {
+            _icons[bucket] = iconRegister
+                    .registerIcon("liquidxp:bucket");
+        }
+
+    }
 }

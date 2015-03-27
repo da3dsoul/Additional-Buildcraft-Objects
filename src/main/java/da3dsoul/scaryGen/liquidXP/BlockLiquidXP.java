@@ -3,17 +3,23 @@ package da3dsoul.scaryGen.liquidXP;
 import abo.ABO;
 import buildcraft.api.core.BlockIndex;
 import buildcraft.core.utils.BlockUtils;
-import mods.immibis.lxp.LiquidXPMod;
+import cpw.mods.fml.common.registry.ExistingSubstitutionException;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
+import mods.immibis.lxp.*;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialLiquid;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
@@ -28,6 +34,10 @@ import java.util.*;
 public class BlockLiquidXP extends BlockFluidClassic {
 
     public static BlockLiquidXP init() {
+        LiquidXPMod.mbPerXp = 1;
+        try {
+            GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
+        }catch(Exception e){ e.printStackTrace();}
         return new BlockLiquidXP(LiquidXPMod.fluid);
     }
 
@@ -51,11 +61,10 @@ public class BlockLiquidXP extends BlockFluidClassic {
 
     @Override
     public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        return LiquidXPMod.fluid.getIcon((World)world,x,y,z);
+        return LiquidXPMod.fluid.getIcon((World) world, x, y, z);
     }
 
-    public int getGreatestQuantaValue(Entity entity)
-    {
+    public int getGreatestQuantaValue(Entity entity) {
         World world = entity.worldObj;
         AxisAlignedBB aaBB = entity.boundingBox.expand(-0.1D, -0.4D, -0.1D);
         int i = MathHelper.floor_double(aaBB.minX);
@@ -66,15 +75,11 @@ public class BlockLiquidXP extends BlockFluidClassic {
         int k1 = MathHelper.floor_double(aaBB.maxZ + 1.0D);
         int greatestQuanta = 0;
 
-        for (int i2 = i; i2 < i1; ++i2)
-        {
-            for (int j2 = j; j2 < j1; ++j2)
-            {
-                for (int k2 = k; k2 < k1; ++k2)
-                {
-                    if (world.getBlock(i2, j2, k2) == ABO.blockLiquidXP)
-                    {
-                        greatestQuanta = Math.max(greatestQuanta, ((BlockLiquidXP)ABO.blockLiquidXP).getQuantaValue(world, i2,j2,k2));
+        for (int i2 = i; i2 < i1; ++i2) {
+            for (int j2 = j; j2 < j1; ++j2) {
+                for (int k2 = k; k2 < k1; ++k2) {
+                    if (world.getBlock(i2, j2, k2) == ABO.blockLiquidXP) {
+                        greatestQuanta = Math.max(greatestQuanta, ((BlockLiquidXP) ABO.blockLiquidXP).getQuantaValue(world, i2, j2, k2));
                     }
                 }
             }
@@ -83,8 +88,7 @@ public class BlockLiquidXP extends BlockFluidClassic {
         return greatestQuanta;
     }
 
-    public boolean isInXP(Entity entity)
-    {
+    public boolean isInXP(Entity entity) {
         World world = entity.worldObj;
         AxisAlignedBB aaBB = entity.boundingBox.expand(-0.1D, -0.4D, -0.1D);
         int i = MathHelper.floor_double(aaBB.minX);
@@ -94,14 +98,10 @@ public class BlockLiquidXP extends BlockFluidClassic {
         int i1 = MathHelper.floor_double(aaBB.minZ);
         int j1 = MathHelper.floor_double(aaBB.maxZ + 1.0D);
 
-        for (int k1 = i; k1 < j; ++k1)
-        {
-            for (int l1 = k; l1 < l; ++l1)
-            {
-                for (int i2 = i1; i2 < j1; ++i2)
-                {
-                    if (world.getBlock(k1, l1, i2) == ABO.blockLiquidXP)
-                    {
+        for (int k1 = i; k1 < j; ++k1) {
+            for (int l1 = k; l1 < l; ++l1) {
+                for (int i2 = i1; i2 < j1; ++i2) {
+                    if (world.getBlock(k1, l1, i2) == ABO.blockLiquidXP) {
                         return true;
                     }
                 }
@@ -122,19 +122,18 @@ public class BlockLiquidXP extends BlockFluidClassic {
      */
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand) {
-        if (world.getBlock(x, y + 1, z).getMaterial() == Material.air && !world.getBlock(x, y + 1, z).isOpaqueCube())
-        {
-            if (rand.nextInt(30) == 0)
-            {
-                if(world.getBlockMetadata(x,y,z) == 0) {
+        if (world.getBlock(x, y + 1, z).getMaterial() == Material.air && !world.getBlock(x, y + 1, z).isOpaqueCube()) {
+            if (rand.nextInt(30) == 0) {
+                if (world.getBlockMetadata(x, y, z) == 0) {
                     EntityXPOrb entity = new EntityXPOrb(world, x + 0.5, y + 0.5, z + 0.5, 5);
                     entity.motionY += 0.5;
                     entity.xpOrbAge = 5900;
-                    if(!world.isRemote) world.spawnEntityInWorld(entity);
-                    if(!world.isRemote) world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
+                    if (!world.isRemote) world.spawnEntityInWorld(entity);
+                    if (!world.isRemote)
+                        world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
                 }
             }
-            world.scheduleBlockUpdateWithPriority(x,y,z,this, 200,2);
+            world.scheduleBlockUpdateWithPriority(x, y, z, this, 200, 2);
         }
         super.updateTick(world, x, y, z, rand);
     }
@@ -153,16 +152,16 @@ public class BlockLiquidXP extends BlockFluidClassic {
     }
 
     public boolean useXP(World world, int x, int y, int z) {
-        TreeMap<Integer, Deque<BlockIndex>> pumpLayerQueues= new TreeMap();
+        TreeMap<Integer, Deque<BlockIndex>> pumpLayerQueues = new TreeMap();
         int numFluidBlocksFound = 0;
-        if(!world.isRemote) {
+        if (!world.isRemote) {
             BlockIndex index = this.getNextIndexToPump(world, pumpLayerQueues, x, y, z, numFluidBlocksFound, false);
-            FluidStack fluidToPump = index != null? BlockUtils.drainBlock(world, index.x, index.y, index.z, false):null;
-            if(fluidToPump != null) {
-                if(fluidToPump.getFluid() == LiquidXPMod.fluid || numFluidBlocksFound < 9) {
+            FluidStack fluidToPump = index != null ? BlockUtils.drainBlock(world, index.x, index.y, index.z, false) : null;
+            if (fluidToPump != null) {
+                if (fluidToPump.getFluid() == LiquidXPMod.fluid || numFluidBlocksFound < 9) {
                     index = this.getNextIndexToPump(world, pumpLayerQueues, x, y, z, numFluidBlocksFound, true);
                     BlockUtils.drainBlock(world, index.x, index.y, index.z, true);
-                    world.notifyBlocksOfNeighborChange(index.x,index.y,index.z, Blocks.air);
+                    world.notifyBlocksOfNeighborChange(index.x, index.y, index.z, Blocks.air);
                     return true;
                 }
             }
@@ -171,8 +170,13 @@ public class BlockLiquidXP extends BlockFluidClassic {
         return false;
     }
 
+    public int getLevelTarget(World world, int x, int y, int z, int quanta) {
+        int L = LiquidXPMod.xpToLevel((int) LiquidXPMod.convertMBToXP(1000));
+        return L * (quanta / quantaPerBlock);
+    }
+
     private BlockIndex getNextIndexToPump(World world,TreeMap<Integer, Deque<BlockIndex>> pumpLayerQueues, int x, int y, int z, int numFluidBlocksFound, boolean remove) {
-        this.rebuildQueue(world,pumpLayerQueues,x, y, z, numFluidBlocksFound);
+        this.rebuildQueue(world, pumpLayerQueues, x, y, z, numFluidBlocksFound);
         try {
             Deque topLayer = (Deque) pumpLayerQueues.lastEntry().getValue();
             if (topLayer != null) {
@@ -337,5 +341,9 @@ public class BlockLiquidXP extends BlockFluidClassic {
             }
         }
         return false;
+    }
+
+    public static void registerIcons(TextureMap textureMapBlocks) {
+        LiquidXPMod.bucket.registerIcons(textureMapBlocks);
     }
 }
