@@ -18,6 +18,7 @@ import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -104,14 +105,14 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release2.6";
+    public static final String VERSION = "release2.6.1";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
     public static final String BUILDCRAFT_VERSION = "6.4";
 
     public static final String FORGE_VERSION = "10.13.2.1277";
-    public static ABOConfiguration aboConfiguration;
+    public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
             .getLogger("Additional-Buildcraft-Objects");
     public static Item pipeFluidsValve = null;
@@ -135,8 +136,16 @@ public class ABO {
     public static BlockWaterwheel waterwheelBlock;
     public static Block blockNull = null;
     public static Block blockNullCollide = null;
+
+    // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
+    public static boolean spawnOrbs = true;
+    public static int orbSpawnChance = 70;
+    public static int orbLifetime = 50;
+    public static int orbSize = 5;
     public static DamageSource experience = (new DamageSource("experience")).setDamageBypassesArmor().setMagicDamage().setDamageIsAbsolute();
+    // LiquidXP
+
     public static int actionSwitchOnPipeID = 128;
     public static IActionInternal actionSwitchOnPipe = null;
     public static int actionToggleOnPipeID = 129;
@@ -222,7 +231,7 @@ public class ABO {
 
         aboLog.info("Starting Additional-Buildcraft-Objects " + "MC" + MINECRAFT_VERSION + "-BC" + BUILDCRAFT_VERSION + VERSION);
 
-        aboConfiguration = new ABOConfiguration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
+        aboConfiguration = new Configuration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
 
         float windmillScalar = 1;
         float waterwheelScalar = 1;
@@ -232,6 +241,11 @@ public class ABO {
 
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
+
+            spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperieneOrbs", spawnOrbs).getBoolean();
+            orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperieneOrbSpawnChance", orbSpawnChance).getInt();
+            orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
+            orbSize = aboConfiguration.get("LiquidXP", "ExperieneOrbSize", orbSize).getInt();
 
             windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
             waterwheelScalar = (float) aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);

@@ -122,12 +122,14 @@ public class BlockLiquidXP extends BlockFluidClassic {
      */
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand) {
+        if(!ABO.spawnOrbs) return;
+
         if (world.getBlock(x, y + 1, z).getMaterial() == Material.air && !world.getBlock(x, y + 1, z).isOpaqueCube()) {
-            if (rand.nextInt(30) == 0) {
+            if (rand.nextInt(ABO.orbSpawnChance) == 0) {
                 if (world.getBlockMetadata(x, y, z) == 0) {
-                    EntityXPOrb entity = new EntityXPOrb(world, x + 0.5, y + 0.5, z + 0.5, 5);
+                    EntityXPOrb entity = new EntityXPOrb(world, x + 0.5, y + 0.5, z + 0.5, ABO.orbSize);
                     entity.motionY += 0.5;
-                    entity.xpOrbAge = 5900;
+                    entity.xpOrbAge = 6000 - ABO.orbLifetime;
                     if (!world.isRemote) world.spawnEntityInWorld(entity);
                     if (!world.isRemote)
                         world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.8F));
