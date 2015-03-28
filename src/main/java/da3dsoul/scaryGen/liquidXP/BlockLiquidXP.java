@@ -6,7 +6,7 @@ import buildcraft.core.utils.BlockUtils;
 import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
-import mods.immibis.lxp.*;
+import mods.immibis.lxp.LiquidXPMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
@@ -34,6 +34,7 @@ import java.util.*;
 public class BlockLiquidXP extends BlockFluidClassic {
 
     public static BlockLiquidXP init() {
+        ABO.bucket = new BucketItem();
         LiquidXPMod.mbPerXp = 1;
         try {
             GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);

@@ -13,7 +13,6 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
-import da3dsoul.scaryGen.liquidXP.BucketItem;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -105,7 +104,7 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release2.6.1";
+    public static final String VERSION = "release2.6.2";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
@@ -161,7 +160,7 @@ public class ABO {
     public static boolean valveConnectsStraight;
     public static boolean valvePhysics;
     private static LinkedList<ABORecipe> aboRecipes = new LinkedList<ABORecipe>();
-    public static BucketItem bucket;
+    public static Item bucket;
     public IIconProvider itemIconProvider = new ItemIconProvider();
     public IIconProvider pipeIconProvider = new PipeIconProvider();
     private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
@@ -318,7 +317,6 @@ public class ABO {
             waterwheelItem = new ItemWaterwheel();
 
             if (Loader.isModLoaded("LiquidXP")) {
-                bucket = new BucketItem();
                 blockLiquidXP = BlockLiquidXP.init();
                 GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
             } else {
