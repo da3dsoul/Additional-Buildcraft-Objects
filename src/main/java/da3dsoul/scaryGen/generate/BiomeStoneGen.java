@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -40,15 +41,33 @@ public class BiomeStoneGen {
             ArrayList<Block> list = new ArrayList<Block>();
             for(ItemStack stack : blocks) {
                 if(stack.getItemDamageForDisplay() > 0) continue;
-                if(Block.blockRegistry.getNameForObject(((ItemBlock)stack.getItem()).field_150939_a).equalsIgnoreCase(BlockColorLookup.OPAL.name))
+                String blockName = Block.blockRegistry.getNameForObject(((ItemBlock)stack.getItem()).field_150939_a);
+                if(blockName.equalsIgnoreCase(BlockColorLookup.OPAL.name))
                     continue;
+                if(biome == BiomeGenBase.desert) {
+                    if (blockName.equalsIgnoreCase(BlockColorLookup.SANDSTONE.name)) {
+                        if(!list.contains(((ItemBlock)stack.getItem()).field_150939_a)) {
+                            list.add(((ItemBlock) stack.getItem()).field_150939_a);
+                        }
+                    } else if(blockName.equalsIgnoreCase(BlockColorLookup.LIMESTONE.name)) {
+                        if(!list.contains(((ItemBlock)stack.getItem()).field_150939_a)) {
+                            list.add(((ItemBlock) stack.getItem()).field_150939_a);
+                        }
+                    }
+                } else if(biome == BiomeGenBase.mesa) {
+                    if (blockName.equalsIgnoreCase(BlockColorLookup.GRANITE.name)) {
+                        if(!list.contains(((ItemBlock)stack.getItem()).field_150939_a)) {
+                            list.add(((ItemBlock) stack.getItem()).field_150939_a);
+                        }
+                    }
+                }
                 color = getColorFromItemStack(stack);
                 blockColorHSL = getRGB(color);
                 double dist = dist(biomeColorHSL,blockColorHSL);
                 if(dist <= 50) {
                     if(!list.contains(((ItemBlock)stack.getItem()).field_150939_a)) {
                         list.add(((ItemBlock) stack.getItem()).field_150939_a);
-                        ABO.aboLog.info("Added " + Block.blockRegistry.getNameForObject(((ItemBlock) stack.getItem()).field_150939_a) + " to " + biome.biomeName + " on the geostrataGen map");
+                        ABO.aboLog.info("Added " + blockName + " to " + biome.biomeName + " on the geostrataGen map");
                     }
                 }
             }

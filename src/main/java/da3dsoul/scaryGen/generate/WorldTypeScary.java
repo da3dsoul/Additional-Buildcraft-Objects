@@ -88,7 +88,7 @@ public class WorldTypeScary extends WorldType {
     	
     	b.append(getOceanReplacement()).append("\n");
     	
-    	b.append(cloudLevel);
+    	b.append(cloudLevel).append("\n");
         b.append(geostrataGen ? 1 : 0);
     	return b.toString();
     }

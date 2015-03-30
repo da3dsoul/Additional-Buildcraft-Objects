@@ -12,7 +12,6 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialLiquid;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,12 +33,16 @@ import java.util.*;
 public class BlockLiquidXP extends BlockFluidClassic {
 
     public static void init() {
-        ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
-        ABO.bucket = new BucketItem();
-        LiquidXPMod.mbPerXp = 1;
         try {
+            ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
+            ABO.bucket = new BucketItem();
             GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
-        }catch(Exception e){ e.printStackTrace();}
+            LiquidXPMod.mbPerXp = 1;
+        }catch(Throwable e){
+            e.printStackTrace();
+            ABO.blockLiquidXP = null;
+            ABO.bucket = null;
+        }
     }
 
     public BlockLiquidXP(Fluid fluid) {
@@ -344,9 +347,5 @@ public class BlockLiquidXP extends BlockFluidClassic {
             }
         }
         return false;
-    }
-
-    public static void registerIcons(TextureMap textureMapBlocks) {
-        LiquidXPMod.bucket.registerIcons(textureMapBlocks);
     }
 }

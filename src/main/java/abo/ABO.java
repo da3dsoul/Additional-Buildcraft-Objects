@@ -140,6 +140,7 @@ public class ABO {
 
     // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
+    public static boolean spawnLakes = true;
     public static boolean spawnOrbs = true;
     public static int orbSpawnChance = 70;
     public static int orbLifetime = 50;
@@ -243,6 +244,7 @@ public class ABO {
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
 
+            spawnLakes = aboConfiguration.get("LiquidXP", "SpawnExperieneLakes", spawnLakes).getBoolean();
             spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperieneOrbs", spawnOrbs).getBoolean();
             orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperieneOrbSpawnChance", orbSpawnChance).getInt();
             orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
