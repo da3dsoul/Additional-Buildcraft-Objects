@@ -8,10 +8,12 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import net.minecraft.block.material.Material;
@@ -317,7 +319,7 @@ public class ABO {
             waterwheelItem = new ItemWaterwheel();
 
             if (Loader.isModLoaded("LiquidXP")) {
-                blockLiquidXP = BlockLiquidXP.init();
+                BlockLiquidXP.init();
                 GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
             } else {
                 blockLiquidXP = null;
@@ -463,6 +465,12 @@ public class ABO {
         ABOProxy.proxy.registerEntities();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
+
+    }
+
+    @EventHandler
+    public void post(FMLPostInitializationEvent event) {
+        BiomeStoneGen.init();
     }
 
     // Side Handling

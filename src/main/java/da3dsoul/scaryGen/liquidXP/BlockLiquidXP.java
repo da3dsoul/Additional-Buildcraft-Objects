@@ -33,13 +33,13 @@ import java.util.*;
 
 public class BlockLiquidXP extends BlockFluidClassic {
 
-    public static BlockLiquidXP init() {
+    public static void init() {
+        ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
         ABO.bucket = new BucketItem();
         LiquidXPMod.mbPerXp = 1;
         try {
             GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
         }catch(Exception e){ e.printStackTrace();}
-        return new BlockLiquidXP(LiquidXPMod.fluid);
     }
 
     public BlockLiquidXP(Fluid fluid) {

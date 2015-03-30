@@ -73,17 +73,19 @@ public class GuiScaryGenCustomize extends GuiScreen {
 		int y = col1.startY;
 
 		this.buttonList.clear();
-		this.buttonList.add(new GuiIntSlider(this, 2, col1.startX, y, "index", 1, 6));
+		this.buttonList.add(new GuiIntSlider(this, 2, col1.startX, y, "index", 0, 6));
 		this.buttonList.add(new GuiIntSlider(this, 3, col2.startX, y, "heightLevel", 4, 255));
 		y += 32;
 		this.buttonList.add(new GuiIntSlider(this, 4, col1.startX, y, "oceanLevel", 0, 255));
 		this.buttonList.add(new GuiIntSlider(this, 5, col2.startX, y, "cloudLevel", 4, 300));
 		y += 32;
+        this.buttonList.add(new GuiIntSlider(this, 6, col1.startX, y, "geostrataGen", 0, 1));
+        y += 32;
 		this.textField = new GuiTextField(this.fontRendererObj, col1.startX, y, 375, 20);
 		this.textField.setMaxStringLength(512);
 		this.textField.setFocused(true);
 		this.textField.setText(worldType.getOceanReplacement());
-		this.buttonList.add(checkButton = new GuiButton(6, col1.startX + 400, y, 25, 20, "?"));
+		this.buttonList.add(checkButton = new GuiButton(7, col1.startX + 400, y, 25, 20, "?"));
 		y += 32;
 
 		this.buttonList.add(0, new GuiButton(0, col1.startX, y, 200, 20, I18n.format("gui.done", new Object[0])));

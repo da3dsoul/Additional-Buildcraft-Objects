@@ -18,6 +18,7 @@ public class WorldTypeScary extends WorldType {
 	public int oceanLevel;
 	public Block oceanReplacement;
 	public int cloudLevel;
+    public boolean geostrataGen;
 	
 	public WorldTypeScary() {
 		super("scaryGen");
@@ -26,13 +27,13 @@ public class WorldTypeScary extends WorldType {
 		oceanLevel = 63;
 		oceanReplacement = Blocks.water;
 		cloudLevel = 128;
-		
+		geostrataGen = false;
 	}
 
 	@Override
 	public IChunkProvider getChunkGenerator(World world, String generatorOptions) {
 		setOptionsFromString(generatorOptions);
-		return new ChunkProviderScary(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), index, heightLevel, oceanLevel, oceanReplacement);
+		return new ChunkProviderScary(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), index, heightLevel, oceanLevel, oceanReplacement, geostrataGen);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -71,6 +72,9 @@ public class WorldTypeScary extends WorldType {
     				oceanReplacement = Blocks.water;
     			}
     			cloudLevel = Integer.parseInt(option[4]);
+                if(option.length > 4) {
+                    geostrataGen = Integer.parseInt(option[5]) != 0;
+                }
     		}
     	}catch(Throwable t){}
     }
@@ -85,6 +89,7 @@ public class WorldTypeScary extends WorldType {
     	b.append(getOceanReplacement()).append("\n");
     	
     	b.append(cloudLevel);
+        b.append(geostrataGen ? 1 : 0);
     	return b.toString();
     }
     
@@ -102,7 +107,10 @@ public class WorldTypeScary extends WorldType {
     	} else if(option == "cloudLevel")
     	{
     		return cloudLevel;
-    	}
+    	} else if(option == "geostrataGen")
+        {
+            return geostrataGen ? 1 : 0;
+        }
     	return -1;
     }
     
@@ -125,7 +133,9 @@ public class WorldTypeScary extends WorldType {
     	} else if(option == "cloudLevel")
     	{
     		cloudLevel = value;
-    	}
+    	} else if(option == "geostrataGen") {
+            geostrataGen = value != 0;
+        }
     }
     
     public boolean setOceanReplacement(String block)
