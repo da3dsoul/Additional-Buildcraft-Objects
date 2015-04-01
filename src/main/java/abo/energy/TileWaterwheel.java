@@ -102,6 +102,17 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 		updateTargetOutput();
 	}
 
+    @Override
+    public boolean isOrientationValid(ForgeDirection o) {
+        int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        if (o == ForgeDirection.UP || o == ForgeDirection.DOWN) return false;
+        if (l == 0 && (o == ForgeDirection.EAST || o == ForgeDirection.WEST)) return false;
+        if (l == 1 && (o == ForgeDirection.NORTH || o == ForgeDirection.SOUTH)) return false;
+        TileEntity tile = getTile(o);
+        return isPoweredTile(tile, o);
+    }
+
+
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;

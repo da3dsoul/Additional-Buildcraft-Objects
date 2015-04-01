@@ -63,13 +63,6 @@ public class TileWindmill extends TileConstantPowerProvider {
 		}
 	}
 
-	@Override
-	public int calculateCurrentOutput() {
-		updateTargetOutput();
-		realCurrentOutput = realCurrentOutput + ((TARGET_OUTPUT - realCurrentOutput) / 200);
-		return Math.round(realCurrentOutput);
-	}
-
 	protected void updateTargetOutput() {
 		if (isRedstonePowered) {
 			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f) + (getWorldObj().rainingStrength / 8f))
@@ -78,6 +71,15 @@ public class TileWindmill extends TileConstantPowerProvider {
 			TARGET_OUTPUT = 0;
 		}
 	}
+
+    @Override
+    public boolean isOrientationValid(ForgeDirection o) {
+        int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        if (o == ForgeDirection.UP || o == ForgeDirection.DOWN) return false;
+        if(o == ForgeDirection.EAST) return false;
+        TileEntity tile = getTile(o);
+        return isPoweredTile(tile, o);
+    }
 
 	protected void updateTargetOutputFirst() {
 		BiomeGenBase biome = getWorldObj().getBiomeGenForCoords(xCoord, zCoord);
@@ -106,24 +108,21 @@ public class TileWindmill extends TileConstantPowerProvider {
 		}
 	}
 
-	public float getPistonSpeed() {
-		if (!worldObj.isRemote) { return Math
-				.max(0.16f * ((realCurrentOutput != 0 ? realCurrentOutput : TARGET_OUTPUT) / 15000F / windmillScalar),
-						0.01f); }
-
-		switch (getEnergyStage()) {
-			case BLUE:
-				return 0.02F;
-			case GREEN:
-				return 0.04F;
-			case YELLOW:
-				return 0.08F;
-			case RED:
-				return 0.16F;
-			default:
-				return 0.01F;
-		}
-	}
+    public float getPistonSpeed() {
+        if (!isRedstonePowered) return 0;
+        switch (getEnergyStage()) {
+            case BLUE:
+                return 0.02F;
+            case GREEN:
+                return 0.04F;
+            case YELLOW:
+                return 0.08F;
+            case RED:
+                return 0.16F;
+            default:
+                return 0.01F;
+        }
+    }
 
 	protected boolean canGetWind() {
 		for (int i = -1; i < 2; i++) {

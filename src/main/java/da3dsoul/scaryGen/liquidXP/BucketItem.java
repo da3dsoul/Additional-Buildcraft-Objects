@@ -2,14 +2,20 @@ package da3dsoul.scaryGen.liquidXP;
 
 import abo.ABO;
 import abo.ItemIconProvider;
+import cpw.mods.fml.common.eventhandler.Event;
 import mods.immibis.lxp.LiquidXPMod;
 import mods.immibis.lxp.R;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.event.entity.player.FillBucketEvent;
 
 public class BucketItem extends mods.immibis.lxp.BucketItem {
 
@@ -17,41 +23,94 @@ public class BucketItem extends mods.immibis.lxp.BucketItem {
         super();
     }
 
-    /**
-     * Callback for item usage. If the item does something special on right clicking, he will have one of those. Return
-     * True if something happen and false if it don't. This is for ITEMS, not BLOCKS
-     *
-     * @param itemStack
-     * @param player
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @param face
-     * @param hitX
-     * @param hitY
-     * @param hitZ
-     */
     @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int face, float hitX, float hitY, float hitZ) {
-        if(itemStack != null) {
-            if(world.getBlock(x,y,z).getMaterial().isReplaceable()){
-                if(world.setBlock(x,y,z, ABO.blockLiquidXP, 0, 3)) {
-                    if(!player.capabilities.isCreativeMode) player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
-                    if(!world.isRemote) player.swingItem();
-                    return true;
+    public ItemStack onItemRightClick(ItemStack p_77659_1_, World p_77659_2_, EntityPlayer p_77659_3_)
+    {
+        MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(p_77659_2_, p_77659_3_, false);
+
+        if (movingobjectposition == null)
+        {
+            return p_77659_1_;
+        }
+        else
+        {
+            if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+            {
+                int i = movingobjectposition.blockX;
+                int j = movingobjectposition.blockY;
+                int k = movingobjectposition.blockZ;
+
+                if (!p_77659_2_.canMineBlock(p_77659_3_, i, j, k))
+                {
+                    return p_77659_1_;
                 }
-            } else {
-                if(face < 0 || face > 5) return false;
-                ForgeDirection dir = ForgeDirection.values()[face];
-                if(world.setBlock(x+dir.offsetX,y+dir.offsetY,z+dir.offsetZ, ABO.blockLiquidXP, 0, 3)) {
-                    if(!player.capabilities.isCreativeMode) player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.bucket));
-                    if(!world.isRemote) player.swingItem();
-                    return true;
+
+                if (movingobjectposition.sideHit == 0)
+                {
+                    --j;
+                }
+
+                if (movingobjectposition.sideHit == 1)
+                {
+                    ++j;
+                }
+
+                if (movingobjectposition.sideHit == 2)
+                {
+                    --k;
+                }
+
+                if (movingobjectposition.sideHit == 3)
+                {
+                    ++k;
+                }
+
+                if (movingobjectposition.sideHit == 4)
+                {
+                    --i;
+                }
+
+                if (movingobjectposition.sideHit == 5)
+                {
+                    ++i;
+                }
+
+                if (!p_77659_3_.canPlayerEdit(i, j, k, movingobjectposition.sideHit, p_77659_1_))
+                {
+                    return p_77659_1_;
+                }
+
+                if (this.tryPlaceContainedLiquid(p_77659_2_, i, j, k) && !p_77659_3_.capabilities.isCreativeMode)
+                {
+                    return new ItemStack(Items.bucket);
                 }
             }
         }
-        return false;
+
+        return p_77659_1_;
+    }
+
+    public boolean tryPlaceContainedLiquid(World p_77875_1_, int p_77875_2_, int p_77875_3_, int p_77875_4_)
+    {
+        Material material = p_77875_1_.getBlock(p_77875_2_, p_77875_3_, p_77875_4_).getMaterial();
+        boolean flag = !material.isSolid();
+
+        if (!p_77875_1_.isAirBlock(p_77875_2_, p_77875_3_, p_77875_4_) && !flag)
+        {
+            return false;
+        }
+        else
+        {
+            if (!p_77875_1_.isRemote && flag && !material.isLiquid())
+            {
+                p_77875_1_.func_147480_a(p_77875_2_, p_77875_3_, p_77875_4_, true);
+            }
+
+            p_77875_1_.setBlock(p_77875_2_, p_77875_3_, p_77875_4_, ABO.blockLiquidXP, 0, 3);
+
+            return true;
+        }
+
     }
 
     /**

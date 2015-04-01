@@ -23,21 +23,30 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry.FluidContainerData;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class BlockLiquidXP extends BlockFluidClassic {
 
     public static void init() {
         try {
+            LiquidXPMod.fluid.setLuminosity(15);
             ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
             ABO.bucket = new BucketItem();
             GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
             LiquidXPMod.mbPerXp = 1;
+
+            FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(LiquidXPMod.bucket), new ItemStack(Items.bucket));
+            FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(ABO.bucket), new ItemStack(Items.bucket));
         }catch(Throwable e){
             e.printStackTrace();
             ABO.blockLiquidXP = null;
@@ -347,5 +356,18 @@ public class BlockLiquidXP extends BlockFluidClassic {
             }
         }
         return false;
+    }
+
+    public static void initAprilFools(TextureStitchEvent.Pre event) {
+        if (event.map.getTextureType() == 0) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            //get current date time with Date()
+            Date date = new Date();
+            String dateString = dateFormat.format(date).substring(5, 10);
+            //ABO.aboLog.info("The date is " + dateString);
+            if (dateString.equals("04/01")) {
+                LiquidXPMod.fluid.setIcons(event.map.registerIcon("Additional-Buildcraft-Objects:liquid"));
+            }
+        }
     }
 }

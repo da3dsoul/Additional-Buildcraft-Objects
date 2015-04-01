@@ -172,9 +172,13 @@ public abstract class TileConstantPowerProvider extends TileEngine {
     }
 
     public boolean isOrientationValid() {
-        TileEntity tile = getTile(orientation);
+        return isOrientationValid(orientation);
+    }
 
-        return isPoweredTile(tile, orientation);
+    public boolean isOrientationValid(ForgeDirection o) {
+        TileEntity tile = getTile(o);
+
+        return isPoweredTile(tile, o);
     }
 
     public boolean switchOrientation(boolean preferPipe) {
@@ -185,16 +189,13 @@ public abstract class TileConstantPowerProvider extends TileEngine {
         }
     }
 
-    private boolean switchOrientationDo(boolean pipesOnly) {
-        int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+    protected boolean switchOrientationDo(boolean pipesOnly) {
         for (int i = orientation.ordinal() + 1; i <= orientation.ordinal() + 6; ++i) {
             ForgeDirection o = ForgeDirection.VALID_DIRECTIONS[i % 6];
-            if (o == ForgeDirection.UP || o == ForgeDirection.DOWN) continue;
-            if (l == 0 && (o == ForgeDirection.EAST || o == ForgeDirection.WEST)) continue;
-            if (l == 1 && (o == ForgeDirection.NORTH || o == ForgeDirection.SOUTH)) continue;
+            if(!isOrientationValid(o)) continue;
             TileEntity tile = getTile(o);
 
-            if ((!pipesOnly || tile instanceof IPipeTile) && isPoweredTile(tile, o)) {
+            if ((!pipesOnly || tile instanceof IPipeTile)) {
                 orientation = o;
                 getWorldObj().markBlockForUpdate(xCoord, yCoord, zCoord);
                 getWorldObj().notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord,

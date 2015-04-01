@@ -25,9 +25,11 @@ import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 import net.minecraftforge.fluids.BlockFluidClassic;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,7 +108,7 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release2.6.2";
+    public static final String VERSION = "release2.6.3";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
@@ -141,6 +143,7 @@ public class ABO {
     // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
     public static boolean spawnLakes = true;
+    public static boolean respawnLakes = false;
     public static boolean spawnOrbs = true;
     public static int orbSpawnChance = 70;
     public static int orbLifetime = 50;
@@ -245,6 +248,7 @@ public class ABO {
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
 
             spawnLakes = aboConfiguration.get("LiquidXP", "SpawnExperieneLakes", spawnLakes).getBoolean();
+            respawnLakes = aboConfiguration.get("LiquidXP", "RespawnExperieneLakes", respawnLakes).getBoolean();
             spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperieneOrbs", spawnOrbs).getBoolean();
             orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperieneOrbSpawnChance", orbSpawnChance).getInt();
             orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
@@ -385,6 +389,8 @@ public class ABO {
     @SubscribeEvent
     public void generate(PopulateChunkEvent.Pre event) {
         if (ABO.blockLiquidXP == null) return;
+        if(!spawnLakes) return;
+        if(!respawnLakes) return;
         if (event.rand.nextInt(16) == 0
                 && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, LAKE)) {
             int k1 = event.chunkX + event.rand.nextInt(16) + 8;
@@ -393,6 +399,31 @@ public class ABO {
             if (event.world.getWorldInfo().getVanillaDimension() != -1) {
                 new WorldGenXPLake().generate(event.world, event.rand, k1, l1, i2);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void generate(DecorateBiomeEvent.Decorate event) {
+        if (ABO.blockLiquidXP == null) return;
+        if(!spawnLakes) return;
+        if(respawnLakes) return;
+        if(event.type != DecorateBiomeEvent.Decorate.EventType.LAKE) return;
+        if (event.rand.nextInt(16) == 0
+                && TerrainGen.decorate(event.world, event.rand, event.chunkX, event.chunkZ, event.type)) {
+            int k1 = event.chunkX + event.rand.nextInt(16) + 8;
+            int l1 = 45 + event.rand.nextInt(211);
+            int i2 = event.chunkZ + event.rand.nextInt(16) + 8;
+            if (event.world.getWorldInfo().getVanillaDimension() != -1) {
+                new WorldGenXPLake().generate(event.world, event.rand, k1, l1, i2);
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+        if(ABO.blockLiquidXP != null) {
+            BlockLiquidXP.initAprilFools(event);
         }
     }
 

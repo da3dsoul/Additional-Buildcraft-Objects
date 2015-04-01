@@ -110,6 +110,16 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 
                 if (item.getItemStack().stackSize <= 0) {
                     transport.items.scheduleRemoval(item);
+                } else {
+                    ForgeDirection o = null;
+                    int xOffset = event.dest.xCoord - this.container.xCoord;
+                    int yOffset = event.dest.yCoord - this.container.yCoord;
+                    int zOffset = event.dest.zCoord - this.container.zCoord;
+                    for(int i = 0; i < 6; i++) {
+                        ForgeDirection o1 = ForgeDirection.getOrientation(i);
+                        if(o1.offsetX == xOffset && o1.offsetY == yOffset && o1.offsetZ == zOffset) o = o1;
+                    }
+                    item.blacklist.add(o.getOpposite());
                 }
                 event.handled = true;
             }
@@ -124,7 +134,7 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
         if (entity instanceof TileGenericPipe) {
             TileGenericPipe pipe = (TileGenericPipe) entity;
 
-            return pipe.pipe.transport instanceof PipeTransportItems;
+            return pipe.pipe.inputOpen(o.getOpposite()) && pipe.canInjectItems(o.getOpposite());
 		} else if (entity instanceof IInventory && item.getInsertionHandler().canInsertItem(item, (IInventory) entity)) {
 			if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
         } else if (entity instanceof TileEntityEnderChest) {
