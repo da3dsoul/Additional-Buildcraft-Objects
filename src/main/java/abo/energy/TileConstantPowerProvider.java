@@ -198,9 +198,9 @@ public abstract class TileConstantPowerProvider extends TileEngine {
             if ((!pipesOnly || tile instanceof IPipeTile)) {
                 orientation = o;
                 getWorldObj().markBlockForUpdate(xCoord, yCoord, zCoord);
-                getWorldObj().notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord,
+                getWorldObj().notifyBlockOfNeighborChange(xCoord, yCoord, zCoord,
                         worldObj.getBlock(xCoord, yCoord, zCoord));
-                getWorldObj().notifyBlocksOfNeighborChange(xCoord + o.offsetX, yCoord + o.offsetY, zCoord + o.offsetZ,
+                getWorldObj().notifyBlockOfNeighborChange(xCoord + o.offsetX, yCoord + o.offsetY, zCoord + o.offsetZ,
                         worldObj.getBlock(xCoord, yCoord, zCoord));
 
                 if (tile instanceof TileGenericPipe) {
@@ -217,7 +217,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
 
     @Override
     public void updateEntity() {
-        animProgress += getPistonSpeed() / radialSymmetryParts;
+        if(isRedstonePowered) animProgress += getPistonSpeed() / radialSymmetryParts;
         if (animProgress >= 1) animProgress = 0;
         super.updateEntity();
     }
@@ -234,6 +234,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
 
         if (tickCount % 60 == 0) {
             checkRedstonePower();
+            worldObj.getBlock(xCoord,yCoord,zCoord).onNeighborBlockChange(worldObj,xCoord,yCoord,zCoord, worldObj.getBlock(xCoord,yCoord,zCoord));
         }
 
         if (burnTime == 0 && isRedstonePowered) {

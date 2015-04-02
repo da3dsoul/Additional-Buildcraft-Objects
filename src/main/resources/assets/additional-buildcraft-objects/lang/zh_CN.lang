@@ -1,12 +1,13 @@
 #Chinese language file
 
-item.PipeFluidsValve=\u9600\u95e8\u7ba1\u9053
-item.PipeFluidsGoldenIron=\u91d1\u94c1\u6db2\u4f53\u7ba1\u9053
-item.PipeFluidsBalance=\u5e73\u8861\u7ba1\u9053
-item.PipeItemsRoundRobin=\u5faa\u73af\u8fd0\u8f93\u7ba1\u9053
-item.PipeItemsInsertion=\u63d2\u5165\u5f0f\u8fd0\u8f93\u7ba1\u9053
-item.PipeItemsExtraction=\u63d0\u53d6\u5f0f\u8fd0\u8f93\u7ba1
-item.PipeItemsCrossover=\u4ea4\u53c9\u8fd0\u8f93\u7ba1\u9053
-item.PipeItemsCompactor=\u538b\u7f29\u8fd0\u8f93\u7ba1\u9053
-item.PipePowerSwitch=\u80fd\u91cf\u63a7\u5236\u7ba1\u9053
-item.PipePowerDirected=\u94c1\u8d28\u80fd\u91cf\u7ba1\u9053
+item.PipeFluidsValve=阀门管道
+item.PipeFluidsGoldenIron=金铁液体管道
+item.PipeFluidsBalance=平衡管道
+item.PipeItemsRoundRobin=循环运输管道
+item.PipeItemsInsertion=插入式运输管道
+item.PipeItemsExtraction=提取式运输管
+item.PipeItemsBounce=红石信号运输管
+item.PipeItemsCrossover=交叉运输管道
+item.PipeItemsCompactor=压缩运输管道
+item.PipePowerSwitch=能量控制管道
+item.PipePowerDirected=铁质能量管道

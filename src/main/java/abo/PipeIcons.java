@@ -29,5 +29,7 @@ public enum PipeIcons {
 	
 	PipeLiquidsReinforcedGolden,
 
+    PipeItemsBounceOpen, PipeItemsBounceClosed,
+
 	MAX
 };

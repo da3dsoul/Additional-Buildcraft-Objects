@@ -226,8 +226,8 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 			TileEntity tile = container.getTile(ForgeDirection.getOrientation(meta));
 
 			if (tile instanceof IFluidHandler) {
-				if (liquidToExtract <= FluidContainerRegistry.BUCKET_VOLUME) {
-					liquidToExtract += FluidContainerRegistry.BUCKET_VOLUME;
+				if (liquidToExtract <= FluidContainerRegistry.BUCKET_VOLUME * 2) {
+					liquidToExtract += FluidContainerRegistry.BUCKET_VOLUME * 2;
 				}
 			}
 			mjStored -= 1;

@@ -29,22 +29,18 @@ import buildcraft.core.ICustomHighlight;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight {
-
-	private static final AxisAlignedBB[][]	boxes	= {
-			{ AxisAlignedBB.getBoundingBox(-2, -1, 0, 3, 2, 1), AxisAlignedBB.getBoundingBox(-1, -2, 0, 2, -1, 1),
-			AxisAlignedBB.getBoundingBox(-1, 2, 0, 2, 3, 1) },
-			{ AxisAlignedBB.getBoundingBox(0, -1, -2, 1, 2, 3), AxisAlignedBB.getBoundingBox(0, -2, -1, 1, -1, 2),
-			AxisAlignedBB.getBoundingBox(0, 2, -1, 1, 3, 2) } };
-
-	private static IIcon					texture;
-
-	private float							scalar	= 1;
+public class BlockWaterwheel extends BlockConstantPowerProvider {
 
 	public BlockWaterwheel() {
-		super(Material.iron);
+		super();
 		setBlockName("waterwheelBlock");
         setCreativeTab(null);
+
+        boxes	= new AxisAlignedBB[][] {
+                { AxisAlignedBB.getBoundingBox(-2, -1, 0, 3, 2, 1), AxisAlignedBB.getBoundingBox(-1, -2, 0, 2, -1, 1),
+                        AxisAlignedBB.getBoundingBox(-1, 2, 0, 2, 3, 1) },
+                { AxisAlignedBB.getBoundingBox(0, -1, -2, 1, 2, 3), AxisAlignedBB.getBoundingBox(0, -2, -1, 1, -1, 2),
+                        AxisAlignedBB.getBoundingBox(0, 2, -1, 1, 3, 2) } };
 	}
 
 	public BlockWaterwheel(float s) {
@@ -52,85 +48,8 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 		scalar = s;
 	}
 
-	@Override
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	@Override
-	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer player, int side, float par7,
-			float par8, float par9) {
-
-		TileEntity tile = world.getTileEntity(i, j, k);
-
-		if (tile instanceof TileWaterwheel) {
-			if (!world.isRemote) {
-				player.addChatComponentMessage(new ChatComponentText("Current Waterwheel Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).realCurrentOutput / 1000)
-						+ "RF/t"));
-				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWaterwheel) tile).TARGET_OUTPUT / 1000) + "RF/t"));
-			}
-			return ((TileWaterwheel) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
-		}
-
-		return false;
-	}
-
-	/**
-	 * Gets an item for the block being called on. Args: world, x, y, z
-	 */
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World p_149694_1_, int p_149694_2_, int p_149694_3_, int p_149694_4_) {
-		return ABO.waterwheelItem;
-	}
-
 	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
 		return ABO.waterwheelItem;
-	}
-
-    /**
-     * Determines the damage on the item the block drops. Used in cloth and wood.
-     *
-     * @param p_149692_1_
-     */
-    @Override
-    public int damageDropped(int p_149692_1_) {
-        return 0;
-    }
-
-    /**
-     * This returns a complete list of items dropped from this block.
-     *
-     * @param world    The current world
-     * @param x        X Position
-     * @param y        Y Position
-     * @param z        Z Position
-     * @param metadata Current metadata
-     * @param fortune  Breakers fortune level
-     * @return A ArrayList containing all items this block drops
-     */
-    @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-        ArrayList list = new ArrayList<ItemStack>();
-        list.add(new ItemStack(ABO.waterwheelItem));
-        return list;
-    }
-
-    @Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister par1IconRegister) {
-		texture = par1IconRegister.registerIcon("additional-buildcraft-objects:waterwheelIcon");
-	}
-
-	@Override
-	public int getRenderType() {
-		return BuildCraftCore.blockByEntityModel;
 	}
 
 	@Override
@@ -138,51 +57,7 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 		return new TileWaterwheel(scalar);
 	}
 
-	@Override
-	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
-		return false;
-	}
-
-	@Override
-	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-
-		if (tile instanceof TileWaterwheel) {
-			return ((TileWaterwheel) tile).switchOrientation(false);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public AxisAlignedBB[] getBoxes(World world, int i, int j, int k, EntityPlayer player) {
-		int l = world.getBlockMetadata(i, j, k);
-		AxisAlignedBB[] box = new AxisAlignedBB[boxes[l].length];
-		for (int m = 0; m < boxes[l].length; m++) {
-			box[m] = boxes[l][m];
-		}
-		return box;
-	}
-
-	@Override
-	public double getExpansion() {
-		return 0;
-	}
-
-	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if (!checkBBClear(world, x, y, z, world.getBlockMetadata(x, y, z))) {
-			this.dropBlockAsItemWithChance(world, x, y, z, 0, 1, 0);
-			return;
-		}
-		try {
-			TileWaterwheel tile = (TileWaterwheel) world.getTileEntity(x, y, z);
-			tile.onNeighborBlockChange(world, x, y, z, block);
-
-		} catch (Exception e) {};
-	}
-
-	private boolean checkBBClear(World world, int i, int j, int k, int l) {
+	protected boolean checkBBClear(World world, int i, int j, int k, int l) {
 		boolean flag = true;
 		Block block;
 		if (l == 0) {
@@ -194,7 +69,7 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 					if (x == 3 && y == 3) continue;
 					if (x == 0 && y == 0) continue;
 					block = world.getBlock(i + x, j + y, k);
-					if (block.getMaterial() == Material.air && block != ABO.blockNullCollide && !(block instanceof IFluidBlock)
+					if (block.getMaterial() != Material.air && block != ABO.blockNullCollide && !(block instanceof IFluidBlock)
 							&& !(block instanceof BlockFluidBase) && !(block instanceof BlockLiquid)
 							&& !block.getMaterial().isLiquid() && !block.getMaterial().isReplaceable()) flag = false;
 				}
@@ -208,7 +83,7 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 					if (x == 3 && y == 3) continue;
 					if (x == 0 && y == 0) continue;
 					block = world.getBlock(i, j + y, k + x);
-					if (block.getMaterial() == Material.air && block != ABO.blockNullCollide && !(block instanceof IFluidBlock)
+					if (block.getMaterial() != Material.air && block != ABO.blockNullCollide && !(block instanceof IFluidBlock)
 							&& !(block instanceof BlockFluidBase) && !(block instanceof BlockLiquid)
 							&& !block.getMaterial().isLiquid() && !block.getMaterial().isReplaceable()) flag = false;
 				}
@@ -216,22 +91,8 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 		}
 		return flag;
 	}
-	
-	public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int l)
-    {
-        return this.canPlaceBlockAt(world, x, y, z) && checkBBClear(world, x, y, z, l);
-    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int meta) {
-		return texture;
-	}
 
-	@Override
-	public TileEntity createNewTileEntity(World world, int metadata) {
-		return null;
-	}
 
 	@Override
 	public void onBlockAdded(World world, int i, int j, int k) {
@@ -263,14 +124,6 @@ public class BlockWaterwheel extends BlockBuildCraft implements ICustomHighlight
 			}
 		}
 	}
-
-    /**
-     * Return true if a player with Silk Touch can harvest this block directly, and not its normal drops.
-     */
-    @Override
-    protected boolean canSilkHarvest() {
-        return false;
-    }
 
     @Override
 	public void onBlockPreDestroy(World world, int i, int j, int k, int oldMeta) {

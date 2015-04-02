@@ -8,6 +8,7 @@ item.PipeFluidsBalance.name=Балансировочная жидкостная 
 item.PipeFluidsInsertion.name=Вводящая жидкостная труба
 item.PipeItemsRoundRobin.name=Циклическая транспортная труба
 item.PipeItemsInsertion.name=Вводящая труба Края
+item.PipeItemsBounce=Упругая труба
 item.PipeItemsDivide.name=Разделяющая транспортная труба
 item.PipeItemsExtraction.name=Извлекающая транспортная труба
 item.PipeItemsCrossover.name=Перекрёстная транспортная труба

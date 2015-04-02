@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import abo.pipes.items.*;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
@@ -64,13 +65,6 @@ import abo.pipes.fluids.PipeFluidsGoldenIron;
 import abo.pipes.fluids.PipeFluidsReinforcedGolden;
 import abo.pipes.fluids.PipeFluidsReinforcedGoldenIron;
 import abo.pipes.fluids.PipeFluidsValve;
-import abo.pipes.items.PipeItemsCompactor;
-import abo.pipes.items.PipeItemsCrossover;
-import abo.pipes.items.PipeItemsDivide;
-import abo.pipes.items.PipeItemsEnderExtraction;
-import abo.pipes.items.PipeItemsExtraction;
-import abo.pipes.items.PipeItemsInsertion;
-import abo.pipes.items.PipeItemsRoundRobin;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
@@ -125,6 +119,7 @@ public class ABO {
     public static Item pipeFluidsInsertion = null;
     public static Item pipeFluidsBalance = null;
     public static Item pipeItemsRoundRobin = null;
+    public static Item pipeItemsBounce = null;
     public static Item pipeItemsDivide = null;
     public static Item pipeItemsCompactor = null;
     public static Item pipeItemsInsertion = null;
@@ -280,8 +275,18 @@ public class ABO {
             pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1, BuildCraftTransport.pipeItemsStone,
                     Blocks.gravel);
 
+            pipeItemsBounce = buildPipe(PipeItemsBounce.class);
+
+            ArrayList<ItemStack> list = OreDictionary.getOres("cobblestone");
+            if (list.size() >= 1) {
+                for (ItemStack item : list) {
+                    addRecipe(pipeItemsBounce, 1, BuildCraftTransport.pipeItemsStone, item);
+                }
+            }
+
             pipeItemsDivide = buildPipe(PipeItemsDivide.class);
 
+            addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.wooden_sword);
             addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.stone_sword);
             addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.iron_sword);
             addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.golden_sword);
@@ -297,7 +302,7 @@ public class ABO {
                     new ItemStack(Items.dye, 1, 2));
 
             pipeItemsExtraction = buildPipe(PipeItemsExtraction.class);
-            ArrayList<ItemStack> list = OreDictionary.getOres("plankWood");
+            list = OreDictionary.getOres("plankWood");
             if (list.size() >= 1) {
                 for (ItemStack item : list) {
                     addRecipe(pipeItemsExtraction, 1, BuildCraftTransport.pipeItemsWood, item);

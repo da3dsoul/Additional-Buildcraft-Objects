@@ -23,19 +23,17 @@ import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.ICustomHighlight;
 import buildcraft.core.IItemPipe;
 
-public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
-
-	private static final AxisAlignedBB[]	boxes	= {
-			AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625),
-			AxisAlignedBB.getBoundingBox(0, 0.25, 0.25, 0.375, 0.75, 0.75),
-			AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) };
-	
-	private float scalar = 1;
+public class BlockWindmill extends BlockConstantPowerProvider {
 
 	public BlockWindmill() {
-		super(Material.iron);
+		super();
 		setBlockName("windmillBlock");
 		setCreativeTab(CreativeTabBuildCraft.BLOCKS.get());
+
+        boxes	= new AxisAlignedBB[][] {{
+                AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625),
+                AxisAlignedBB.getBoundingBox(0, 0.25, 0.25, 0.375, 0.75, 0.75),
+                AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) }};
 	}
 	
 	public BlockWindmill(float s)
@@ -45,75 +43,14 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	}
 
 	@Override
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	@Override
-	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer player, int side, float par7,
-			float par8, float par9) {
-
-		TileEntity tile = world.getTileEntity(i, j, k);
-
-		// REMOVED DUE TO CREATIVE ENGINE REQUIREMENTS - dmillerw
-		// Drop through if the player is sneaking
-		// if (player.isSneaking()) {
-		// return false;
-		// }
-
-		// Do not open guis when having a pipe in hand
-		if (player.getCurrentEquippedItem() != null) {
-			if (player.getCurrentEquippedItem().getItem() instanceof IItemPipe) { return false; }
-		}
-
-		if (tile instanceof TileWindmill) {
-			if (!world.isRemote) {
-				player.addChatComponentMessage(new ChatComponentText("Current Windmill Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).realCurrentOutput/1000) + "RF/t"));
-				player.addChatComponentMessage(new ChatComponentText("Target Output is "
-						+ new DecimalFormat("##0.0##").format(((TileWindmill) tile).TARGET_OUTPUT/1000) + "RF/t"));
-			}
-			return ((TileWindmill) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	@Override
-	public int getRenderType() {
-		return BuildCraftCore.blockByEntityModel;
-	}
-
-	@Override
 	public TileEntity createTileEntity(World world, int metadata) {
 		return new TileWindmill(scalar);
 	}
 
 	@Override
-	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
-		return false;
-	}
-
-	@Override
-	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
-		TileEntity tile = world.getTileEntity(x, y, z);
-
-		if (tile instanceof TileWindmill) {
-			return ((TileWindmill) tile).switchOrientation(false);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public void addCollisionBoxesToList(World wrd, int x, int y, int z, AxisAlignedBB mask, List list, Entity ent) {
-		for (AxisAlignedBB aabb : boxes) {
+		for (AxisAlignedBB aabb : boxes[0]) {
 			AxisAlignedBB aabbTmp = aabb.getOffsetBoundingBox(x, y, z);
 			if (mask.intersectsWith(aabbTmp)) {
 				list.add(aabbTmp);
@@ -123,7 +60,7 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 
 	@Override
 	public AxisAlignedBB[] getBoxes(World wrd, int x, int y, int z, EntityPlayer player) {
-		return boxes;
+		return boxes[0];
 	}
 
 	@Override
@@ -134,7 +71,7 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	@Override
 	public MovingObjectPosition collisionRayTrace(World wrd, int x, int y, int z, Vec3 origin, Vec3 direction) {
 		MovingObjectPosition closest = null;
-		for (AxisAlignedBB aabb : boxes) {
+		for (AxisAlignedBB aabb : boxes[0]) {
 			MovingObjectPosition mop = aabb.getOffsetBoundingBox(x, y, z).calculateIntercept(origin, direction);
 			if (mop != null) {
 				if (closest != null && mop.hitVec.distanceTo(origin) < closest.hitVec.distanceTo(origin)) {
@@ -153,40 +90,21 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 		return closest;
 	}
 
-	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-		if (!checkBBClear(world, x, y, z)) { world.func_147480_a(x, y, z, true); return;}
-		try {
-			TileWindmill tile = (TileWindmill) world.getTileEntity(x, y, z);
-			tile.onNeighborBlockChange(world, x, y, z, block);
-
-		} catch (Exception e) {};
-	}
-
-	private boolean checkBBClear(World world, int x, int y, int z) {
+    @Override
+	protected boolean checkBBClear(World world, int x, int y, int z, int l) {
 		if (world.getBlock(x, y - 1, z) != Blocks.fence && world.getBlock(x, y - 1, z) != Blocks.nether_brick_fence)
 			return false;
 		if (world.getBlock(x, y - 2, z) != Blocks.fence && world.getBlock(x, y - 2, z) != Blocks.nether_brick_fence)
 			return false;
-		if (world.getBlock(x, y + 1, z) != Blocks.air && world.getBlock(x, y + 1, z) != ABO.blockNull) return false;
+		if (world.getBlock(x, y + 1, z).getMaterial() != Material.air && world.getBlock(x, y + 1, z) != ABO.blockNull) return false;
 		return true;
-	}
-
-	@Override
-	public boolean canPlaceBlockAt(World world, int x, int y, int z) {
-		return super.canPlaceBlockAt(world, x, y, z) && checkBBClear(world, x, y, z);
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World world, int metadata) {
-		return null;
 	}
 
 	@Override
 	public void onBlockAdded(World world, int i, int j, int k) {
 		super.onBlockAdded(world, i, j, k);
 		
-		if(world.getBlock(i, j + 1, k) == Blocks.air)
+		if(world.getBlock(i, j + 1, k).getMaterial() == Material.air)
 		{
 			world.setBlock(i, j + 1, k, ABO.blockNull);
 		}
@@ -196,7 +114,5 @@ public class BlockWindmill extends BlockBuildCraft implements ICustomHighlight {
 	public void onBlockPreDestroy(World world, int i, int j, int k, int oldMeta) {
 		if(world.getBlock(i, j + 1, k) == ABO.blockNull) world.setBlock(i, j + 1, k, Blocks.air);
 	}
-
-	
 
 }

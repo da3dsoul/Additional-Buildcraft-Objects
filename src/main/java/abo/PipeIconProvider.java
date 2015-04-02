@@ -61,6 +61,11 @@ public class PipeIconProvider implements IIconProvider {
 		_icons[PipeIcons.PipeLiquidsValveOpenSide.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeLiquidsValveOpenSide");
 
+        _icons[PipeIcons.PipeItemsBounceOpen.ordinal()] = iconRegister
+                .registerIcon("additional-buildcraft-objects:PipeItemsBounce");
+        _icons[PipeIcons.PipeItemsBounceClosed.ordinal()] = iconRegister
+                .registerIcon("additional-buildcraft-objects:PipeItemsBounceClosed");
+
 		_icons[PipeIcons.PipePowerSwitchPowered.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipePowerSwitchPowered");
 		_icons[PipeIcons.PipePowerSwitchUnpowered.ordinal()] = iconRegister
