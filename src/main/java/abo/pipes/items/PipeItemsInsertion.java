@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import buildcraft.core.ItemWrench;
+import buildcraft.transport.pipes.PipeItemsEmerald;
+import buildcraft.transport.pipes.PipeItemsIron;
+import buildcraft.transport.pipes.PipeItemsWood;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -61,6 +64,7 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
         if (entityplayer.getCurrentEquippedItem() != null
                 && entityplayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
             isLegacy = !isLegacy;
+            container.scheduleRenderUpdate();
             return true;
         }
         TileEntity tile = null;
@@ -150,8 +154,11 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
 
         if (entity instanceof TileGenericPipe) {
             TileGenericPipe pipe = (TileGenericPipe) entity;
+            if(pipe.pipe == null || pipe.pipe.transport == null) return false;
 
-            return isLegacy ? (pipe.pipe.transport instanceof PipeTransportItems) : (pipe.pipe.inputOpen(o.getOpposite()) && pipe.canInjectItems(o.getOpposite()));
+            boolean iron = pipe.pipe instanceof PipeItemsIron && pipe.pipe.outputOpen(o.getOpposite());
+
+            return isLegacy ? (pipe.pipe.transport instanceof PipeTransportItems) : (pipe.pipe.transport instanceof PipeTransportItems && pipe.pipe.inputOpen(o.getOpposite()) && pipe.canInjectItems(o.getOpposite()) && !iron);
 		} else if (entity instanceof IInventory && item.getInsertionHandler().canInsertItem(item, (IInventory) entity)) {
 			if (Transactor.getTransactorFor(entity).add(item.getItemStack(), o.getOpposite(), false).stackSize > 0) { return true; }
         } else if (entity instanceof TileEntityEnderChest) {

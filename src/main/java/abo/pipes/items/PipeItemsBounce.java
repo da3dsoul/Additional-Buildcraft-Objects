@@ -32,6 +32,16 @@ public class PipeItemsBounce extends ABOPipe<PipeTransportItems> implements ISol
         return closedTexture;
     }
 
+    @Override
+    public boolean inputOpen(ForgeDirection from) {
+        return container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
+    }
+
+    @Override
+    public boolean outputOpen(ForgeDirection to) {
+        return container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord, container.zCoord);
+    }
+
     public void eventHandler(PipeEventItem.FindDest event) {
         List possibleOrientations = event.destinations;
 
