@@ -14,7 +14,7 @@ Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 1 warning
 
-:processResources UP-TO-DATE
+:processResources
 :classes
 :jar
 :extractMcpData UP-TO-DATE
@@ -26,4 +26,4 @@ Note: Recompile with -Xlint:unchecked for details.
 
 BUILD SUCCESSFUL
 
-Total time: 9.235 secs
+Total time: 17.942 secs
