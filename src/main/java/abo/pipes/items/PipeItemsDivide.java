@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import buildcraft.api.tools.IToolWrench;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -88,12 +89,13 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {
-		if (entityplayer.getCurrentEquippedItem() != null
-				&& entityplayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
+        if (entityplayer.getCurrentEquippedItem() != null
+                && entityplayer.getCurrentEquippedItem().getItem() instanceof IToolWrench && ((IToolWrench)entityplayer.getCurrentEquippedItem().getItem()).canWrench(entityplayer, container.xCoord, container.yCoord, container.zCoord)) {
 			incrementMeta();
 			if (!container.getWorldObj().isRemote)
 				entityplayer.addChatComponentMessage(new ChatComponentText("Set the desired stack size to "
 						+ desiredSize + "."));
+            ((IToolWrench)entityplayer.getCurrentEquippedItem().getItem()).wrenchUsed(entityplayer, container.xCoord, container.yCoord, container.zCoord);
 			return true;
 		}
 		return false;

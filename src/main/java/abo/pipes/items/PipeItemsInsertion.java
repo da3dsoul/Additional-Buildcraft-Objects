@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import buildcraft.api.tools.IToolWrench;
 import buildcraft.core.ItemWrench;
 import buildcraft.transport.pipes.PipeItemsEmerald;
 import buildcraft.transport.pipes.PipeItemsIron;
@@ -62,9 +63,10 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
     @Override
     public boolean blockActivated(EntityPlayer entityplayer) {
         if (entityplayer.getCurrentEquippedItem() != null
-                && entityplayer.getCurrentEquippedItem().getItem() instanceof ItemWrench) {
+                && entityplayer.getCurrentEquippedItem().getItem() instanceof IToolWrench && ((IToolWrench)entityplayer.getCurrentEquippedItem().getItem()).canWrench(entityplayer, container.xCoord, container.yCoord, container.zCoord)) {
             isLegacy = !isLegacy;
             container.scheduleRenderUpdate();
+            ((IToolWrench)entityplayer.getCurrentEquippedItem().getItem()).wrenchUsed(entityplayer, container.xCoord, container.yCoord, container.zCoord);
             return true;
         }
         TileEntity tile = null;
