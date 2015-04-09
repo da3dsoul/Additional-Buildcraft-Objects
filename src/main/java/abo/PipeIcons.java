@@ -5,7 +5,9 @@ public enum PipeIcons {
 
 	PipeItemsExtraction, PipeItemsExtractionSide,
 
-	PipeItemsInsertion, PipeItemsRoundRobin,
+	PipeItemsInsertionLegacy, PipeItemsInsertionNew,
+
+    PipeItemsRoundRobin,
 
 	PipeLiquidsBalance,
 

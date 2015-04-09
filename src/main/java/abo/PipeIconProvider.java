@@ -30,8 +30,11 @@ public class PipeIconProvider implements IIconProvider {
 		_icons[PipeIcons.PipeItemsExtractionSide.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeItemsExtractSide");
 
-		_icons[PipeIcons.PipeItemsInsertion.ordinal()] = iconRegister
-				.registerIcon("additional-buildcraft-objects:PipeItemsInsert");
+		_icons[PipeIcons.PipeItemsInsertionLegacy.ordinal()] = iconRegister
+				.registerIcon("additional-buildcraft-objects:PipeItemsInsertLegacy");
+        _icons[PipeIcons.PipeItemsInsertionNew.ordinal()] = iconRegister
+                .registerIcon("additional-buildcraft-objects:PipeItemsInsertNew");
+
 		_icons[PipeIcons.PipeItemsRoundRobin.ordinal()] = iconRegister
 				.registerIcon("additional-buildcraft-objects:PipeItemsRoundRobin");
 

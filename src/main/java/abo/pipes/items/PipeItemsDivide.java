@@ -8,6 +8,7 @@ import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIcons;
@@ -123,4 +124,18 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 		}
 
 	}
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbttagcompound) {
+        super.writeToNBT(nbttagcompound);
+        nbttagcompound.setByte("desiredStackSize", desiredSize);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbttagcompound) {
+        super.readFromNBT(nbttagcompound);
+        if(nbttagcompound.hasKey("desiredStackSize")) {
+            desiredSize = nbttagcompound.getByte("desiredStackSize");
+        }
+    }
 }
