@@ -27,7 +27,7 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
 
     protected AxisAlignedBB[][]	boxes = {{AxisAlignedBB.getBoundingBox(0,0,0,1,1,1)}};
 
-    protected float scalar = 1;
+    protected double scalar = 1;
 
     protected static IIcon					texture;
 
@@ -54,7 +54,7 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
 
         if (tile instanceof TileConstantPowerProvider) {
             if (!world.isRemote) {
-                player.addChatComponentMessage(new ChatComponentText("Current " + this.getClass().getSimpleName().substring(6) + " Output is "
+                player.addChatComponentMessage(new ChatComponentText("Current " + this.getClass().getSimpleName().substring(5) + " Output is "
                         + new DecimalFormat("##0.0##").format(((TileConstantPowerProvider) tile).realCurrentOutput / 1000)
                         + "RF/t"));
                 player.addChatComponentMessage(new ChatComponentText("Target Output is "

@@ -8,6 +8,7 @@ import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.client.FMLClientHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -16,27 +17,27 @@ import net.minecraftforge.common.util.ForgeDirection;
 public abstract class TileConstantPowerProvider extends TileEngine {
 
 
-    static final float						MAX_OUTPUT				= 1.5f;
-    static final float						MIN_OUTPUT				= MAX_OUTPUT / 3;
-    public float							TARGET_OUTPUT			= 0.1f;
+    static final double						MAX_OUTPUT				= 1.5f;
+    static final double						MIN_OUTPUT				= MAX_OUTPUT / 3;
+    public double							TARGET_OUTPUT			= 0.1f;
 
-    public float							realCurrentOutput		= 0;
+    public double							realCurrentOutput		= 0;
 
-    public static float						windmillScalar;
+    public static double						windmillScalar;
 
     private int								burnTime				= 0;
     private int								totalBurnTime			= 0;
 
     private int								tickCount				= 0;
 
-    public float							animProgress			= 0;
+    public double							animProgress			= 0;
     protected int radialSymmetryParts;
 
     public TileConstantPowerProvider() {
         super();
     }
 
-    public TileConstantPowerProvider(float scalar) {
+    public TileConstantPowerProvider(double scalar) {
         this();
         windmillScalar = scalar;
     }
@@ -47,6 +48,18 @@ public abstract class TileConstantPowerProvider extends TileEngine {
         updateTargetOutputFirst();
         initDirection();
         sendNetworkUpdate();
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound data) {
+        super.readFromNBT(data);
+        realCurrentOutput = data.getDouble("realCurrentOutput");
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound data) {
+        super.writeToNBT(data);
+        data.setDouble("realCurrentOutput", realCurrentOutput);
     }
 
     @Override
@@ -87,7 +100,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
     public int calculateCurrentOutput() {
         updateTargetOutput();
         realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200;
-        return Math.round(realCurrentOutput);
+        return (int) Math.round(realCurrentOutput);
     }
 
 
@@ -126,8 +139,8 @@ public abstract class TileConstantPowerProvider extends TileEngine {
         }
     }
 
-    private int in(float a) {
-        return Math.round(a);
+    private int in(double a) {
+        return (int) Math.round(a);
     }
 
     protected void sendPower() {

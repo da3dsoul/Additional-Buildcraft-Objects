@@ -352,13 +352,13 @@ public class ChunkProviderScary implements IChunkProvider {
             for (int blockZ = 0; blockZ < 16; ++blockZ) {
                 for (int y = 0; y < k; ++y) {
                     int k1 = blockX * k * 16 | blockZ * k | y;
-                    BiomeGenBase biomegenbase = biomes[blockX + blockZ * 16];
+                    if (blocks[k1] == Blocks.stone) {
+                        BiomeGenBase biomegenbase = biomes[blockX + blockZ * 16];
 
-                    Block[] stoneBlocks = BiomeStoneGen.biomeStoneArray[biomegenbase.biomeID];
-                    if (stoneBlocks == null || stoneBlocks.length <= 0) continue;
+                        Block[] stoneBlocks = BiomeStoneGen.biomeStoneArray[biomegenbase.biomeID];
+                        if (stoneBlocks == null || stoneBlocks.length <= 0) continue;
 
-                    if (blocks[index] == Blocks.stone) {
-                        blocks[index] = stoneBlocks[rand.nextInt(stoneBlocks.length)];
+                        blocks[k1] = stoneBlocks[rand.nextInt(stoneBlocks.length)];
                     }
                 }
             }

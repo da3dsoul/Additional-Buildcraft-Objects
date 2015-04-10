@@ -21,8 +21,8 @@ import cofh.api.energy.IEnergyHandler;
 public class TileWaterwheel extends TileConstantPowerProvider {
 
 
-	private float							BIOME_OUTPUT			= 0.125f;
-	private float							DESIGN_OUTPUT			= 0.125f;
+	private double							BIOME_OUTPUT			= 0.125f;
+	private double							DESIGN_OUTPUT			= 0.125f;
 
 	public boolean							renderBackwards			= false;
 
@@ -40,7 +40,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
         radialSymmetryParts = 6;
 	}
 
-	public TileWaterwheel(float scalar) {
+	public TileWaterwheel(double scalar) {
 		this();
 		windmillScalar = scalar;
 	}
@@ -73,13 +73,13 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 	@Override
 	public void readData(ByteBuf stream) {
 		super.readData(stream);
-		renderBackwards = stream.readBoolean();
+        renderBackwards = stream.readBoolean();
 	}
 
 	@Override
 	public void writeData(ByteBuf stream) {
 		super.writeData(stream);
-		stream.writeBoolean(renderBackwards);
+        stream.writeBoolean(renderBackwards);
 	}
 
 
@@ -137,38 +137,64 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 		Block block;
 		int prevdir = 0;
 		int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        boolean flag = false;
 		if (l == 0) {
-			for (int x = -3; x <= 3; x++) {
-				block = worldObj.getBlock(xCoord + x, yCoord - 3, zCoord);
-				if (BlockUtils.getFluid(block) != null) {
-					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
-					block.velocityToAddToEntity(worldObj, xCoord + x, yCoord - 3, zCoord, null, vec);
+            block = worldObj.getBlock(xCoord - 3, yCoord, zCoord);
+            if (BlockUtils.getFluid(block) != null) {
+                Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                block.velocityToAddToEntity(worldObj, xCoord - 3, yCoord, zCoord, null, vec);
 
-					if (vec.xCoord != 0) {
-						if (vec.xCoord < 0 && (prevdir == 0 || prevdir < 0)) {
-							prevdir = -1;
-						} else if (vec.xCoord > 0 && (prevdir == 0 || prevdir > 0)) {
-							prevdir = 1;
-						}
-					}
-				}
-			}
+                if (vec.yCoord < 0) {
+                    prevdir += 1;
+                    flag = true;
+                }
+            }
+            if(!flag) {
+                for (int x = -3; x <= 3; x++) {
+                    block = worldObj.getBlock(xCoord + x, yCoord - 3, zCoord);
+                    if (BlockUtils.getFluid(block) != null) {
+                        Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                        block.velocityToAddToEntity(worldObj, xCoord + x, yCoord - 3, zCoord, null, vec);
+
+                        if (vec.xCoord != 0) {
+                            if (vec.xCoord < 0) {
+                                prevdir += -1;
+                            } else if (vec.xCoord > 0) {
+                                prevdir += 1;
+                            }
+                        }
+                    }
+                }
+            }
 		} else if (l == 1) {
-			for (int x = -3; x <= 3; x++) {
-				block = worldObj.getBlock(xCoord, yCoord - 3, zCoord + x);
-				if (BlockUtils.getFluid(block) != null) {
-					Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
-					block.velocityToAddToEntity(worldObj, xCoord, yCoord - 3, zCoord + x, null, vec);
+            block = worldObj.getBlock(xCoord, yCoord, zCoord - 3);
+            if (BlockUtils.getFluid(block) != null) {
+                Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                block.velocityToAddToEntity(worldObj, xCoord, yCoord, zCoord - 3, null, vec);
 
-					if (vec.zCoord != 0) {
-						if (vec.zCoord < 0 && (prevdir == 0 || prevdir < 0)) {
-							prevdir = -1;
-						} else if (vec.zCoord > 0 && (prevdir == 0 || prevdir > 0)) {
-							prevdir = 1;
-						}
-					}
-				}
-			}
+                if (vec.yCoord < 0) {
+                    prevdir += 1;
+                    flag = true;
+                }
+
+            }
+            if(!flag) {
+                for (int x = -3; x <= 3; x++) {
+                    block = worldObj.getBlock(xCoord, yCoord - 3, zCoord + x);
+                    if (BlockUtils.getFluid(block) != null) {
+                        Vec3 vec = Vec3.createVectorHelper(0, 0, 0);
+                        block.velocityToAddToEntity(worldObj, xCoord, yCoord - 3, zCoord + x, null, vec);
+
+                        if (vec.zCoord != 0) {
+                            if (vec.zCoord < 0) {
+                                prevdir += -1;
+                            } else if (vec.zCoord > 0) {
+                                prevdir += 1;
+                            }
+                        }
+                    }
+                }
+            }
 		}
 
 		if (prevdir > 0) {
@@ -179,13 +205,14 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 	}
 
 	private boolean isFlowInProperDirection(int rX, int rY, int rZ, int meta, Vec3 vec) {
-		if (rY != -3 && vec.yCoord < 0) return true;
 		if (meta == 0) {
+            if(Math.abs(rX) == 3 && vec.yCoord < 0) return true;
 			if (rY == -3) {
 				if (vec.xCoord != 0) return true;
 			}
 
 		} else if (meta == 1) {
+            if(Math.abs(rZ) == 3 && vec.yCoord < 0) return true;
 			if (rY == -3) {
 				if (vec.zCoord != 0) return true;
 			}

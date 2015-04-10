@@ -43,7 +43,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
                         AxisAlignedBB.getBoundingBox(0, 2, -1, 1, 3, 2) } };
 	}
 
-	public BlockWaterwheel(float s) {
+	public BlockWaterwheel(double s) {
 		this();
 		scalar = s;
 	}

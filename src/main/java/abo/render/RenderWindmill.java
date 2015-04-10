@@ -72,7 +72,7 @@ public class RenderWindmill extends TileEntitySpecialRenderer implements IInvent
 		}
 	}
 
-	private void render(float progress, double x, double y, double z, ResourceLocation TrunkTexture, int xCoord,
+	private void render(double progress, double x, double y, double z, ResourceLocation TrunkTexture, int xCoord,
 			int yCoord, int zCoord) {
 
 		if (BuildCraftCore.render == RenderMode.NoDynamic) { return; }

@@ -32,6 +32,8 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 
 		TileWaterwheel tile = (TileWaterwheel) tileentity;
 
+        boolean overlay = false;
+
 		GL11.glPushMatrix();
 		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
 		GL11.glEnable(GL11.GL_LIGHTING);
@@ -46,32 +48,34 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 		int l = tile.getWorldObj().getBlockMetadata(xCoord, yCoord, zCoord);
 
 		if (l == 0) {
-			GL11.glColor3f(1, 1, 1);
 			if(!tile.renderBackwards)
 			{
+                if(overlay) GL11.glColor3f(1, 0, 0);
 				GL11.glTranslated(x + 0.5D, y + 0.5D, z + 1.0D);
 				GL11.glRotatef(-90, 1.0F, 0.0F, 0.0F);
 			}else {
+                if(overlay) GL11.glColor3f(1, 1, 0);
 				GL11.glTranslated(x + 0.5D, y + 0.5D, z);
 				GL11.glRotatef(90, 1.0F, 0.0F, 0.0F);
 			}
 		} else if (l == 1) {
-			GL11.glColor3f(1, 1, 1);
 			if(!tile.renderBackwards)
 			{
+                if(overlay) GL11.glColor3f(0, 1, 0);
 				GL11.glTranslated(x, y + 0.5D, z + 0.5D);
 				GL11.glRotatef(-90, 0.0F, 0.0F, 1.0F);
 			}else {
+                if(overlay) GL11.glColor3f(0, 1, 1);
 				GL11.glTranslated(x + 1.0D, y + 0.5D, z + 0.5D);
 				GL11.glRotatef(90, 0.0F, 0.0F, 1.0F);
 			}
 		}
 
-		float progress = tile.animProgress;
+		double progress = tile.animProgress;
 
-		float rotateAngleZ = 0;
-		float rotateAngleY = 0;
-		float rotateAngleX = 0;
+		double rotateAngleZ = 0;
+		double rotateAngleY = 0;
+		double rotateAngleX = 0;
 
 		boolean inDist = true;
 		try {
@@ -86,25 +90,23 @@ public class RenderWaterwheel extends TileEntitySpecialRenderer {
 			e.printStackTrace();
 		}
 
-		// fix this
-
 		if (ABO.windmillAnimations && inDist) {
-			float step = progress * 360;
+			double step = progress * 360;
 			rotateAngleY = step;
 		}
 
 		GL11.glPushMatrix();
 
 		if (rotateAngleZ != 0.0F) {
-			GL11.glRotatef(rotateAngleZ, 0.0F, 0.0F, 1.0F);
+			GL11.glRotatef((float) rotateAngleZ, 0.0F, 0.0F, 1.0F);
 		}
 
 		if (rotateAngleY != 0.0F) {
-			GL11.glRotatef(rotateAngleY, 0.0F, 1.0F, 0.0F);
+			GL11.glRotatef((float) rotateAngleY, 0.0F, 1.0F, 0.0F);
 		}
 
 		if (rotateAngleX != 0.0F) {
-			GL11.glRotatef(rotateAngleX, 1.0F, 0.0F, 0.0F);
+			GL11.glRotatef((float) rotateAngleX, 1.0F, 0.0F, 0.0F);
 		}
 
 		bindTexture(texture);

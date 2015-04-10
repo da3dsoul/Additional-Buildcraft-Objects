@@ -36,7 +36,7 @@ public class BlockWindmill extends BlockConstantPowerProvider {
                 AxisAlignedBB.getBoundingBox(0.625, 0.25, 0.0625, 0.75, 1.125, 0.9375) }};
 	}
 	
-	public BlockWindmill(float s)
+	public BlockWindmill(double s)
 	{
 		this();
 		scalar = s;

@@ -233,8 +233,8 @@ public class ABO {
 
         aboConfiguration = new Configuration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
 
-        float windmillScalar = 1;
-        float waterwheelScalar = 1;
+        double windmillScalar = 1;
+        double waterwheelScalar = 1;
 
         try {
             aboConfiguration.load();
@@ -249,8 +249,8 @@ public class ABO {
             orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
             orbSize = aboConfiguration.get("LiquidXP", "ExperieneOrbSize", orbSize).getInt();
 
-            windmillScalar = (float) aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
-            waterwheelScalar = (float) aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
+            windmillScalar = aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
+            waterwheelScalar = aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
 
             valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
                     .getBoolean(true);

@@ -16,8 +16,8 @@ import buildcraft.transport.TileGenericPipe;
 
 public class TileWindmill extends TileConstantPowerProvider {
 
-	private float							BIOME_OUTPUT			= 0.175f;
-	private float							HEIGHT_OUTPUT			= 0f;
+	private double							BIOME_OUTPUT			= 0.175f;
+	private double							HEIGHT_OUTPUT			= 0f;
 
 	public static final ResourceLocation	TRUNK_BLUE_TEXTURE		= new ResourceLocation(
 																			"additional-buildcraft-objects:textures/blocks/trunk_blue.png");
@@ -33,7 +33,7 @@ public class TileWindmill extends TileConstantPowerProvider {
         radialSymmetryParts = 4;
 	}
 
-	public TileWindmill(float scalar) {
+	public TileWindmill(double scalar) {
 		this();
 		windmillScalar = scalar;
 	}
@@ -88,7 +88,7 @@ public class TileWindmill extends TileConstantPowerProvider {
 			HEIGHT_OUTPUT = (float) MathUtils.clamp((yCoord - 58) / 66f, 0f, 1.2f);
 		} else {
 			BIOME_OUTPUT = (float) MathUtils.clamp(1.2f - biome.heightVariation, 0f, 1.2f);
-			float distFrom64Mod = (float) (0.2f * (-0.00077160494 * yCoord * yCoord + 0.10185 * yCoord - 2.36111111));
+			float distFrom64Mod = (float) (0.2f * (-7.7160494E-4 * yCoord * yCoord + 0.10185 * yCoord - 2.36111111));
 			HEIGHT_OUTPUT = (float) MathUtils.clamp(distFrom64Mod, 0f, 0.2f);
 		}
 		updateTargetOutput();
