@@ -16,14 +16,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class TileConstantPowerProvider extends TileEngine {
 
-
-    static final double						MAX_OUTPUT				= 1.5f;
-    static final double						MIN_OUTPUT				= MAX_OUTPUT / 3;
     public double							TARGET_OUTPUT			= 0.1f;
 
     public double							realCurrentOutput		= 0;
-
-    public static double						windmillScalar;
 
     private int								burnTime				= 0;
     private int								totalBurnTime			= 0;
@@ -35,11 +30,6 @@ public abstract class TileConstantPowerProvider extends TileEngine {
 
     public TileConstantPowerProvider() {
         super();
-    }
-
-    public TileConstantPowerProvider(double scalar) {
-        this();
-        windmillScalar = scalar;
     }
 
     @Override
@@ -133,7 +123,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
         if (tile instanceof IEnergyHandler) {
             IEnergyHandler handler = (IEnergyHandler) tile;
             int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), in(this.currentOutput / 1000), true);
-            return in(maxEnergy * windmillScalar);
+            return in(maxEnergy * ((BlockConstantPowerProvider)this.getBlockType()).scalar);
         } else {
             return 0;
         }
@@ -250,7 +240,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
             worldObj.getBlock(xCoord,yCoord,zCoord).onNeighborBlockChange(worldObj,xCoord,yCoord,zCoord, worldObj.getBlock(xCoord,yCoord,zCoord));
         }
 
-        if (burnTime == 0 && isRedstonePowered) {
+        if (burnTime <= 0 && isRedstonePowered) {
             burnTime = totalBurnTime = 1200;
         } else {
             if (tickCount >= 1199) {

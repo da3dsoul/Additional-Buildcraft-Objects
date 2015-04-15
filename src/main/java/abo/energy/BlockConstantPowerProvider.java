@@ -27,7 +27,7 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
 
     protected AxisAlignedBB[][]	boxes = {{AxisAlignedBB.getBoundingBox(0,0,0,1,1,1)}};
 
-    protected double scalar = 1;
+    public double scalar = 1;
 
     protected static IIcon					texture;
 

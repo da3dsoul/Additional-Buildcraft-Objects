@@ -54,7 +54,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 
 	@Override
 	public TileEntity createTileEntity(World world, int metadata) {
-		return new TileWaterwheel(scalar);
+		return new TileWaterwheel();
 	}
 
 	protected boolean checkBBClear(World world, int i, int j, int k, int l) {

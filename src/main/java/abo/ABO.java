@@ -227,7 +227,7 @@ public class ABO {
 
     @SuppressWarnings("deprecation")
     @EventHandler
-    public void preInitialize(FMLPreInitializationEvent evt) {
+    public void preinit(FMLPreInitializationEvent evt) {
 
         aboLog.info("Starting Additional-Buildcraft-Objects " + "MC" + MINECRAFT_VERSION + "-BC" + BUILDCRAFT_VERSION + VERSION);
 
@@ -249,8 +249,8 @@ public class ABO {
             orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
             orbSize = aboConfiguration.get("LiquidXP", "ExperieneOrbSize", orbSize).getInt();
 
-            windmillScalar = aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble(1.0);
-            waterwheelScalar = aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble(1.0);
+            windmillScalar = aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble();
+            waterwheelScalar = aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble();
 
             valveConnectsStraight = aboConfiguration.get("Misc", "ValvePipeOnlyConnectsStraight", true)
                     .getBoolean(true);
@@ -392,7 +392,7 @@ public class ABO {
     }
 
     @SubscribeEvent
-    public void generate(PopulateChunkEvent.Pre event) {
+    public void populate(PopulateChunkEvent.Pre event) {
         if (ABO.blockLiquidXP == null) return;
         if(!spawnLakes) return;
         if(!respawnLakes) return;
@@ -408,7 +408,7 @@ public class ABO {
     }
 
     @SubscribeEvent
-    public void generate(DecorateBiomeEvent.Decorate event) {
+    public void decorate(DecorateBiomeEvent.Decorate event) {
         if (ABO.blockLiquidXP == null) return;
         if(!spawnLakes) return;
         if(respawnLakes) return;
@@ -493,7 +493,7 @@ public class ABO {
     }
 
     @EventHandler
-    public void load(FMLInitializationEvent evt) {
+    public void init(FMLInitializationEvent evt) {
 
         loadRecipes();
 

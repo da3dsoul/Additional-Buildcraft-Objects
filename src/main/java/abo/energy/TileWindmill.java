@@ -33,11 +33,6 @@ public class TileWindmill extends TileConstantPowerProvider {
         radialSymmetryParts = 4;
 	}
 
-	public TileWindmill(double scalar) {
-		this();
-		windmillScalar = scalar;
-	}
-
 	@Override
 	public ResourceLocation getBaseTexture() {
 		return BASE_TEXTURES[0];
@@ -66,7 +61,7 @@ public class TileWindmill extends TileConstantPowerProvider {
 	protected void updateTargetOutput() {
 		if (isRedstonePowered) {
 			TARGET_OUTPUT = (float) (0.175f + MathUtils.clamp(BIOME_OUTPUT + HEIGHT_OUTPUT, 0.0f, 1.2f) + (getWorldObj().rainingStrength / 8f))
-					* 10000 * windmillScalar;
+					* 10000 * ABO.windmillBlock.scalar;
 		} else {
 			TARGET_OUTPUT = 0;
 		}
@@ -92,16 +87,22 @@ public class TileWindmill extends TileConstantPowerProvider {
 			HEIGHT_OUTPUT = (float) MathUtils.clamp(distFrom64Mod, 0f, 0.2f);
 		}
 		updateTargetOutput();
-	}
+        ABO.aboLog.info("Windmill at " + xCoord + ", " + yCoord + ", " + zCoord);
+        ABO.aboLog.info("Windmill Energy Scalar: " + ABO.windmillBlock.scalar);
+        ABO.aboLog.info("In Biome: " + biome.biomeName);
+        ABO.aboLog.info("Biome Output: " + BIOME_OUTPUT);
+        ABO.aboLog.info("Height Output: " + HEIGHT_OUTPUT);
+        ABO.aboLog.info("Target Output: " + TARGET_OUTPUT);
+    }
 
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;
-		if (energyLevel < 3750f * windmillScalar) {
+		if (energyLevel < 3750f * ABO.windmillBlock.scalar) {
 			return EnergyStage.BLUE;
-		} else if (energyLevel < 7500f * windmillScalar) {
+		} else if (energyLevel < 7500f * ABO.windmillBlock.scalar) {
 			return EnergyStage.GREEN;
-		} else if (energyLevel < 13740f * windmillScalar) {
+		} else if (energyLevel < 13740f * ABO.windmillBlock.scalar) {
 			return EnergyStage.YELLOW;
 		} else {
 			return EnergyStage.RED;

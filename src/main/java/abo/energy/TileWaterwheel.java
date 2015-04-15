@@ -40,11 +40,6 @@ public class TileWaterwheel extends TileConstantPowerProvider {
         radialSymmetryParts = 6;
 	}
 
-	public TileWaterwheel(double scalar) {
-		this();
-		windmillScalar = scalar;
-	}
-
 	@Override
 	public ResourceLocation getBaseTexture() {
 		return BASE_TEXTURES[0];
@@ -89,7 +84,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 			float x = getLiquidDensity();
 			DESIGN_OUTPUT = MathHelper.clamp_float((float) (-2.021 * x * x + 2.021 * x), 0, 0.5f);
 			TARGET_OUTPUT = (float) (0.125f + BIOME_OUTPUT + DESIGN_OUTPUT + (getWorldObj().rainingStrength / 8f))
-					* 10000 * windmillScalar;
+					* 10000 * ABO.waterwheelBlock.scalar;
 		} else {
 			TARGET_OUTPUT = 0;
 		}
@@ -116,11 +111,11 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 	@Override
 	protected EnergyStage computeEnergyStage() {
 		double energyLevel = currentOutput;
-		if (energyLevel < 3500f * windmillScalar) {
+		if (energyLevel < 3500f * ABO.waterwheelBlock.scalar) {
 			return EnergyStage.BLUE;
-		} else if (energyLevel < 5000f * windmillScalar) {
+		} else if (energyLevel < 5000f * ABO.waterwheelBlock.scalar) {
 			return EnergyStage.GREEN;
-		} else if (energyLevel < 7450f * windmillScalar) {
+		} else if (energyLevel < 7450f * ABO.waterwheelBlock.scalar) {
 			return EnergyStage.YELLOW;
 		} else {
 			return EnergyStage.RED;

@@ -44,7 +44,7 @@ public class BlockWindmill extends BlockConstantPowerProvider {
 
 	@Override
 	public TileEntity createTileEntity(World world, int metadata) {
-		return new TileWindmill(scalar);
+		return new TileWindmill();
 	}
 
 	@Override
