@@ -89,8 +89,8 @@ public abstract class TileConstantPowerProvider extends TileEngine {
     @Override
     public int calculateCurrentOutput() {
         updateTargetOutput();
-        realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200;
-        return (int) Math.round(realCurrentOutput);
+        realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200D;
+        return in(realCurrentOutput);
     }
 
 
@@ -122,8 +122,8 @@ public abstract class TileConstantPowerProvider extends TileEngine {
 
         if (tile instanceof IEnergyHandler) {
             IEnergyHandler handler = (IEnergyHandler) tile;
-            int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), in(this.currentOutput / 1000), true);
-            return in(maxEnergy * ((BlockConstantPowerProvider)this.getBlockType()).scalar);
+            int maxEnergy = handler.receiveEnergy(orientation.getOpposite(), in(this.currentOutput / 1000D * ((BlockConstantPowerProvider)this.getBlockType()).scalar), true);
+            return in(maxEnergy);
         } else {
             return 0;
         }
@@ -141,7 +141,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
             if (tile instanceof IEnergyHandler) {
                 IEnergyHandler handler = (IEnergyHandler) tile;
                 if (extracted > 0) {
-                    int neededRF = handler.receiveEnergy(orientation.getOpposite(),	extracted, false);
+                    int neededRF = handler.receiveEnergy(orientation.getOpposite(), extracted, false);
                 }
             }
         }
@@ -254,7 +254,7 @@ public abstract class TileConstantPowerProvider extends TileEngine {
     }
 
     public int getScaledBurnTime(int i) {
-        return (int) (((float) burnTime / (float) totalBurnTime) * i);
+        return (int) ((burnTime / totalBurnTime) * i);
     }
 
     // RF
