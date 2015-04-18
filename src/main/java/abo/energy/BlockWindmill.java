@@ -106,13 +106,13 @@ public class BlockWindmill extends BlockConstantPowerProvider {
 		
 		if(world.getBlock(i, j + 1, k).getMaterial() == Material.air)
 		{
-			world.setBlock(i, j + 1, k, ABO.blockNull);
+			world.setBlock(i, j + 1, k, ABO.blockNull,0,2);
 		}
 	}
 
 	@Override
 	public void onBlockPreDestroy(World world, int i, int j, int k, int oldMeta) {
-		if(world.getBlock(i, j + 1, k) == ABO.blockNull) world.setBlock(i, j + 1, k, Blocks.air);
+		if(world.getBlock(i, j + 1, k) == ABO.blockNull) world.setBlock(i, j + 1, k, Blocks.air,0,2);
 	}
 
 }

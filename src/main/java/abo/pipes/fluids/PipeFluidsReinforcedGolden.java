@@ -10,13 +10,16 @@ import abo.pipes.ABOPipe;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.BuildCraftTransport;
 import buildcraft.transport.PipeTransportFluids;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 
-public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluids> {
+public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluidsReinforced> {
 
 	public PipeFluidsReinforcedGolden(Item item) {
-	        super(new PipeTransportFluids(), item);
+	        super(new PipeTransportFluidsReinforced(), item);
 
-		transport.flowRate = 16 * BuildCraftTransport.pipeFluidsBaseFlowRate;
+		PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+
+		transport.flowRate = 2 * FluidContainerRegistry.BUCKET_VOLUME;
 		transport.travelDelay = 2;
 	}
 	

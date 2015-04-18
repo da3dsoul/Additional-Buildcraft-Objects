@@ -107,7 +107,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 					if (x == 2 && y == 2) continue;
 					if (x == 0 && y == 0) continue;
 					if (world.getBlock(i + x, j + y, k) != ABO.blockNullCollide)
-						world.setBlock(i + x, j + y, k, ABO.blockNullCollide);
+						world.setBlock(i + x, j + y, k, ABO.blockNullCollide,0,2);
 				}
 			}
 		} else if (l == 1) {
@@ -119,7 +119,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 					if (x == 2 && y == 2) continue;
 					if (x == 0 && y == 0) continue;
 					if (world.getBlock(i, j + y, k + x) != ABO.blockNullCollide)
-						world.setBlock(i, j + y, k + x, ABO.blockNullCollide);
+						world.setBlock(i, j + y, k + x, ABO.blockNullCollide,0,2);
 				}
 			}
 		}
@@ -137,7 +137,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 					if (x == 2 && y == 2) continue;
 					if (x == 0 && y == 0) continue;
 					if (world.getBlock(i + x, j + y, k) == ABO.blockNullCollide)
-						world.setBlock(i + x, j + y, k, Blocks.air);
+						world.setBlock(i + x, j + y, k, Blocks.air,0,2);
 				}
 			}
 		} else if (l == 1) {
@@ -149,7 +149,7 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 					if (x == 2 && y == 2) continue;
 					if (x == 0 && y == 0) continue;
 					if (world.getBlock(i, j + y, k + x) == ABO.blockNullCollide)
-						world.setBlock(i, j + y, k + x, Blocks.air);
+						world.setBlock(i, j + y, k + x, Blocks.air,0,2);
 				}
 			}
 		}

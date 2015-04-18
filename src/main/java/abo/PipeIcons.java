@@ -11,6 +11,8 @@ public enum PipeIcons {
 
 	PipeLiquidsBalance,
 
+	PipeLiquidsDrain,
+
 	PipeLiquidsGoldenIron, PipeLiquidsGoldenIronSide,
 
 	PipeLiquidsValveClosed, PipeLiquidsValveClosedSide, PipeLiquidsValveOpen, PipeLiquidsValveOpenSide,

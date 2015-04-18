@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -20,7 +21,6 @@ import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
-import abo.pipes.PipeLogicValve;
 import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.core.Position;
@@ -34,7 +34,7 @@ import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.gates.StatementSlot;
 
-public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile, ISerializable {
+public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> implements ISolidSideTile, ISerializable {
 
 	private boolean			powered;
 	private boolean			switched;
@@ -56,9 +56,11 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISo
 	private PipeLogicValve	logic				= new PipeLogicValve(this);
 
 	public PipeFluidsValve(Item itemID) {
-		super(new PipeTransportFluids(), itemID);
+		super(new PipeTransportFluidsReinforced(), itemID);
 
-		transport.flowRate = 16 * BuildCraftTransport.pipeFluidsBaseFlowRate;
+		PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+
+		transport.flowRate = 2 * FluidContainerRegistry.BUCKET_VOLUME;
 		transport.travelDelay = 2;
 
 		onlyStraight = ABO.valveConnectsStraight;

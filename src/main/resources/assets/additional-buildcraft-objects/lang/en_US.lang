@@ -5,6 +5,7 @@ item.PipeFluidsGoldenIron.name=Golden Iron Fluid Pipe
 item.PipeFluidsReinforcedGoldenIron.name=Reinforced Golden Iron Fluid Pipe
 item.PipeFluidsReinforcedGolden.name=Reinforced Golden Fluid Pipe
 item.PipeFluidsBalance.name=Balancing Fluid Pipe
+item.PipeFluidsDrain.name=Drain Pipe
 item.PipeFluidsInsertion.name=Insertion Fluid Pipe
 item.PipeItemsRoundRobin.name=Round-Robin Transport Pipe
 item.PipeItemsInsertion.name=Insertion Pipe

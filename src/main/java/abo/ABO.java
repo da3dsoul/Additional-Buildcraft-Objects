@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import abo.pipes.fluids.*;
 import abo.pipes.items.*;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
@@ -70,12 +71,6 @@ import abo.energy.BlockWaterwheel;
 import abo.energy.BlockWindmill;
 import abo.energy.ItemWaterwheel;
 import abo.gui.ABOGuiHandler;
-import abo.pipes.fluids.PipeFluidsBalance;
-import abo.pipes.fluids.PipeFluidsInsertion;
-import abo.pipes.fluids.PipeFluidsGoldenIron;
-import abo.pipes.fluids.PipeFluidsReinforcedGolden;
-import abo.pipes.fluids.PipeFluidsReinforcedGoldenIron;
-import abo.pipes.fluids.PipeFluidsValve;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
@@ -129,6 +124,7 @@ public class ABO {
     public static Item pipeFluidsReinforcedGoldenIron = null;
     public static Item pipeFluidsInsertion = null;
     public static Item pipeFluidsBalance = null;
+    public static Item pipeFluidsDrain = null;
     public static Item pipeItemsRoundRobin = null;
     public static Item pipeItemsBounce = null;
     public static Item pipeItemsDivide = null;
@@ -270,6 +266,9 @@ public class ABO {
 
             pipeFluidsValve = buildPipe(PipeFluidsValve.class, 1, BuildCraftTransport.pipeFluidsWood,
                     BuildCraftTransport.pipeGate);
+
+            pipeFluidsDrain = buildPipe(PipeFluidsDrain.class, 1, BuildCraftTransport.pipeFluidsWood,
+                    Items.iron_ingot);
 
             pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1, BuildCraftTransport.pipeFluidsGold,
                     BuildCraftTransport.pipeFluidsIron);

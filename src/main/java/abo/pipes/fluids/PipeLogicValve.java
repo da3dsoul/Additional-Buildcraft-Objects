@@ -1,4 +1,4 @@
-package abo.pipes;
+package abo.pipes.fluids;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

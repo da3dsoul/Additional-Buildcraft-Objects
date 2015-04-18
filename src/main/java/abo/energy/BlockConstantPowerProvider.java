@@ -143,8 +143,8 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         int l = world.getBlockMetadata(x, y, z);
         if (!checkBBClear(world, x, y, z, l)) {
-            world.func_147480_a(x,y,z,false);
-            if(!world.isRemote) dropBlockAsItem(world,x,y,z, l, 0);
+            world.func_147480_a(x,y,z,true);
+
             return;
         }
         try {

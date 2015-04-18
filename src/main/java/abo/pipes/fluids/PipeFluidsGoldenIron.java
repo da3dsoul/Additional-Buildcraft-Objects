@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.IFluidHandler;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
@@ -21,30 +22,32 @@ import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
 import buildcraft.transport.statements.ActionPipeDirection;
 
-public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
+public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluidsReinforced> {
 
 	private final int			standardIconIndex	= PipeIcons.PipeLiquidsGoldenIron.ordinal();
 	private final int			solidIconIndex		= PipeIcons.PipeLiquidsGoldenIronSide.ordinal();
 
 	private final PipeLogicIron	logic				= new PipeLogicIron(this) {
-														@Override
-														protected boolean isValidConnectingTile(TileEntity tile) {
-															if (tile instanceof TileGenericPipe) {
-																Pipe otherPipe = ((TileGenericPipe) tile).pipe;
-																if (otherPipe instanceof PipeFluidsWood
-																		|| otherPipe instanceof PipeStructureCobblestone)
-																	return false;
-																if (otherPipe.transport instanceof PipeTransportFluids)
-																	return true;
-																return false;
-															}
-															if (tile instanceof IFluidHandler) return true;
-															return false;
-														}
-													};
+		@Override
+		protected boolean isValidConnectingTile(TileEntity tile) {
+			if (tile instanceof TileGenericPipe) {
+				Pipe otherPipe = ((TileGenericPipe) tile).pipe;
+				if (otherPipe instanceof PipeFluidsWood
+						|| otherPipe instanceof PipeStructureCobblestone)
+					return false;
+				if (otherPipe.transport instanceof PipeTransportFluids)
+					return true;
+				return false;
+			}
+			if (tile instanceof IFluidHandler) return true;
+			return false;
+		}
+	};
 
 	public PipeFluidsGoldenIron(Item itemID) {
-		super(new PipeTransportFluids(), itemID);
+		super(new PipeTransportFluidsReinforced(), itemID);
+
+		PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
 
 		transport.flowRate = 8 * BuildCraftTransport.pipeFluidsBaseFlowRate;
 		transport.travelDelay = 2;
