@@ -54,6 +54,7 @@ public class ItemBottle extends ItemGlassBottle {
 			item = stack.splitStack(1);
 			if (player instanceof EntityPlayer) {
 				item = capture(item, player, entity);
+				if(item == null) return false;
 				if (!((EntityPlayer) player).inventory.addItemStackToInventory(item)) {
 					((EntityPlayer) player).dropPlayerItemWithRandomChoice(item, false);
 				}
@@ -196,6 +197,7 @@ public class ItemBottle extends ItemGlassBottle {
 					}
 
 					ent.setLocationAndAngles(i + 0.5, j + 0.5, k + 0.5, ent.rotationYaw, ent.rotationPitch);
+					ent.timeUntilPortal = ent.getMaxInPortalTime();
 
 					if (!world.isRemote) world.spawnEntityInWorld(ent);
 

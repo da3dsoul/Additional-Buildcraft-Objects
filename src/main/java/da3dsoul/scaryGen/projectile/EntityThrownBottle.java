@@ -4,6 +4,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import da3dsoul.scaryGen.items.ItemBottle;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,6 +19,11 @@ public class EntityThrownBottle extends EntityPotion {
 		this.itemstack = itemstack;
 	}
 
+	public EntityThrownBottle(World p_i1792_1_, double p_i1792_2_, double p_i1792_4_, double p_i1792_6_, ItemStack p_i1792_8_) {
+		super(p_i1792_1_, p_i1792_2_, p_i1792_4_, p_i1792_6_, p_i1792_8_);
+		itemstack = p_i1792_8_;
+	}
+
 	public EntityThrownBottle(World par1World, EntityLivingBase par2EntityLivingBase, ItemStack itemstack) {
 		super(par1World, par2EntityLivingBase, 0);
 		this.itemstack = itemstack;
@@ -27,6 +33,11 @@ public class EntityThrownBottle extends EntityPotion {
 	 * Called when this EntityThrowable hits a block or entity.
 	 */
 	protected void onImpact(MovingObjectPosition par1MovingObjectPosition) {
+		if(par1MovingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+			if(worldObj.getBlock(par1MovingObjectPosition.blockX, par1MovingObjectPosition.blockY, par1MovingObjectPosition.blockZ) == Blocks.portal) {
+				return;
+			}
+		}
 		if (par1MovingObjectPosition.entityHit != null) {
 
 			if (!(par1MovingObjectPosition.entityHit instanceof EntityPlayer)) {
@@ -44,6 +55,14 @@ public class EntityThrownBottle extends EntityPotion {
 			ItemBottle.tryPlace(itemstack, worldObj, i, j, k, l);
 		}
 		drop();
+	}
+
+	/**
+	 * Called to update the entity's position/logic.
+	 */
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
 	}
 
 	private void drop() {

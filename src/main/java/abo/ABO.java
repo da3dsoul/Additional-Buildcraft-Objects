@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import abo.pipes.items.*;
+import buildcraft.api.transport.PipeManager;
+import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
@@ -17,9 +19,18 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
+import da3dsoul.scaryGen.projectile.EntityThrownBottle;
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.material.Material;
+import net.minecraft.dispenser.*;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityEgg;
+import net.minecraft.entity.projectile.EntityPotion;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
@@ -102,7 +113,7 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release2.7.1";
+    public static final String VERSION = "release2.7.2";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
@@ -358,6 +369,31 @@ public class ABO {
                     new Object[]{" B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'),
                             Blocks.planks});
             GameRegistry.registerItem(bottle, "MobBottle");
+
+            PipeManager.registerStripesHandler(new StripesHandlerRightClick() {
+                @Override
+                public boolean shouldHandle(ItemStack stack) {
+                    return stack.getItem() == ABO.bottle;
+                }
+            });
+            BlockDispenser.dispenseBehaviorRegistry.putObject(ABO.bottle, new BehaviorProjectileDispense() {
+
+                @Override
+                public ItemStack dispenseStack(IBlockSource p_82487_1_, ItemStack p_82487_2_) {
+                    World world = p_82487_1_.getWorld();
+                    IPosition iposition = BlockDispenser.func_149939_a(p_82487_1_);
+                    EnumFacing enumfacing = BlockDispenser.func_149937_b(p_82487_1_.getBlockMetadata());
+                    IProjectile iprojectile = new EntityThrownBottle(world, iposition.getX(),iposition.getY(),iposition.getZ(), p_82487_2_.splitStack(1));
+                    iprojectile.setThrowableHeading((double) enumfacing.getFrontOffsetX(), (double) ((float) enumfacing.getFrontOffsetY() + 0.1F), (double) enumfacing.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
+                    world.spawnEntityInWorld((Entity)iprojectile);
+                    return p_82487_2_;
+                }
+
+                @Override
+                protected IProjectile getProjectileEntity(World p_82499_1_, IPosition p_82499_2_) {
+                    return null;
+                }
+            });
 
             goldenstaff = new ItemGoldenStaff();
 

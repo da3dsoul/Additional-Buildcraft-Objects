@@ -87,12 +87,12 @@ public class TileWindmill extends TileConstantPowerProvider {
 			HEIGHT_OUTPUT = (float) MathUtils.clamp(distFrom64Mod, 0f, 0.2f);
 		}
 		updateTargetOutput();
-        ABO.aboLog.info("Windmill at " + xCoord + ", " + yCoord + ", " + zCoord);
-        ABO.aboLog.info("Windmill Energy Scalar: " + ABO.windmillBlock.scalar);
-        ABO.aboLog.info("In Biome: " + biome.biomeName);
-        ABO.aboLog.info("Biome Output: " + BIOME_OUTPUT);
-        ABO.aboLog.info("Height Output: " + HEIGHT_OUTPUT);
-        ABO.aboLog.info("Target Output: " + TARGET_OUTPUT);
+        //ABO.aboLog.info("Windmill at " + xCoord + ", " + yCoord + ", " + zCoord);
+        //ABO.aboLog.info("Windmill Energy Scalar: " + ABO.windmillBlock.scalar);
+        //ABO.aboLog.info("In Biome: " + biome.biomeName);
+        //ABO.aboLog.info("Biome Output: " + BIOME_OUTPUT);
+        //ABO.aboLog.info("Height Output: " + HEIGHT_OUTPUT);
+        //ABO.aboLog.info("Target Output: " + TARGET_OUTPUT);
     }
 
 	@Override
