@@ -2,25 +2,35 @@
 
 item.PipeFluidsValve.name=Вентильная труба
 item.PipeFluidsGoldenIron.name=Золотисто-железная жидкостная труба
-item.PipeFluidsReinforcedGoldenIron.name=Усиленная золотисто-железная жидкостная труба
-item.PipeFluidsReinforcedGolden.name=Усиленная золотая жидкостная труба
+item.PipeFluidsReinforcedGoldenIron.name=Укреплённая золотисто-железная жидкостная труба
+item.PipeFluidsReinforcedGolden.name=Укреплённая золотая жидкостная труба
 item.PipeFluidsBalance.name=Балансировочная жидкостная труба
+item.PipeFluidsDrain.name=Высасывающая труба
 item.PipeFluidsInsertion.name=Вводящая жидкостная труба
 item.PipeItemsRoundRobin.name=Циклическая транспортная труба
-item.PipeItemsInsertion.name=Вводящая труба Края
-item.PipeItemsBounce=Упругая труба
+item.PipeItemsInsertion.name=Вводящая труба
 item.PipeItemsDivide.name=Разделяющая транспортная труба
 item.PipeItemsExtraction.name=Извлекающая транспортная труба
 item.PipeItemsCrossover.name=Перекрёстная транспортная труба
 item.PipeItemsCompactor.name=Уплотняющая транспортная труба
-item.PipePowerSwitch.name=Переключающая энергетическая труба
+item.PipeItemsBounce=Упругая транспортная труба
+item.PipePowerSwitch.name=Переключаемая энергетическая труба
 item.PipePowerDirected.name=Диодная энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
 item.waterwheelItem.name=Водяное колесо
-item.MobBottleFull.name=Бутылка (Полная)
-item.MobBottleEmpty.name=Бутылка (Пустая)
-item.GoldenStaff.name=Жёлтая краска на палочке
+
+# da3dsoul, might eventually be moved
+
 tile.windmillBlock.name=Гидрогенератор
 tile.waterwheelBlock.name=Водяное колесо
 
+item.MobBottleFull.name=Бутылка для мобов (Полная)
+item.MobBottleEmpty.name=Бутылка для мобов
+item.MobBottleNoEntityName=У сущности нет имени. Сообщите разработчику модификации и он 'возможно' исправит это.
+item.GoldenStaff.name=Жёлтая краска на палочке
+
+tile.blockLiquidXP.name=Жидкий опыт
+
 generator.scaryGen=Жуткая генерация
+
+death.attack.experience=%1$s十分な経験を持っていない。たぶん、彼奴が学んでいる？
