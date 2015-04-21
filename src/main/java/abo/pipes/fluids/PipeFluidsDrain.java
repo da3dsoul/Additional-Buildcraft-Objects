@@ -128,11 +128,7 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
             int amt = ((IFluidHandler) tile).fill(ForgeDirection.UP, maxFromTank, true);
 
             if(amt > 0) {
-                ABO.aboLog.info("tile filled " + amt);
                 maxFromTank = this.tank.drain(amt, true);
-                if(maxFromTank.amount != amt) {
-                    ABO.aboLog.info("tank drained " + maxFromTank.amount);
-                }
             }
         }
     }
