@@ -2,14 +2,20 @@ package abo.pipes.fluids;
 
 import abo.ABO;
 import abo.PipeIcons;
+import abo.actions.ActionSwitchOnPipe;
+import abo.actions.ActionToggleOffPipe;
+import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftFactory;
 import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.BlockIndex;
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.core.Position;
 import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.power.IRedstoneEngineReceiver;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.IStatement;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
 import buildcraft.core.EntityBlock;
@@ -19,7 +25,10 @@ import buildcraft.core.fluids.SingleUseTank;
 import buildcraft.core.fluids.TankUtils;
 import buildcraft.core.utils.BlockUtils;
 import buildcraft.core.utils.Utils;
+import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.TileGenericPipe;
+import buildcraft.transport.gates.StatementSlot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -43,6 +52,10 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
     private int tick;
     private int numFluidBlocksFound;
 
+    private boolean			powered;
+    private boolean			switched;
+    private boolean			toggled;
+
     public PipeFluidsDrain(Item item) {
         super(new PipeTransportFluidsReinforced(),item);
 
@@ -64,27 +77,81 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
         return super.blockActivated(entityplayer);
     }
 
+    public boolean isPowered() {
+        return powered || switched || toggled;
+    }
+
+    public void updateRedstoneCurrent() {
+        boolean lastPowered = powered;
+
+
+        powered = false;
+
+        if (!powered)
+            powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
+                    container.zCoord);
+
+        if (lastPowered != powered) {
+            this.container.scheduleNeighborChange();
+            this.container.updateEntity();
+        }
+    }
+
+    @Override
+    protected void actionsActivated(Collection<StatementSlot> actions) {
+        boolean lastSwitched = switched;
+        boolean lastToggled = toggled;
+
+        super.actionsActivated(actions);
+
+        switched = false;
+        // Activate the actions
+        for (StatementSlot actionslot : actions) {
+            IStatement i = actionslot.statement;
+            if (i instanceof ActionSwitchOnPipe) {
+                switched = false;
+            } else if (i instanceof ActionToggleOnPipe) {
+                toggled = false;
+            } else if (i instanceof ActionToggleOffPipe) {
+                toggled = true;
+            }
+
+        }
+        if ((lastSwitched != switched) || (lastToggled != toggled)) {
+            if (lastSwitched != switched && !switched) toggled = false;
+
+            updateNeighbors(true);
+        }
+    }
+
+    @Override
+    public LinkedList<IActionInternal> getActions() {
+        LinkedList<IActionInternal> actions = super.getActions();
+        actions.add(ABO.actionSwitchOnPipe);
+        actions.add(ABO.actionToggleOnPipe);
+        actions.add(ABO.actionToggleOffPipe);
+        return actions;
+    }
+
+    @Override
+    public void onNeighborBlockChange(int blockId) {
+        super.onNeighborBlockChange(blockId);
+        updateRedstoneCurrent();
+    }
+
     @Override
     public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
         return side == ForgeDirection.DOWN && super.canPipeConnect(tile, side);
     }
 
-    /*@Override
-    public boolean inputOpen(ForgeDirection from) {
-        return from == ForgeDirection.UNKNOWN;
-    }
-
-    @Override
-    public boolean outputOpen(ForgeDirection to) {
-        return to == ForgeDirection.DOWN;
-    }*/
-
     @Override
     public void updateEntity() {
         super.updateEntity();
+        updateRedstoneCurrent();
 
         if(!this.container.getWorldObj().isRemote) {
             this.pushToConsumers();
+            if(isPowered()) return;
             ++this.tick;
             if(this.tick % 8 == 0) {
                 BlockIndex index = this.getNextIndexToPump(false);
@@ -245,12 +312,18 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
         super.writeToNBT(nbt);
         this.tank.writeToNBT(nbt);
 
+        nbt.setBoolean("powered", powered);
+        nbt.setBoolean("switched", switched);
+        nbt.setBoolean("toggled", toggled);
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         this.tank.readFromNBT(nbt);
 
+        powered = nbt.getBoolean("powered");
+        switched = nbt.getBoolean("switched");
+        toggled = nbt.getBoolean("toggled");
     }
 
     public void invalidate() {

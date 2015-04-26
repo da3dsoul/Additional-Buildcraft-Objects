@@ -7,6 +7,8 @@ public class PipeTransportFluidsReinforced extends PipeTransportFluids {
 
     public PipeTransportFluidsReinforced() {
         super();
+        this.INPUT_TTL = 2 * FluidContainerRegistry.BUCKET_VOLUME - 250;
+        this.OUTPUT_TTL = 2 * FluidContainerRegistry.BUCKET_VOLUME;
     }
 
     @Override

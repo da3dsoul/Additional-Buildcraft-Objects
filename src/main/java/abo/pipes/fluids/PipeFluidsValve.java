@@ -92,20 +92,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 		neighbours.add(this.container);
 
 		powered = false;
-		for (ForgeDirection o : ForgeDirection.VALID_DIRECTIONS) {
-			Position pos = new Position(container.xCoord, container.yCoord, container.zCoord, o);
-			pos.moveForwards(1.0);
-
-			TileEntity tile = container.getTile(o);
-
-			if (tile instanceof TileGenericPipe) {
-				TileGenericPipe pipe = (TileGenericPipe) tile;
-				if (BlockGenericPipe.isValid(pipe.pipe)) {
-					neighbours.add(pipe);
-					if (pipe.pipe.hasGate(o.getOpposite()) && pipe.pipe.gates[o.getOpposite().ordinal()].redstoneOutput > 0) powered = true;
-				}
-			}
-		}
 
 		if (!powered)
 			powered = container.getWorldObj().isBlockIndirectlyGettingPowered(container.xCoord, container.yCoord,
@@ -245,8 +231,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 		return actions;
 	}
 
-
-
 	@Override
 	protected void actionsActivated(Collection<StatementSlot> actions) {
 		boolean lastSwitched = switched;
@@ -290,12 +274,7 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 
 	@Override
 	public boolean isSolidOnSide(ForgeDirection side) {
-		if (getWorld()
-				.getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
-						container.zCoord + side.offsetZ).getMaterial().isReplaceable()
-						|| getWorld().getBlock(container.xCoord + side.offsetX, container.yCoord + side.offsetY,
-								container.zCoord + side.offsetZ).getMaterial() == Material.circuits) { return true; }
-		return false;
+		return true;
 	}
 
 	private void buildTankCache()
