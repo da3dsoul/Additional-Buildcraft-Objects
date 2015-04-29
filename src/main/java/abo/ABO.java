@@ -17,6 +17,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
@@ -29,6 +30,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.item.ItemPotion;
+import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -135,15 +137,20 @@ public class ABO {
     public static Item pipeItemsCrossover = null;
     public static Item pipePowerSwitch = null;
     public static Item pipePowerIron = null;
-    public static Item bottle = null;
-    public static Item goldenstaff = null;
+
     public static BlockWindmill windmillBlock;
     public static BlockWaterwheel waterwheelBlock;
     public static Block blockNull = null;
     public static Block blockNullCollide = null;
 
+    public static Block blockLargeButtonStone = null;
+    public static Block blockLargeButtonWood = null;
+    public static Item bottle = null;
+    public static Item goldenstaff = null;
+
     // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
+    public static Item bucket;
     public static boolean spawnLakes = true;
     public static boolean respawnLakes = false;
     public static boolean spawnOrbs = true;
@@ -168,7 +175,7 @@ public class ABO {
     public static boolean valveConnectsStraight;
     public static boolean valvePhysics;
     private static LinkedList<ABORecipe> aboRecipes = new LinkedList<ABORecipe>();
-    public static Item bucket;
+
     public IIconProvider itemIconProvider = new ItemIconProvider();
     public IIconProvider pipeIconProvider = new PipeIconProvider();
     private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
@@ -382,9 +389,9 @@ public class ABO {
                     World world = p_82487_1_.getWorld();
                     IPosition iposition = BlockDispenser.func_149939_a(p_82487_1_);
                     EnumFacing enumfacing = BlockDispenser.func_149937_b(p_82487_1_.getBlockMetadata());
-                    IProjectile iprojectile = new EntityThrownBottle(world, iposition.getX(),iposition.getY(),iposition.getZ(), p_82487_2_.splitStack(1));
+                    IProjectile iprojectile = new EntityThrownBottle(world, iposition.getX(), iposition.getY(), iposition.getZ(), p_82487_2_.splitStack(1));
                     iprojectile.setThrowableHeading((double) enumfacing.getFrontOffsetX(), (double) ((float) enumfacing.getFrontOffsetY() + 0.1F), (double) enumfacing.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
-                    world.spawnEntityInWorld((Entity)iprojectile);
+                    world.spawnEntityInWorld((Entity) iprojectile);
                     return p_82487_2_;
                 }
 
@@ -400,6 +407,17 @@ public class ABO {
                     new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
                             new ItemStack(Items.dye, 1, 11)});
             GameRegistry.registerItem(goldenstaff, "GoldenStaff");
+
+            blockLargeButtonWood = new BlockLargeButton(true).setBlockName("largebuttonwood");
+            blockLargeButtonStone = new BlockLargeButton(false).setBlockName("largebuttonstone");
+
+            GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonWood),
+                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.wooden_button});
+            GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonStone),
+                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.stone_button});
+
+            GameRegistry.registerBlock(blockLargeButtonWood, "largebuttonwood");
+            GameRegistry.registerBlock(blockLargeButtonStone, "largebuttonstone");
 
             int id = 0;
 

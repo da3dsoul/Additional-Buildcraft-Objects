@@ -18,11 +18,13 @@ item.PipePowerSwitch.name=Kinesis Switch Pipe
 item.PipePowerDirected.name=Diode Kinesis Pipe
 item.PipeItemsEnderExtraction.name=Ender Extraction Pipe
 item.waterwheelItem.name=Waterwheel
+tile.windmillBlock.name=Windmill
+tile.waterwheelBlock.name=Waterwheel
 
 # da3dsoul, might eventually be moved
 
-tile.windmillBlock.name=Windmill
-tile.waterwheelBlock.name=Waterwheel
+tile.largebuttonstone.name=Large Stone Button
+tile.largebuttonwood.name=Large Wooden Button
 
 item.MobBottleFull.name=Mob Bottle (Full)
 item.MobBottleEmpty.name=Mob Bottle
