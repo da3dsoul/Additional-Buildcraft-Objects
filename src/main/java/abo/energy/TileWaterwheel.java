@@ -23,6 +23,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 
 	private double							BIOME_OUTPUT			= 0.125f;
 	private double							DESIGN_OUTPUT			= 0.125f;
+	TileConstantPowerProvider[]				cache;
 
 	public boolean							renderBackwards			= false;
 
@@ -38,6 +39,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 	public TileWaterwheel() {
 		super();
         radialSymmetryParts = 6;
+		cache = new TileConstantPowerProvider[3];
 	}
 
 	@Override
@@ -97,7 +99,31 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 		updateTargetOutput();
 	}
 
-    @Override
+	@Override
+	protected double calculateChainedOutput() {
+		if(isOrientationValid(orientation)) {
+			int out = 0;
+            if(tickCount % 60 == 0) generateCache();
+			if(cache[0] == null) generateCache();
+			for(int i = 0; i < 3; i++) {
+				if(cache[i] == null) break;
+				out += cache[i].realCurrentOutput;
+			}
+			return out;
+		}
+		return super.calculateChainedOutput();
+	}
+
+	private void generateCache() {
+		for(int i = 1; i < 4; i++) {
+			TileEntity entity = worldObj.getTileEntity(xCoord + orientation.getOpposite().offsetX * i, yCoord, zCoord + orientation.getOpposite().offsetZ * i);
+			if (entity != null && entity instanceof TileConstantPowerProvider && ((TileConstantPowerProvider) entity).orientation == orientation) {
+				cache[i-1] = (TileConstantPowerProvider) entity;
+			} else break;
+		}
+	}
+
+	@Override
     public boolean isOrientationValid(ForgeDirection o) {
         int l = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
         if (o == ForgeDirection.UP || o == ForgeDirection.DOWN) return false;
@@ -110,7 +136,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 
 	@Override
 	protected EnergyStage computeEnergyStage() {
-		double energyLevel = currentOutput;
+		double energyLevel = realCurrentOutput;
 		if (energyLevel < 3500f * ABO.waterwheelBlock.scalar) {
 			return EnergyStage.BLUE;
 		} else if (energyLevel < 5000f * ABO.waterwheelBlock.scalar) {

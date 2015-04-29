@@ -97,7 +97,7 @@ public class TileWindmill extends TileConstantPowerProvider {
 
 	@Override
 	protected EnergyStage computeEnergyStage() {
-		double energyLevel = currentOutput;
+		double energyLevel = realCurrentOutput;
 		if (energyLevel < 3750f * ABO.windmillBlock.scalar) {
 			return EnergyStage.BLUE;
 		} else if (energyLevel < 7500f * ABO.windmillBlock.scalar) {

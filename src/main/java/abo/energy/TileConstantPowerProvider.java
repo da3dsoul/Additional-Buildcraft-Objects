@@ -16,14 +16,15 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class TileConstantPowerProvider extends TileEngine {
 
-    public double							TARGET_OUTPUT			= 0.1f;
+    public double							    TARGET_OUTPUT			= 0.1f;
 
-    public double							realCurrentOutput		= 0;
+    public double							    realCurrentOutput		= 0;
+    public double							    chainedEnergy         = 0;
 
     private int								burnTime				= 0;
     private int								totalBurnTime			= 0;
 
-    private int								tickCount				= 0;
+    protected int								tickCount				= 0;
 
     public double							animProgress			= 0;
     protected int radialSymmetryParts;
@@ -86,11 +87,14 @@ public abstract class TileConstantPowerProvider extends TileEngine {
         return currentOutput;
     }
 
+    protected double calculateChainedOutput(){ return 0; }
+
     @Override
     public int calculateCurrentOutput() {
         updateTargetOutput();
         realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200D;
-        return in(realCurrentOutput);
+        chainedEnergy = calculateChainedOutput();
+        return in(realCurrentOutput + chainedEnergy);
     }
 
 
