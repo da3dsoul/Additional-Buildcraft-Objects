@@ -23,7 +23,7 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 
 	private double							BIOME_OUTPUT			= 0.125f;
 	private double							DESIGN_OUTPUT			= 0.125f;
-	TileConstantPowerProvider[]				cache;
+	private TileConstantPowerProvider[]	cache;
 
 	public boolean							renderBackwards			= false;
 
