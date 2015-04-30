@@ -18,11 +18,13 @@ item.PipePowerSwitch.name=Переключаемая энергетическа�
 item.PipePowerDirected.name=Диодная энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
 item.waterwheelItem.name=Водяное колесо
+tile.windmillBlock.name=Гидрогенератор
+tile.waterwheelBlock.name=Водяное колесо
 
 # da3dsoul, might eventually be moved
 
-tile.windmillBlock.name=Гидрогенератор
-tile.waterwheelBlock.name=Водяное колесо
+tile.largebuttonstone.name=Большая каменная кнопка
+tile.largebuttonwood.name=Большая деревянная кнопка
 
 item.MobBottleFull.name=Бутылка для мобов (Полная)
 item.MobBottleEmpty.name=Бутылка для мобов
