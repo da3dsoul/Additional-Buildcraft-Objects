@@ -117,8 +117,8 @@ public class TileWaterwheel extends TileConstantPowerProvider {
 	private void generateCache() {
 		for(int i = 1; i < 4; i++) {
 			TileEntity entity = worldObj.getTileEntity(xCoord + orientation.getOpposite().offsetX * i, yCoord, zCoord + orientation.getOpposite().offsetZ * i);
-			if (entity != null && entity instanceof TileConstantPowerProvider && ((TileConstantPowerProvider) entity).orientation == orientation) {
-				cache[i-1] = (TileConstantPowerProvider) entity;
+			if (entity != null && entity instanceof TileWaterwheel && ((TileWaterwheel) entity).orientation == orientation) {
+				cache[i-1] = (TileWaterwheel) entity;
 			} else break;
 		}
 	}
