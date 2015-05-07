@@ -48,6 +48,11 @@ public class BlockWaterwheel extends BlockConstantPowerProvider {
 		scalar = s;
 	}
 
+	@Override
+	public IIcon getIcon(int side, int meta) {
+		return Blocks.planks.getIcon(side,meta);
+	}
+
 	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
 		return ABO.waterwheelItem;
 	}

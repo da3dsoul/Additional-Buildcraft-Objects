@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -29,16 +30,8 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
 
     public double scalar = 1;
 
-    protected static IIcon					texture;
-
     protected BlockConstantPowerProvider() {
         super(Material.iron);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister par1IconRegister) {
-        texture = par1IconRegister.registerIcon("additional-buildcraft-objects:waterwheelIcon");
     }
 
     @Override
@@ -171,7 +164,7 @@ public abstract class BlockConstantPowerProvider extends BlockBuildCraft impleme
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
-        return texture;
+        return Blocks.iron_block.getIcon(side,meta);
     }
 
     /**

@@ -338,10 +338,9 @@ public class ABO {
                     BuildCraftTransport.pipePowerGold);
 
             blockNull = new BlockNull().setLightOpacity(0).setBlockUnbreakable().setStepSound(Block.soundTypePiston)
-                    .setBlockName("null").setBlockTextureName("additional-buildcraft-objects:null");
+                    .setBlockName("null");
             blockNullCollide = new BlockNullCollide().setLightOpacity(0).setBlockUnbreakable()
-                    .setStepSound(Block.soundTypePiston).setBlockName("null")
-                    .setBlockTextureName("additional-buildcraft-objects:null");
+                    .setStepSound(Block.soundTypePiston).setBlockName("null");
             windmillBlock = new BlockWindmill(windmillScalar);
             waterwheelBlock = new BlockWaterwheel(waterwheelScalar);
             waterwheelItem = new ItemWaterwheel();
