@@ -6,6 +6,7 @@ import java.util.List;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -65,33 +66,10 @@ public class ItemBottle extends ItemGlassBottle {
 		return true;
 	}
 
-	@Override
-	public boolean hitEntity(ItemStack itemstack, EntityLivingBase usedon, EntityLivingBase user) {
-		/*float i = 1;
-		if (user instanceof EntityPlayer) {
-			float var2 = (float) user.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
-			float var4 = 0;
-			if (var2 > 0.0F || var4 > 0.0F) {
-				boolean var5 = user.fallDistance > 0.0F && !user.onGround && !user.isOnLadder() && !user.isInWater()
-						&& !user.isPotionActive(Potion.blindness) && user.ridingEntity == null;
-
-				if (var5 && var2 > 0.0F) {
-					var2 *= 1.5F;
-				}
-
-				var2 += var4;
-				i = var2;
-			}
-		}
-		usedon.heal(i);*/
-		
-
-		return false;
-	}
-
 	public static ItemStack capture(ItemStack itemstack, Entity user, Entity usedon) {
 		if (itemstack == null || usedon == null) return null;
 		if (!hasCaptured(itemstack) && !(usedon instanceof EntityPlayer) && itemstack.stackSize == 1) {
+            if(EntityList.getEntityString(usedon) == null || EntityList.getEntityString(usedon).isEmpty()) return itemstack;
 			NBTTagCompound mob = new NBTTagCompound();
 			if (usedon instanceof EntityLivingBase) {
 				EntityLivingBase ent = (EntityLivingBase) usedon;
@@ -136,7 +114,7 @@ public class ItemBottle extends ItemGlassBottle {
 
             String s = "entity." + mob.getString("id") + ".name";
             String s1 = t("entity." + mob.getString("id"));
-            if(s.equals(s1)) return "";
+            if(s1 == null || s1.isEmpty() || s.equals(s1)) return "";
             return s1;
         }
         return "";
@@ -306,10 +284,15 @@ public class ItemBottle extends ItemGlassBottle {
 
     @Override
     public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean isAdvanced) {
-        if(player.isSneaking()) {
-            if(getLocalizedMobName(itemstack) == ""){
-                list.add(t("item.MobBottleNoEntityName"));
-            }
+
+		if(hasCaptured(itemstack) && getLocalizedMobName(itemstack) == ""){
+			if(GuiScreen.isShiftKeyDown()) {
+                list.add(t("item.MobBottleNoEntityName0"));
+				list.add(t("item.MobBottleNoEntityName1"));
+				list.add(t("item.MobBottleNoEntityName2") + " " + getUnlocalizedMobName(itemstack));
+            } else {
+				list.add(t("item.MobBottlePressShift"));
+			}
         }
     }
 

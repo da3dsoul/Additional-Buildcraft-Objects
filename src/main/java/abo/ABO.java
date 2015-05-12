@@ -411,9 +411,9 @@ public class ABO {
             blockLargeButtonStone = new BlockLargeButton(false).setBlockName("largebuttonstone");
 
             GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonWood),
-                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.wooden_button});
+                    new Object[]{"AA", Character.valueOf('A'), Blocks.wooden_button});
             GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonStone),
-                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.stone_button});
+                    new Object[]{"AA", Character.valueOf('A'), Blocks.stone_button});
 
             GameRegistry.registerBlock(blockLargeButtonWood, "largebuttonwood");
             GameRegistry.registerBlock(blockLargeButtonStone, "largebuttonstone");

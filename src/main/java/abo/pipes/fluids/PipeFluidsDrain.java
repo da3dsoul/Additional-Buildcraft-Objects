@@ -158,11 +158,9 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
                 FluidStack fluidToPump = index != null? BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, false):null;
                 if(fluidToPump != null) {
                     if(this.isFluidAllowed(fluidToPump.getFluid()) && this.tank.fill(fluidToPump, false) == fluidToPump.amount) {
-                        if(fluidToPump.getFluid() != FluidRegistry.WATER || BuildCraftCore.consumeWaterSources || this.numFluidBlocksFound < 9) {
-                            index = this.getNextIndexToPump(true);
-                            BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, true);
-                        }
-                        ABO.aboLog.info("Filled tank with " + this.tank.fill(fluidToPump, true));
+                        index = this.getNextIndexToPump(true);
+                        BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, true);
+
                     }
                 } else if(this.tick % 128 == 0) {
                     this.rebuildQueue();
@@ -261,9 +259,6 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
                         this.queueForPumping(index.x - 1, index.y, index.z, visitedBlocks, fluidsFound, pumpingFluid);
                         this.queueForPumping(index.x, index.y, index.z + 1, visitedBlocks, fluidsFound, pumpingFluid);
                         this.queueForPumping(index.x, index.y, index.z - 1, visitedBlocks, fluidsFound, pumpingFluid);
-                        if (pumpingFluid == FluidRegistry.WATER && !BuildCraftCore.consumeWaterSources && this.numFluidBlocksFound >= 9) {
-                            return;
-                        }
                     }
                 }
             }

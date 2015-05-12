@@ -28,7 +28,10 @@ tile.largebuttonwood.name=Large Wooden Button
 
 item.MobBottleFull.name=Mob Bottle (Full)
 item.MobBottleEmpty.name=Mob Bottle
-item.MobBottleNoEntityName=The entity does not have a localized name. Contact the mod developer and they 'might' fix it.
+item.MobBottleNoEntityName0.name=The entity does not have a localized name.
+item.MobBottleNoEntityName1.name=Contact the mod developer and they 'might' fix it.
+item.MobBottleNoEntityName2.name=The entity's unlocalized name is:
+item.MobBottlePressShift.name=Press shift more details.
 item.GoldenStaff.name=Yellow Dye on a Stick
 
 tile.blockLiquidXP.name=Liquid Experience

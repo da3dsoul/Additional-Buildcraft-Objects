@@ -17,9 +17,9 @@ item.PipeItemsBounce=Упругая транспортная труба
 item.PipePowerSwitch.name=Переключаемая энергетическая труба
 item.PipePowerDirected.name=Диодная энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
-item.waterwheelItem.name=Водяное колесо
-tile.windmillBlock.name=Гидрогенератор
-tile.waterwheelBlock.name=Водяное колесо
+item.waterwheelItem.name=Гидрогенератор
+tile.windmillBlock.name=Ветрогенератор
+tile.waterwheelBlock.name=Гидрогенератор
 
 # da3dsoul, might eventually be moved
 
@@ -28,7 +28,8 @@ tile.largebuttonwood.name=Большая деревянная кнопка
 
 item.MobBottleFull.name=Бутылка для мобов (Полная)
 item.MobBottleEmpty.name=Бутылка для мобов
-item.MobBottleNoEntityName=У сущности нет имени. Сообщите разработчику модификации и он 'возможно' исправит это.
+item.MobBottleNoEntityName0.name=У сущности нет имени.
+item.MobBottleNoEntityName1.name=Сообщите разработчику модификации и он 'возможно' исправит это.
 item.GoldenStaff.name=Жёлтая краска на палочке
 
 tile.blockLiquidXP.name=Жидкий опыт
