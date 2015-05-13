@@ -239,6 +239,13 @@ public class ABO {
         }
     }
 
+    private static void addFullRecipe(ItemStack stack, Object[] ingredients) {
+        ABORecipe recipe = new ABORecipe();
+        recipe.result = stack;
+        recipe.input = ingredients;
+        aboRecipes.add(recipe);
+    }
+
     @SuppressWarnings("deprecation")
     @EventHandler
     public void preinit(FMLPreInitializationEvent evt) {
@@ -354,26 +361,24 @@ public class ABO {
 
             GameRegistry.registerItem(waterwheelItem, "waterwheelItem");
 
-            GameRegistry.addShapedRecipe(new ItemStack(waterwheelItem),
-                    new Object[]{"CBC", "BAB", "CBC", Character.valueOf('A'), BuildCraftCore.ironGearItem,
-                            Character.valueOf('B'), Blocks.stone, Character.valueOf('C'), Items.stick});
+            addFullRecipe(new ItemStack(ABO.waterwheelItem),
+                    new Object[]{"CBC", "BAB", "CBC", 'A', BuildCraftCore.ironGearItem,
+                            'B', Blocks.stone, 'C', Items.stick});
 
             GameRegistry.registerBlock(windmillBlock, "windmillBlock");
             GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
             GameRegistry.registerBlock(blockNull, "null");
             GameRegistry.registerBlock(blockNullCollide, "nullCollide");
-            GameRegistry.addShapedRecipe(new ItemStack(windmillBlock),
-                    new Object[]{"ABA", "BBB", "ABA", Character.valueOf('A'), BuildCraftCore.diamondGearItem,
-                            Character.valueOf('B'), Items.iron_ingot});
+            addFullRecipe(new ItemStack(windmillBlock),
+                    new Object[]{"ABA", "BBB", "ABA", 'A', BuildCraftCore.diamondGearItem,
+                            'B', Items.iron_ingot});
 
             // scaryGen
 
             bottle = new ItemBottle();
-
-            GameRegistry.addShapedRecipe(new ItemStack(bottle, 3),
-                    new Object[]{" B ", "A A", " A ", Character.valueOf('A'), Blocks.glass, Character.valueOf('B'),
-                            Blocks.planks});
             GameRegistry.registerItem(bottle, "MobBottle");
+            addFullRecipe(new ItemStack(bottle, 3, 0),
+                    new Object[]{" B ", "A A", " A ", 'A', Blocks.glass, 'B', Blocks.planks});
 
             PipeManager.registerStripesHandler(new StripesHandlerRightClick() {
                 @Override
@@ -401,22 +406,21 @@ public class ABO {
             });
 
             goldenstaff = new ItemGoldenStaff();
-
-            GameRegistry.addShapedRecipe(new ItemStack(goldenstaff),
+            GameRegistry.registerItem(goldenstaff, "GoldenStaff");
+            addFullRecipe(new ItemStack(goldenstaff, 1, 0),
                     new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
                             new ItemStack(Items.dye, 1, 11)});
-            GameRegistry.registerItem(goldenstaff, "GoldenStaff");
 
             blockLargeButtonWood = new BlockLargeButton(true).setBlockName("largebuttonwood");
             blockLargeButtonStone = new BlockLargeButton(false).setBlockName("largebuttonstone");
 
-            GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonWood),
-                    new Object[]{"AA", Character.valueOf('A'), Blocks.wooden_button});
-            GameRegistry.addShapedRecipe(new ItemStack(blockLargeButtonStone),
-                    new Object[]{"AA", Character.valueOf('A'), Blocks.stone_button});
-
             GameRegistry.registerBlock(blockLargeButtonWood, "largebuttonwood");
             GameRegistry.registerBlock(blockLargeButtonStone, "largebuttonstone");
+
+            addFullRecipe(new ItemStack(blockLargeButtonWood, 1, 0),
+                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.wooden_button});
+            addFullRecipe(new ItemStack(blockLargeButtonStone, 1, 0),
+                    new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.stone_button});
 
             int id = 0;
 
@@ -666,7 +670,7 @@ public class ABO {
             if (recipe.isShapeless) {
                 GameRegistry.addShapelessRecipe(recipe.result, recipe.input);
             } else {
-                GameRegistry.addRecipe(recipe.result, recipe.input);
+                GameRegistry.addShapedRecipe(recipe.result, recipe.input);
             }
 
         }
