@@ -29,7 +29,9 @@ tile.largebuttonwood.name=Большая деревянная кнопка
 item.MobBottleFull.name=Бутылка для мобов (Полная)
 item.MobBottleEmpty.name=Бутылка для мобов
 item.MobBottleNoEntityName0.name=У сущности нет имени.
-item.MobBottleNoEntityName1.name=Сообщите разработчику модификации и он 'возможно' исправит это.
+item.MobBottleNoEntityName1.name=Сообщите разработчику модификации и 'возможно' он исправит это.
+item.MobBottleNoEntityName2.name=Нелокализированное имя сущности:
+item.MobBottlePressShift.name=Нажмите shift для подробной информации.
 item.GoldenStaff.name=Жёлтая краска на палочке
 
 tile.blockLiquidXP.name=Жидкий опыт
