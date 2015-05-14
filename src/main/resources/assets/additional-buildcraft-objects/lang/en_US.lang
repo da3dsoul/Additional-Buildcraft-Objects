@@ -31,7 +31,7 @@ item.MobBottleEmpty.name=Mob Bottle
 item.MobBottleNoEntityName0.name=The entity does not have a localized name.
 item.MobBottleNoEntityName1.name=Contact the mod developer and they 'might' fix it.
 item.MobBottleNoEntityName2.name=The entity's unlocalized name is:
-item.MobBottlePressShift.name=Press shift more details.
+item.MobBottlePressShift.name=Press shift for more details.
 item.GoldenStaff.name=Yellow Dye on a Stick
 
 tile.blockLiquidXP.name=Liquid Experience
