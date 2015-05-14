@@ -151,31 +151,32 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
 
         if(!this.container.getWorldObj().isRemote) {
             this.pushToConsumers();
-            if(isPowered()) return;
+            if (isPowered()) return;
             ++this.tick;
-            if(this.tick % 8 == 0) {
+            if (this.tick % 8 == 0) {
                 BlockIndex index = this.getNextIndexToPump(false);
-                FluidStack fluidToPump = index != null? BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, false):null;
-                if(fluidToPump != null) {
-                    if(this.isFluidAllowed(fluidToPump.getFluid()) && this.tank.fill(fluidToPump, false) == fluidToPump.amount) {
+                FluidStack fluidToPump = index != null ? BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, false) : null;
+                if (fluidToPump != null) {
+                    if (this.isFluidAllowed(fluidToPump.getFluid()) && this.tank.fill(fluidToPump, false) == fluidToPump.amount) {
                         index = this.getNextIndexToPump(true);
                         BlockUtils.drainBlock(this.container.getWorldObj(), index.x, index.y, index.z, true);
-
+                        this.tank.fill(fluidToPump, true);
                     }
-                } else if(this.tick % 128 == 0) {
+                } else if (this.tick % 128 == 0) {
                     this.rebuildQueue();
-                    if(this.getNextIndexToPump(false) == null) {
-                        if(this.isPumpableFluid(this.container.xCoord, this.container.yCoord + 1, this.container.zCoord)) {
+                    if (this.getNextIndexToPump(false) == null) {
+                        if (this.isPumpableFluid(this.container.xCoord, this.container.yCoord + 1, this.container.zCoord)) {
                             return;
                         }
 
-                        if(this.isBlocked(this.container.xCoord, this.container.yCoord + 1, this.container.zCoord)) {
+                        if (this.isBlocked(this.container.xCoord, this.container.yCoord + 1, this.container.zCoord)) {
                             return;
                         }
                     }
                 }
             }
         }
+
 
     }
 
