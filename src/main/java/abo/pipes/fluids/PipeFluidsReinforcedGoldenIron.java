@@ -17,8 +17,6 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 
 		PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
 
-		transport.flowRate = 16 * BuildCraftTransport.pipeFluidsBaseFlowRate;
-		transport.travelDelay = 2;
 	}
 	
 	@Override

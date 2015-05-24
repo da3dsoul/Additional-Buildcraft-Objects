@@ -1,5 +1,6 @@
 package abo.energy;
 
+import buildcraft.core.lib.utils.MathUtils;
 import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
@@ -10,8 +11,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.core.utils.MathUtils;
-import buildcraft.energy.TileEngine;
 import buildcraft.transport.TileGenericPipe;
 
 public class TileWindmill extends TileConstantPowerProvider {
@@ -33,14 +32,19 @@ public class TileWindmill extends TileConstantPowerProvider {
         radialSymmetryParts = 4;
 	}
 
-	@Override
+    @Override
+    public String getResourcePrefix() {
+        return "";
+    }
+
+    @Override
 	public ResourceLocation getBaseTexture() {
-		return BASE_TEXTURES[0];
+		return TRUNK_BLUE_TEXTURE;
 	}
 
 	@Override
 	public ResourceLocation getChamberTexture() {
-		return CHAMBER_TEXTURES[0];
+		return TRUNK_BLUE_TEXTURE;
 	}
 
 	public ResourceLocation getTrunkTexture(EnergyStage stage) {

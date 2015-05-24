@@ -3,11 +3,11 @@ package abo.pipes.items;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import buildcraft.core.lib.inventory.InvUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.core.inventory.InvUtils;
 
 public class PipeItemsCompactorInventory {
 	private class InventorySlot {
@@ -62,11 +62,6 @@ public class PipeItemsCompactorInventory {
 
 	private final LinkedList<InventorySlot>	inventoryContents	= new LinkedList<InventorySlot>();
 
-	/**
-	 * creates the inventory
-	 * 
-	 * @param world
-	 */
 	public PipeItemsCompactorInventory() {}
 
 	/**

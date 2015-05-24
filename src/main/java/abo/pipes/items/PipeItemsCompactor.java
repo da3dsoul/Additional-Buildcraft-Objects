@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import buildcraft.api.statements.*;
+import buildcraft.core.lib.inventory.InvUtils;
+import buildcraft.core.lib.utils.Utils;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,18 +22,11 @@ import abo.actions.ActionToggleOnPipe;
 import abo.pipes.ABOPipe;
 import buildcraft.api.core.Position;
 import buildcraft.api.core.SafeTimeTracker;
-import buildcraft.api.statements.IActionInternal;
-import buildcraft.api.statements.IActionReceptor;
-import buildcraft.api.statements.IStatement;
-import buildcraft.api.statements.IStatementParameter;
-import buildcraft.core.inventory.InvUtils;
-import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;
-import buildcraft.transport.gates.StatementSlot;
 import buildcraft.transport.pipes.events.PipeEventItem;
 
 public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements IActionReceptor {
@@ -54,8 +50,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 
 	/**
 	 * @param orientation
-	 * @param itemID
-	 * @param stackSize
+	 * @param stack
 	 */
 	public void addItemToItemStack(ForgeDirection orientation, ItemStack stack) {
 		// System.out.println("in:  Stack " + stack.toString());
@@ -242,7 +237,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 					// System.out.println("out: Stack " + stack.toString());
 
 					stack.stackSize -= Utils.addToRandomInjectableAround(container.getWorldObj(), container.xCoord,
-							container.yCoord, container.zCoord, receivedStack.getKey(), stack);
+                            container.yCoord, container.zCoord, receivedStack.getKey(), stack);
 					if (stack.stackSize > 0) {
 						Position destPos = new Position(container.xCoord, container.yCoord, container.zCoord,
 								receivedStack.getKey());
@@ -250,7 +245,7 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 						destPos.moveForwards(0.3);
 
 						InvUtils.dropItems(container.getWorldObj(), stack, (int) destPos.x, (int) destPos.y,
-								(int) destPos.z);
+                                (int) destPos.z);
 					}
 
 				}

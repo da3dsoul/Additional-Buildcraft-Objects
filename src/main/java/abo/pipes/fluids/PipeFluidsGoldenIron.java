@@ -3,6 +3,7 @@ package abo.pipes.fluids;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import buildcraft.api.statements.StatementSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -16,13 +17,12 @@ import buildcraft.api.statements.IActionInternal;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
-import buildcraft.transport.gates.StatementSlot;
 import buildcraft.transport.pipes.PipeFluidsWood;
 import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
 import buildcraft.transport.statements.ActionPipeDirection;
 
-public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluidsReinforced> {
+public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 
 	private final int			standardIconIndex	= PipeIcons.PipeLiquidsGoldenIron.ordinal();
 	private final int			solidIconIndex		= PipeIcons.PipeLiquidsGoldenIronSide.ordinal();
@@ -49,8 +49,6 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluidsReinforced>
 
 		PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
 
-		transport.flowRate = 8 * BuildCraftTransport.pipeFluidsBaseFlowRate;
-		transport.travelDelay = 2;
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package abo.energy;
 
 import buildcraft.BuildCraftCore;
-import buildcraft.core.BlockBuildCraft;
-import buildcraft.core.ICustomHighlight;
+import buildcraft.core.lib.block.BlockBuildCraft;
+import buildcraft.core.lib.render.ICustomHighlight;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;

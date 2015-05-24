@@ -6,6 +6,7 @@
 
 package abo.render;
 
+import buildcraft.core.lib.render.IInventoryRenderer;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -20,7 +21,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftCore.RenderMode;
-import buildcraft.core.IInventoryRenderer;
 
 public class RenderWindmill extends TileEntitySpecialRenderer implements IInventoryRenderer {
 	// fields

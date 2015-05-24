@@ -1,5 +1,6 @@
 package abo.energy;
 
+import buildcraft.core.BCCreativeTab;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -7,14 +8,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import abo.items.ABOItem;
-import buildcraft.core.CreativeTabBuildCraft;
 
 public class ItemWaterwheel extends ABOItem
 {
 	
     public ItemWaterwheel()
     {
-        this.setCreativeTab(CreativeTabBuildCraft.BLOCKS.get());
+        this.setCreativeTab(BCCreativeTab.get("main"));
         setUnlocalizedName("waterwheelItem");
     }
 

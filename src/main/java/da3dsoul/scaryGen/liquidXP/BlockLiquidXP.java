@@ -2,7 +2,7 @@ package da3dsoul.scaryGen.liquidXP;
 
 import abo.ABO;
 import buildcraft.api.core.BlockIndex;
-import buildcraft.core.utils.BlockUtils;
+import buildcraft.core.lib.utils.BlockUtils;
 import cpw.mods.fml.common.registry.ExistingSubstitutionException;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;

@@ -73,14 +73,11 @@ class Neighbor {
  * @author Flow86
  * 
  */
-public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
+public class PipeFluidsBalance extends ABOPipe<PipeTransportFluidsReinforced> {
 	// private final int blockTexture = 5 * 16 + 0;
 
 	public PipeFluidsBalance(Item itemID) {
-		super(new PipeTransportFluids(), itemID);
-
-		transport.flowRate = 160;
-		transport.travelDelay = 1;
+		super(new PipeTransportFluidsReinforced(), itemID);
 	}
 
 	@Override
@@ -164,7 +161,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 			if (liquidToExtract > 1) {
 				// drain tank (read available liquidXP)
 				FluidStack liquidExtracted = neighbor.getTankEntity().drain(neighbor.getOrientation(),
-						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
+						liquidToExtract > transport.getFlowRate() ? transport.getFlowRate() : liquidToExtract, false);
 				if (liquidExtracted != null) {
 					// fill pipe
 					int filled = transport.fill(neighbor.getOrientation(), liquidExtracted, true);
@@ -177,7 +174,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 			} else if (liquidToExtract < 1) {
 				// drain pipe (read available liquidXP)
 				FluidStack liquidExtracted = transport.drain(neighbor.getOrientation().getOpposite(),
-						liquidToExtract > transport.flowRate ? transport.flowRate : liquidToExtract, false);
+						liquidToExtract > transport.getFlowRate() ? transport.getFlowRate() : liquidToExtract, false);
 				if (liquidExtracted != null) {
 					// fill tank
 					int filled = neighbor.getTankEntity().fill(neighbor.getOrientation().getOpposite(),

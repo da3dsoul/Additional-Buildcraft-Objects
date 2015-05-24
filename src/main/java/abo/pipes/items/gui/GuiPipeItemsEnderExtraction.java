@@ -8,31 +8,29 @@
  */
 package abo.pipes.items.gui;
 
+import buildcraft.core.lib.gui.GuiBuildCraft;
+import buildcraft.core.lib.gui.buttons.GuiImageButton;
+import buildcraft.core.lib.gui.buttons.IButtonClickEventListener;
+import buildcraft.core.lib.gui.buttons.IButtonClickEventTrigger;
+import buildcraft.core.lib.network.PacketGuiReturn;
+import buildcraft.core.lib.utils.StringUtils;
 import org.lwjgl.opengl.GL11;
 
 import abo.pipes.items.PipeItemsEnderExtraction;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import buildcraft.core.DefaultProps;
-import buildcraft.core.gui.GuiBuildCraft;
-import buildcraft.core.gui.buttons.GuiImageButton;
-import buildcraft.core.gui.buttons.IButtonClickEventListener;
-import buildcraft.core.gui.buttons.IButtonClickEventTrigger;
-import buildcraft.core.network.PacketGuiReturn;
-import buildcraft.core.utils.StringUtils;
 import buildcraft.transport.pipes.PipeItemsEmerald.FilterMode;
 
 public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButtonClickEventListener {
 
-	private static final ResourceLocation	TEXTURE					= new ResourceLocation("buildcraft",
-																			DefaultProps.TEXTURE_PATH_GUI
-																					+ "/pipe_emerald.png");
+	private static final ResourceLocation	TEXTURE = new ResourceLocation("buildcrafttransport:textures/gui/pipe_emerald.png");
 
 	private static final int				WHITE_LIST_BUTTON_ID	= 1;
 	private static final int				BLACK_LIST_BUTTON_ID	= 2;
 	private static final int				ROUND_ROBIN_BUTTON_ID	= 3;
 
-	private GuiImageButton					whiteListButton;
+	private GuiImageButton whiteListButton;
 	private GuiImageButton					blackListButton;
 	private GuiImageButton					roundRobinButton;
 

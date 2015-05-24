@@ -16,19 +16,15 @@ import buildcraft.api.core.SafeTimeTracker;
 import buildcraft.api.power.IRedstoneEngineReceiver;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.IStatement;
+import buildcraft.api.statements.StatementSlot;
 import buildcraft.api.tiles.IControllable;
 import buildcraft.api.tiles.IHasWork;
-import buildcraft.core.EntityBlock;
-import buildcraft.core.RFBattery;
-import buildcraft.core.TileBuffer;
-import buildcraft.core.fluids.SingleUseTank;
-import buildcraft.core.fluids.TankUtils;
-import buildcraft.core.utils.BlockUtils;
-import buildcraft.core.utils.Utils;
+import buildcraft.core.lib.fluids.SingleUseTank;
+import buildcraft.core.lib.utils.BlockUtils;
+import buildcraft.core.lib.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
-import buildcraft.transport.gates.StatementSlot;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -57,7 +53,7 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
     private boolean			toggled;
 
     public PipeFluidsDrain(Item item) {
-        super(new PipeTransportFluidsReinforced(),item);
+        super(new PipeTransportFluidsReinforced(), item);
 
         PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
 

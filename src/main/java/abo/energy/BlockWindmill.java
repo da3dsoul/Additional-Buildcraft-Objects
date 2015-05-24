@@ -3,6 +3,7 @@ package abo.energy;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import buildcraft.core.BCCreativeTab;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -18,17 +19,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
 import buildcraft.BuildCraftCore;
-import buildcraft.core.BlockBuildCraft;
-import buildcraft.core.CreativeTabBuildCraft;
-import buildcraft.core.ICustomHighlight;
-import buildcraft.core.IItemPipe;
 
 public class BlockWindmill extends BlockConstantPowerProvider {
 
 	public BlockWindmill() {
 		super();
 		setBlockName("windmillBlock");
-		setCreativeTab(CreativeTabBuildCraft.BLOCKS.get());
+		setCreativeTab(BCCreativeTab.get("main"));
 
         boxes	= new AxisAlignedBB[][] {{
                 AxisAlignedBB.getBoundingBox(0.375, 0, 0.375, 0.625, 0.8125, 0.625),

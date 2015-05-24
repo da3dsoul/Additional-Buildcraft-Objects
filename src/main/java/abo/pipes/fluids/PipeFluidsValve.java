@@ -1,5 +1,6 @@
 package abo.pipes.fluids;
 
+import buildcraft.api.statements.StatementSlot;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Collection;
@@ -32,7 +33,6 @@ import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
-import buildcraft.transport.gates.StatementSlot;
 
 public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> implements ISolidSideTile, ISerializable {
 
@@ -59,9 +59,6 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 		super(new PipeTransportFluidsReinforced(), itemID);
 
 		PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-
-		transport.flowRate = 2 * FluidContainerRegistry.BUCKET_VOLUME;
-		transport.travelDelay = 2;
 
 		onlyStraight = ABO.valveConnectsStraight;
 		valvePhysics = ABO.valvePhysics;
@@ -168,7 +165,7 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 
 			if (tile instanceof IFluidHandler) {
 				IFluidHandler fluidHandler = (IFluidHandler) tile;
-				int flowRate = transport.flowRate;
+				int flowRate = transport.getFlowRate();
 				int inserted = 0;
 				int amountToExtract = liquidToExtract > flowRate ? flowRate	: liquidToExtract;
 				if(valvePhysics)

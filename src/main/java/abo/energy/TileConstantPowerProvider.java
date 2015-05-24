@@ -2,7 +2,7 @@ package abo.energy;
 
 import abo.ABO;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.energy.TileEngine;
+import buildcraft.core.lib.engines.TileEngineBase;
 import buildcraft.transport.TileGenericPipe;
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -14,7 +14,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class TileConstantPowerProvider extends TileEngine {
+public abstract class TileConstantPowerProvider extends TileEngineBase {
 
     public double							    TARGET_OUTPUT			= 0.1f;
 

@@ -3,6 +3,7 @@ package abo.pipes.power;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import buildcraft.api.statements.StatementSlot;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,7 +23,6 @@ import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeConnectionBans;
 import buildcraft.transport.PipeTransportPower;
 import buildcraft.transport.TileGenericPipe;
-import buildcraft.transport.gates.StatementSlot;
 
 public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook, ISolidSideTile {
 	private final int	unpoweredTexture	= PipeIcons.PipePowerSwitchUnpowered.ordinal();

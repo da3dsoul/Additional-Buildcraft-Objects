@@ -1,8 +1,8 @@
 package abo.items;
 
+import buildcraft.core.BCCreativeTab;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
-import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.transport.ItemPipe;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -12,7 +12,7 @@ public class ABOItemPipe extends ItemPipe {
 	private String	iconName;
 
 	public ABOItemPipe() {
-		super(CreativeTabBuildCraft.PIPES);
+		super(BCCreativeTab.get("main"));
 	}
 
 	@Override

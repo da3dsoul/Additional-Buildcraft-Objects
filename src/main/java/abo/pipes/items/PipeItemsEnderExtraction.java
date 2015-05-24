@@ -1,5 +1,10 @@
 package abo.pipes.items;
 
+import buildcraft.core.lib.RFBattery;
+import buildcraft.core.lib.inventory.SimpleInventory;
+import buildcraft.core.lib.inventory.StackHelper;
+import buildcraft.core.lib.network.IGuiReturnHandler;
+import buildcraft.core.lib.utils.NetworkUtils;
 import io.netty.buffer.ByteBuf;
 
 import java.util.LinkedList;
@@ -20,11 +25,6 @@ import abo.gui.ABOGuiIds;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.core.ISerializable;
 import buildcraft.api.core.Position;
-import buildcraft.core.RFBattery;
-import buildcraft.core.inventory.SimpleInventory;
-import buildcraft.core.inventory.StackHelper;
-import buildcraft.core.network.IGuiReturnHandler;
-import buildcraft.core.utils.Utils;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeConnectionBans;
@@ -37,7 +37,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implements IEnergyHandler, ISerializable,
-		IGuiReturnHandler {
+        IGuiReturnHandler {
 	private final int		standardIconIndex	= PipeIcons.PipeItemsEnderExtraction.ordinal();
 
 	protected RFBattery battery = new RFBattery(640, 640, 0);
@@ -372,12 +372,12 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	public void writeData(ByteBuf data) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		writeToNBT(nbt);
-		Utils.writeNBT(data, nbt);
+		NetworkUtils.writeNBT(data, nbt);
 	}
 
 	@Override
 	public void readData(ByteBuf data) {
-		NBTTagCompound nbt = Utils.readNBT(data);
+		NBTTagCompound nbt = NetworkUtils.readNBT(data);
 		readFromNBT(nbt);
 	}
 

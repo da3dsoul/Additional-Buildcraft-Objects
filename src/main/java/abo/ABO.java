@@ -9,7 +9,9 @@ import java.util.Random;
 
 import abo.pipes.fluids.*;
 import abo.pipes.items.*;
+import buildcraft.BuildCraftMod;
 import buildcraft.api.transport.PipeManager;
+import buildcraft.core.BCCreativeTab;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -82,7 +84,6 @@ import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementManager;
-import buildcraft.core.CreativeTabBuildCraft;
 import buildcraft.core.InterModComms;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
@@ -193,7 +194,7 @@ public class ABO {
 
     public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
 
-        ItemPipe res = BlockGenericPipe.registerPipe(clas, CreativeTabBuildCraft.PIPES);
+        ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("main"));
         res.setUnlocalizedName(clas.getSimpleName());
         ABOProxy.proxy.registerPipe(res);
 
@@ -294,7 +295,7 @@ public class ABO {
                     Blocks.obsidian);
 
             pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
-                    new ItemStack(BuildCraftEnergy.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
+                    new ItemStack(BuildCraftCore.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
 
             pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1, BuildCraftTransport.pipeItemsStone,
                     Blocks.gravel);

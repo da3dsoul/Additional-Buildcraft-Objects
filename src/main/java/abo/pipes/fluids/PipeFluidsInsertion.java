@@ -16,9 +16,6 @@ public class PipeFluidsInsertion extends ABOPipe<PipeTransportFluids> {
 
 	public PipeFluidsInsertion(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
-
-		transport.flowRate = 160;
-		transport.travelDelay = 2;
 	}
 
 	@Override

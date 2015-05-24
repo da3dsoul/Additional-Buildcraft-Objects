@@ -24,8 +24,6 @@ import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.IFluidBlock;
 import abo.ABO;
 import buildcraft.BuildCraftCore;
-import buildcraft.core.BlockBuildCraft;
-import buildcraft.core.ICustomHighlight;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

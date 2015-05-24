@@ -19,8 +19,6 @@ public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluidsReinf
 
 		PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
 
-		transport.flowRate = 2 * FluidContainerRegistry.BUCKET_VOLUME;
-		transport.travelDelay = 2;
 	}
 	
 	@Override

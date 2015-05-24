@@ -1,5 +1,6 @@
 package abo.pipes.fluids;
 
+import buildcraft.core.lib.TileBuffer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -7,7 +8,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.IFluidHandler;
 import buildcraft.api.tools.IToolWrench;
 import buildcraft.api.transport.IPipeTile;
-import buildcraft.core.TileBuffer;
 import buildcraft.transport.Pipe;
 
 public class PipeLogicValve {

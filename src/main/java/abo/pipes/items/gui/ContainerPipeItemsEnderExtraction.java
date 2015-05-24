@@ -10,11 +10,11 @@ package abo.pipes.items.gui;
 
 import abo.pipes.items.PipeItemsEnderExtraction;
 
+import buildcraft.core.lib.gui.BuildCraftContainer;
+import buildcraft.core.lib.gui.slots.SlotPhantom;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import buildcraft.core.gui.BuildCraftContainer;
-import buildcraft.core.gui.slots.SlotPhantom;
 
 public class ContainerPipeItemsEnderExtraction extends BuildCraftContainer {
 
