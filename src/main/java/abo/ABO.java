@@ -195,7 +195,7 @@ public class ABO {
 
     public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
 
-        ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("main"));
+        ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("pipes"));
         res.setUnlocalizedName(clas.getSimpleName());
         ABOProxy.proxy.registerPipe(res);
 
