@@ -12,6 +12,7 @@ import abo.pipes.items.*;
 import buildcraft.BuildCraftMod;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.core.BCCreativeTab;
+import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -111,11 +112,11 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release2.9.3";
+    public static final String VERSION = "release3.0.0pre";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
-    public static final String BUILDCRAFT_VERSION = "6.4";
+    public static final String BUILDCRAFT_VERSION = "7";
 
     public static final String FORGE_VERSION = "10.13.2.1277";
     public static Configuration aboConfiguration;
@@ -259,6 +260,8 @@ public class ABO {
         double waterwheelScalar = 1;
 
         try {
+            initFluidCapacities();
+
             aboConfiguration.load();
 
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
@@ -288,11 +291,9 @@ public class ABO {
             pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1, BuildCraftTransport.pipeFluidsGold,
                     BuildCraftTransport.pipeFluidsIron);
 
-            pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class, 1,
-                    BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
+            pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class); //, 1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
 
-            pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class, 1, pipeFluidsGoldenIron,
-                    Blocks.obsidian);
+            pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class); //, 1, pipeFluidsGoldenIron, Blocks.obsidian);
 
             pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
                     new ItemStack(BuildCraftCore.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
@@ -446,6 +447,18 @@ public class ABO {
         } finally {
             if (aboConfiguration.hasChanged()) aboConfiguration.save();
         }
+    }
+
+    private void initFluidCapacities() {
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsInsertion.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsBalance.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+
     }
 
     @SubscribeEvent

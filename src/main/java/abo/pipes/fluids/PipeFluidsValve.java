@@ -34,7 +34,7 @@ import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.TileGenericPipe;
 
-public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> implements ISolidSideTile, ISerializable {
+public class PipeFluidsValve extends ABOPipe<PipeTransportFluids> implements ISolidSideTile, ISerializable {
 
 	private boolean			powered;
 	private boolean			switched;
@@ -56,10 +56,8 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 	private PipeLogicValve	logic				= new PipeLogicValve(this);
 
 	public PipeFluidsValve(Item itemID) {
-		super(new PipeTransportFluidsReinforced(), itemID);
-
-		PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-
+		super(new PipeTransportFluids(), itemID);
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 		onlyStraight = ABO.valveConnectsStraight;
 		valvePhysics = ABO.valvePhysics;
 	}

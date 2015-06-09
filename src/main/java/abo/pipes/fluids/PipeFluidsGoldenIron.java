@@ -45,9 +45,9 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 	};
 
 	public PipeFluidsGoldenIron(Item itemID) {
-		super(new PipeTransportFluidsReinforced(), itemID);
+		super(new PipeTransportFluids(), itemID);
 
-		PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 
 	}
 

@@ -15,7 +15,7 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 	public PipeFluidsReinforcedGoldenIron(Item itemID) {
 		super(itemID);
 
-		PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 
 	}
 	

@@ -12,12 +12,12 @@ import buildcraft.BuildCraftTransport;
 import buildcraft.transport.PipeTransportFluids;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
-public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluidsReinforced> {
+public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluids> {
 
 	public PipeFluidsReinforcedGolden(Item item) {
-	        super(new PipeTransportFluidsReinforced(), item);
+	        super(new PipeTransportFluids(), item);
 
-		PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 
 	}
 	

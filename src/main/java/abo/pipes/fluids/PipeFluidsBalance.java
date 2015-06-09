@@ -73,11 +73,12 @@ class Neighbor {
  * @author Flow86
  * 
  */
-public class PipeFluidsBalance extends ABOPipe<PipeTransportFluidsReinforced> {
+public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 	// private final int blockTexture = 5 * 16 + 0;
 
 	public PipeFluidsBalance(Item itemID) {
-		super(new PipeTransportFluidsReinforced(), itemID);
+		super(new PipeTransportFluids(), itemID);
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 	}
 
 	@Override

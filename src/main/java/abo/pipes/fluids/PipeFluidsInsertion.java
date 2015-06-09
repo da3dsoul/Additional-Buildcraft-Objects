@@ -16,6 +16,7 @@ public class PipeFluidsInsertion extends ABOPipe<PipeTransportFluids> {
 
 	public PipeFluidsInsertion(Item itemID) {
 		super(new PipeTransportFluids(), itemID);
+        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 	}
 
 	@Override

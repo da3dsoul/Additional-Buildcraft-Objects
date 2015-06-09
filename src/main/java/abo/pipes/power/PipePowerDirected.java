@@ -89,7 +89,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 			transport.internalNextPower[from.ordinal()] += val;
 
 			if (transport.internalNextPower[from.ordinal()] > transport.maxPower) {
-				val = transport.internalNextPower[from.ordinal()] - transport.maxPower;
+				val = (int) transport.internalNextPower[from.ordinal()] - transport.maxPower;
 				transport.internalNextPower[from.ordinal()] = transport.maxPower;
 			}
 		}

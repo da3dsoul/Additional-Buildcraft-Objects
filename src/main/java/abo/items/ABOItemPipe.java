@@ -12,7 +12,7 @@ public class ABOItemPipe extends ItemPipe {
 	private String	iconName;
 
 	public ABOItemPipe() {
-		super(BCCreativeTab.get("main"));
+		super(BCCreativeTab.get("pipes"));
 	}
 
 	@Override

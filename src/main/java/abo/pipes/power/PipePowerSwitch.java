@@ -168,7 +168,7 @@ public class PipePowerSwitch extends ABOPipe<PipeTransportPower> implements IPip
 			transport.internalNextPower[from.ordinal()] += val;
 
 			if (transport.internalNextPower[from.ordinal()] > transport.maxPower) {
-				val = (transport.internalNextPower[from.ordinal()] - transport.maxPower);
+				val = (int)(transport.internalNextPower[from.ordinal()] - transport.maxPower);
 				transport.internalNextPower[from.ordinal()] = transport.maxPower;
 			}
 		}
