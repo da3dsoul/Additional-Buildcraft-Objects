@@ -38,7 +38,7 @@ import net.minecraftforge.fluids.*;
 
 import java.util.*;
 
-public class PipeFluidsDrain extends ABOPipe<PipeTransportFluids> implements IHasWork {
+public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> implements IHasWork {
 
     public static final int REBUID_DELAY = 512;
     public static int MAX_LIQUID = 16000;
@@ -53,7 +53,7 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluids> implements IHa
     private boolean			toggled;
 
     public PipeFluidsDrain(Item item) {
-        super(new PipeTransportFluids(), item);
+        super(new PipeTransportFluidsReinforced(), item);
 
         ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
 

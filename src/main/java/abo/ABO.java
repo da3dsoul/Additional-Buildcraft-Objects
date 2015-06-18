@@ -112,7 +112,7 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release3.0.0pre";
+    public static final String VERSION = "release3.0.1";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
@@ -291,9 +291,9 @@ public class ABO {
             pipeFluidsGoldenIron = buildPipe(PipeFluidsGoldenIron.class, 1, BuildCraftTransport.pipeFluidsGold,
                     BuildCraftTransport.pipeFluidsIron);
 
-            pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class); //, 1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
+            pipeFluidsReinforcedGolden = buildPipe(PipeFluidsReinforcedGolden.class, 1, BuildCraftTransport.pipeFluidsGold, Blocks.obsidian);
 
-            pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class); //, 1, pipeFluidsGoldenIron, Blocks.obsidian);
+            pipeFluidsReinforcedGoldenIron = buildPipe(PipeFluidsReinforcedGoldenIron.class, 1, pipeFluidsGoldenIron, Blocks.obsidian);
 
             pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
                     new ItemStack(BuildCraftCore.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
@@ -453,11 +453,11 @@ public class ABO {
         PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
         PipeTransportFluids.fluidCapacities.put(PipeFluidsInsertion.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
 
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsBalance.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsBalance.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
 
     }
 

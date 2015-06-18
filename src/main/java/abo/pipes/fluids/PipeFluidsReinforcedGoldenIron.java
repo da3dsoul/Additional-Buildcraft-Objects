@@ -15,7 +15,7 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 	public PipeFluidsReinforcedGoldenIron(Item itemID) {
 		super(itemID);
 
-        ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
+        ((PipeTransportFluidsReinforced)this.transport).initFromPipe(this.getClass());
 
 	}
 	

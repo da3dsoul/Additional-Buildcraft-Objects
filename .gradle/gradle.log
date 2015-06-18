@@ -10,11 +10,13 @@
 :apiClasses UP-TO-DATE
 :sourceMainJava
 :compileJavawarning: [options] bootstrap class path not set in conjunction with -source 1.6
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 1 warning
 
-:processResources
+:processResources UP-TO-DATE
 :classes
 :jar
 :extractMcpData UP-TO-DATE
@@ -26,4 +28,4 @@ Note: Recompile with -Xlint:unchecked for details.
 
 BUILD SUCCESSFUL
 
-Total time: 9.627 secs
+Total time: 7.765 secs
