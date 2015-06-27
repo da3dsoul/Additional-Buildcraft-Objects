@@ -2,12 +2,40 @@
 
 item.PipeFluidsValve=阀门管道
 item.PipeFluidsGoldenIron=金铁液体管道
+item.PipeFluidsReinforcedGoldenIron.name=增强金铁液体管道
+item.PipeFluidsReinforcedGolden.name=增强金质液体管道
 item.PipeFluidsBalance=平衡管道
+item.PipeFluidsDrain.name=排水管道
+item.PipeFluidsInsertion.name=插入式运输管道
 item.PipeItemsRoundRobin=循环运输管道
 item.PipeItemsInsertion=插入式运输管道
-item.PipeItemsExtraction=提取式运输管
-item.PipeItemsBounce=红石信号运输管
-item.PipeItemsCrossover=交叉运输管道
-item.PipeItemsCompactor=压缩运输管道
-item.PipePowerSwitch=能量控制管道
-item.PipePowerDirected=铁质能量管道
+item.PipeItemsDivide.name=分割运输管道
+item.PipeItemsExtraction=提取式运输管道
+item.PipeItemsCrossover.name=交叉运输管道
+item.PipeItemsCompactor.name=压缩运输管道
+item.PipeItemsBounce=弹性运输管道
+item.PipePowerSwitch.name=活动开关管道
+item.PipePowerDirected.name=活动二极管管道
+item.PipeItemsEnderExtraction.name=末影提取管道
+item.waterwheelItem.name=水车
+tile.windmillBlock.name=风车
+tile.waterwheelBlock.name=水车
+
+# da3dsoul, might eventually be moved
+
+tile.largebuttonstone.name=大型石质按钮
+tile.largebuttonwood.name=大型木质按钮
+
+item.MobBottleFull.name=生物瓶 (满)
+item.MobBottleEmpty.name=生物瓶
+item.MobBottleNoEntityName0.name=实体没有本地化名称.
+item.MobBottleNoEntityName1.name=与开发者联系,他们'或许'会修复它.
+item.MobBottleNoEntityName2.name=实体的本地化名称是:
+item.MobBottlePressShift.name=按下潜行键查看更多信息.
+item.GoldenStaff.name=黄色木棍
+
+tile.blockLiquidXP.name=液态经验
+
+generator.scaryGen=恐怖生成
+
+death.attack.experience=%1$s没有丰富的经验。那个家伙大概还在学习吧？
