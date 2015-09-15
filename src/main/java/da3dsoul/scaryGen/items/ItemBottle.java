@@ -50,20 +50,25 @@ public class ItemBottle extends ItemGlassBottle {
 
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-		ItemStack item;
-		if (stack.stackSize > 1) {
-			item = stack.splitStack(1);
-			if (player instanceof EntityPlayer) {
-				item = capture(item, player, entity);
-				if(item == null) return false;
-				if (!((EntityPlayer) player).inventory.addItemStackToInventory(item)) {
-					((EntityPlayer) player).dropPlayerItemWithRandomChoice(item, false);
-				}
-			}
-		} else {
-			stack = capture(stack, player, entity);
-		}
-		return true;
+        try {
+            ItemStack item;
+            if (stack.stackSize > 1) {
+                item = stack.splitStack(1);
+                if (player instanceof EntityPlayer) {
+                    item = capture(item, player, entity);
+                    if (item == null) return false;
+                    if (!((EntityPlayer) player).inventory.addItemStackToInventory(item)) {
+                        ((EntityPlayer) player).dropPlayerItemWithRandomChoice(item, false);
+                    }
+                }
+            } else {
+                stack = capture(stack, player, entity);
+            }
+            return true;
+        } catch(Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
 	}
 
 	public static ItemStack capture(ItemStack itemstack, Entity user, Entity usedon) {

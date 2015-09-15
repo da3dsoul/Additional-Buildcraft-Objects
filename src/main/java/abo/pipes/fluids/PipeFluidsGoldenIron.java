@@ -44,12 +44,15 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 		}
 	};
 
-	public PipeFluidsGoldenIron(Item itemID) {
-		super(new PipeTransportFluids(), itemID);
+	public PipeFluidsGoldenIron(PipeTransportFluids transport, Item itemID) {
+		super(transport, itemID);
 
         ((PipeTransportFluids)this.transport).initFromPipe(this.getClass());
-
 	}
+
+    public PipeFluidsGoldenIron(Item item) {
+        this(new PipeTransportFluids(), item);
+    }
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer) {

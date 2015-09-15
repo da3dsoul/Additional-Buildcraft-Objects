@@ -37,14 +37,23 @@ import java.util.*;
 
 public class BlockLiquidXP extends BlockFluidClassic {
 
-    public static void init() {
+    public static void preinit() {
         try {
             LiquidXPMod.fluid.setLuminosity(15);
             ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
             ABO.bucket = new BucketItem();
-            GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
             LiquidXPMod.mbPerXp = 1;
 
+        }catch(Throwable e){
+            e.printStackTrace();
+            ABO.blockLiquidXP = null;
+            ABO.bucket = null;
+        }
+    }
+
+    public static void init() {
+        try {
+            GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
             FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(LiquidXPMod.bucket), new ItemStack(Items.bucket));
             FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(ABO.bucket), new ItemStack(Items.bucket));
         }catch(Throwable e){
@@ -151,6 +160,10 @@ public class BlockLiquidXP extends BlockFluidClassic {
             world.scheduleBlockUpdateWithPriority(x, y, z, this, 200, 2);
         }
         super.updateTick(world, x, y, z, rand);
+    }
+
+    public int getXPforOneBlock() {
+        return 1000;
     }
 
     /**

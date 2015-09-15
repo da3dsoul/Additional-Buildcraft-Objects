@@ -37,12 +37,10 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.FillBucketEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
@@ -112,7 +110,7 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "MC" + ABO.MINECRAFT_VERSION + "-BC" + ABO.BUILDCRAFT_VERSION + ABO.VERSION, acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "release3.0.1";
+    public static final String VERSION = "release3.0.2";
 
     public static final String MINECRAFT_VERSION = "1.7.10";
 
@@ -355,7 +353,7 @@ public class ABO {
             waterwheelItem = new ItemWaterwheel();
 
             if (Loader.isModLoaded("LiquidXP")) {
-                BlockLiquidXP.init();
+                BlockLiquidXP.preinit();
                 GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
             } else {
                 blockLiquidXP = null;
@@ -539,6 +537,107 @@ public class ABO {
     }
 
     @SubscribeEvent
+    public void onBonemeal(BonemealEvent event) {
+        Block var5 = event.block;
+        World par1World = event.world;
+        if (var5 == Blocks.dirt)
+        {
+            if (!par1World.isRemote)
+            {
+                boolean success = false;
+
+                if (isBlockDirtAndFree(par1World, event.x, event.y, event.z))
+                {
+                    BiomeGenBase biome = par1World.getBiomeGenForCoords(event.x, event.z);
+                    Block block1 = Blocks.grass;
+                    int meta = 0;
+                    if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
+                    if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                    success = par1World.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(par1World, event.x, event.y, event.z);
+                }
+
+                if (success && !event.entityPlayer.capabilities.isCreativeMode && par1World.rand.nextInt(20) == 0)
+                {
+                    event.entityPlayer.inventory.getCurrentItem().stackSize--;
+                    if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
+                }
+            }
+        }
+    }
+
+    private boolean randomizeGrass(World world, int i, int j, int k)
+    {
+        boolean success = false;
+        int l1 = new Random().nextInt(4) + 1;
+
+        do
+        {
+            int l = new Random().nextInt(2);
+
+            if(new Random().nextInt(2) == 0)
+            {
+                switch (l) {
+                    case 0:
+                        i++;
+                        break;
+
+                    case 1:
+                        k++;
+                        break;
+                }
+            }else
+            {
+                switch(l)
+                {
+                    case 0:
+                        i--;
+                        break;
+                    case 1:
+                        k--;
+                        break;
+                }
+            }
+            int m = j;
+            j = j - 3;
+
+            while (!isBlockDirtAndFree(world, i, j, k) && j <= m + 3)
+            {
+                j++;
+            }
+
+            if (isBlockDirtAndFree(world, i, j, k))
+            {
+                BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
+                Block block1 = Blocks.grass;
+                int meta = 0;
+                if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
+                if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                if(world.setBlock(i, j, k, block1, meta, 3)) success = true;
+            }
+
+            l1--;
+        }
+        while (l1 > 0);
+
+        return success;
+    }
+
+    private boolean isBlockDirtAndFree(World world, int i, int j, int k)
+    {
+        if (world.getBlock(i, j, k) != Blocks.dirt)
+        {
+            return false;
+        }
+
+        if (world.getBlock(i, j + 1, k).isBlockNormalCube())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @SubscribeEvent
     public void onRightClick(PlayerInteractEvent event) {
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             if (event.entityLiving instanceof EntityPlayer) {
@@ -566,6 +665,10 @@ public class ABO {
     public void init(FMLInitializationEvent evt) {
 
         loadRecipes();
+
+        if(blockLiquidXP != null) {
+            BlockLiquidXP.init();
+        }
 
         ABOProxy.proxy.registerTileEntities();
         ABOProxy.proxy.registerBlockRenderers();
@@ -627,7 +730,7 @@ public class ABO {
         }
     }
 
-    @Mod.EventHandler
+    @EventHandler
     public void processIMCRequests(FMLInterModComms.IMCEvent event) {
         InterModComms.processIMC(event);
     }

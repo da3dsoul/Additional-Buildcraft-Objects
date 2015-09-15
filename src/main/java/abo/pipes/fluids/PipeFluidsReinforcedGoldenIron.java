@@ -11,15 +11,16 @@ public class PipeFluidsReinforcedGoldenIron extends PipeFluidsGoldenIron {
 	
 	private final int			standardIconIndex	= PipeIcons.PipeLiquidsReinforcedGoldenIron.ordinal();
 	private final int			solidIconIndex		= PipeIcons.PipeLiquidsReinforcedGoldenIronSide.ordinal();
-	
-	public PipeFluidsReinforcedGoldenIron(Item itemID) {
-		super(itemID);
 
-        ((PipeTransportFluidsReinforced)this.transport).initFromPipe(this.getClass());
+    public PipeFluidsReinforcedGoldenIron(PipeTransportFluids transport, Item itemID) {
+        super(transport, itemID);
+    }
 
-	}
-	
-	@Override
+    public PipeFluidsReinforcedGoldenIron(Item item) {
+        this(new PipeTransportFluidsReinforced(), item);
+    }
+
+    @Override
 	public int getIconIndex(ForgeDirection direction) {
 		if (direction == ForgeDirection.UNKNOWN)
 			return standardIconIndex;
