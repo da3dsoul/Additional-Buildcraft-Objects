@@ -20,7 +20,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "release3.0.2"
+version = "release3.0.3"
 group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ABO-MC1.7.10-BC7"
 
