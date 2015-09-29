@@ -20,13 +20,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "${project.version}"
+version = "MC1.7.10-BC7.1release" + "4.0.0"
 group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ABO-MC1.7.10-BC7"
+archivesBaseName = "ABO"
 
 minecraft {
     version = "1.7.10-10.13.2.1277"
-    runDir = "eclipse/assets"
+    replace '${version}', project.version
 }
 
 dependencies {
