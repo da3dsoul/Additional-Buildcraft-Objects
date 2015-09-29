@@ -629,7 +629,7 @@ public class ABO {
             return false;
         }
 
-        if (world.getBlock(i, j + 1, k).isBlockNormalCube())
+        if (world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2)
         {
             return false;
         }
