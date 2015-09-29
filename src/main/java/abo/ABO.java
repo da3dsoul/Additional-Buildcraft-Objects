@@ -183,7 +183,7 @@ public class ABO {
     // Mod Init Handling
     private boolean bucketEventCanceled = false;
 
-    public static ItemPipe buildPipe(Class<? extends Pipe> clas, int count, Object... ingredients) {
+    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas, int count, Object... ingredients) {
         ItemPipe res = buildPipe(clas);
 
         addRecipe(res, count, ingredients);
@@ -191,7 +191,7 @@ public class ABO {
         return res;
     }
 
-    public static ItemPipe buildPipe(Class<? extends Pipe> clas) {
+    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas) {
 
         ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("pipes"));
         res.setUnlocalizedName(clas.getSimpleName());
@@ -629,7 +629,7 @@ public class ABO {
             return false;
         }
 
-        if (world.getBlock(i, j + 1, k).isBlockNormalCube())
+        if (world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2)
         {
             return false;
         }

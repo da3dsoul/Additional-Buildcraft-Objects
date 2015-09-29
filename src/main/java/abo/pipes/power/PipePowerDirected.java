@@ -38,7 +38,7 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 											};
 
 	@Override
-	public boolean blockActivated(EntityPlayer entityplayer) {
+	public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection side) {
 		return logic.blockActivated(entityplayer);
 	}
 

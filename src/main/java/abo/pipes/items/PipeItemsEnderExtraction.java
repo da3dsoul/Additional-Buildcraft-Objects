@@ -121,12 +121,12 @@ public class PipeItemsEnderExtraction extends Pipe<PipeTransportItems> implement
 	}
 
 	@Override
-	public boolean blockActivated(EntityPlayer entityplayer) {
+	public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection side) {
 		if (entityplayer.getCurrentEquippedItem() != null) {
 			if (Block.getBlockFromItem(entityplayer.getCurrentEquippedItem().getItem()) instanceof BlockGenericPipe) { return false; }
 		}
 
-		if (super.blockActivated(entityplayer)) { return true; }
+		if (super.blockActivated(entityplayer, side)) { return true; }
 
 		if (hasEnderChest()) {
 			if (getWorld().isRemote) {

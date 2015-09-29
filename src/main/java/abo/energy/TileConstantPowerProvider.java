@@ -73,13 +73,8 @@ public abstract class TileConstantPowerProvider extends TileEngineBase {
     }
 
     @Override
-    public int maxEnergyReceived() {
-        return 0;
-    }
-
-    @Override
-    public int maxEnergyExtracted() {
-        return currentOutput;
+    public boolean canReceiveFromEngine(ForgeDirection side) {
+        return false;
     }
 
     @Override

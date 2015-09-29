@@ -33,8 +33,8 @@ public class TileWindmill extends TileConstantPowerProvider {
 	}
 
     @Override
-    public String getResourcePrefix() {
-        return "";
+    public int getIdealOutput() {
+        return 10;
     }
 
     @Override

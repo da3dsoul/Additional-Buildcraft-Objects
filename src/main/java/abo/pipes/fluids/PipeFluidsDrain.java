@@ -65,12 +65,12 @@ public class PipeFluidsDrain extends ABOPipe<PipeTransportFluidsReinforced> impl
     }
 
     @Override
-    public boolean blockActivated(EntityPlayer entityplayer) {
+    public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection side) {
         if(tank.getFluid() != null) {
             ABO.aboLog.info("Tank cap " + tank.getFluidAmount());
             ABO.aboLog.info("Tank fluid " + tank.getFluid().getFluid().getName());
         }
-        return super.blockActivated(entityplayer);
+        return super.blockActivated(entityplayer, side);
     }
 
     public boolean isPowered() {

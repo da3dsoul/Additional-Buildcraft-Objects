@@ -61,7 +61,7 @@ public class PipeItemsInsertion extends ABOPipe<PipeTransportItems> {
     }
 
     @Override
-    public boolean blockActivated(EntityPlayer entityplayer) {
+    public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection hitSide) {
         if (entityplayer.getCurrentEquippedItem() != null
                 && entityplayer.getCurrentEquippedItem().getItem() instanceof IToolWrench && ((IToolWrench)entityplayer.getCurrentEquippedItem().getItem()).canWrench(entityplayer, container.xCoord, container.yCoord, container.zCoord)) {
             isLegacy = !isLegacy;

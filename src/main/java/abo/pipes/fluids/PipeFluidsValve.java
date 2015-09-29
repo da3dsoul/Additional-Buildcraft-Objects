@@ -108,7 +108,7 @@ public class PipeFluidsValve extends ABOPipe<PipeTransportFluidsReinforced> impl
 	}
 
 	@Override
-	public boolean blockActivated(EntityPlayer entityplayer) {
+	public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection side) {
 		boolean flag = logic.blockActivated(entityplayer);
 		if (flag) container.scheduleNeighborChange();
 		return flag;
