@@ -3,8 +3,12 @@ package abo.proxy;
 import abo.ABO;
 import abo.energy.TileWaterwheel;
 import abo.energy.TileWindmill;
+import abo.pipes.fluids.PipeTransportFluidsReinforced;
 import abo.render.RenderWaterwheel;
 import abo.render.RenderWindmill;
+import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.render.PipeTransportFluidsRenderer;
+import buildcraft.transport.render.PipeTransportRenderer;
 import cpw.mods.fml.client.FMLClientHandler;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import net.minecraft.item.Item;
@@ -35,6 +39,10 @@ public class ABOProxyClient extends ABOProxy {
 	public void registerBlockRenderers() {
 		RenderingEntityBlocks.blockByEntityRenders.put(new EntityRenderIndex(ABO.windmillBlock, 0),
 				new RenderWindmill());
+
+        PipeTransportRenderer renderer = PipeTransportRenderer.RENDERER_MAP.get(PipeTransportFluids.class);
+
+        PipeTransportRenderer.RENDERER_MAP.put(PipeTransportFluidsReinforced.class, renderer);
 
         if(ABO.blockLiquidXP != null){
             try {

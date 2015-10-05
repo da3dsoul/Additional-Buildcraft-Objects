@@ -110,13 +110,6 @@ import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.Ev
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
 public class ABO {
-    public static final String VERSION = "4.0.0";
-
-    public static final String MINECRAFT_VERSION = "1.7.10";
-
-    public static final String BUILDCRAFT_VERSION = "7.1";
-
-    public static final String FORGE_VERSION = "10.13.2.1277";
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
             .getLogger("Additional-Buildcraft-Objects");
@@ -250,7 +243,7 @@ public class ABO {
     @EventHandler
     public void preinit(FMLPreInitializationEvent evt) {
 
-        aboLog.info("Starting Additional-Buildcraft-Objects " + "MC" + MINECRAFT_VERSION + "-BC" + BUILDCRAFT_VERSION + VERSION);
+        aboLog.info("Starting Additional-Buildcraft-Objects " + "${version}");
 
         aboConfiguration = new Configuration(new File(evt.getModConfigurationDirectory(), "abo/main.conf"));
 
