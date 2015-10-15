@@ -289,6 +289,8 @@ public class ABO {
             pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
                     new ItemStack(BuildCraftCore.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
 
+            // Item Pipes
+
             pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1, BuildCraftTransport.pipeItemsStone,
                     Blocks.gravel);
 
@@ -532,24 +534,24 @@ public class ABO {
     @SubscribeEvent
     public void onBonemeal(BonemealEvent event) {
         Block var5 = event.block;
-        World par1World = event.world;
+        World world = event.world;
         if (var5 == Blocks.dirt)
         {
-            if (!par1World.isRemote)
+            if (!world.isRemote)
             {
                 boolean success = false;
 
-                if (isBlockDirtAndFree(par1World, event.x, event.y, event.z))
+                if (isBlockDirtAndFree(world, event.x, event.y, event.z))
                 {
-                    BiomeGenBase biome = par1World.getBiomeGenForCoords(event.x, event.z);
+                    BiomeGenBase biome = world.getBiomeGenForCoords(event.x, event.z);
                     Block block1 = Blocks.grass;
                     int meta = 0;
                     if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
                     if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                    success = par1World.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(par1World, event.x, event.y, event.z);
+                    success = world.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(world, event.x, event.y, event.z);
                 }
 
-                if (success && !event.entityPlayer.capabilities.isCreativeMode && par1World.rand.nextInt(20) == 0)
+                if (success && !event.entityPlayer.capabilities.isCreativeMode && world.rand.nextInt(20) == 0)
                 {
                     event.entityPlayer.inventory.getCurrentItem().stackSize--;
                     if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
@@ -561,21 +563,25 @@ public class ABO {
     private boolean randomizeGrass(World world, int i, int j, int k)
     {
         boolean success = false;
-        int l1 = new Random().nextInt(4) + 1;
+        Random random = new Random();
+        int l1 = random.nextInt(4) + 1;
+
+        int x = i;
+        int z = k;
 
         do
         {
-            int l = new Random().nextInt(2);
+            int l = random.nextInt(2);
 
-            if(new Random().nextInt(2) == 0)
+            if(random.nextInt(2) == 0)
             {
                 switch (l) {
                     case 0:
-                        i++;
+                        x++;
                         break;
 
                     case 1:
-                        k++;
+                        z++;
                         break;
                 }
             }else
@@ -583,29 +589,28 @@ public class ABO {
                 switch(l)
                 {
                     case 0:
-                        i--;
+                        x--;
                         break;
                     case 1:
-                        k--;
+                        z--;
                         break;
                 }
             }
-            int m = j;
-            j = j - 3;
+            int y = j - 3;
 
-            while (!isBlockDirtAndFree(world, i, j, k) && j <= m + 3)
+            while (!isBlockDirtAndFree(world, x, y, z) && y <= j + 6)
             {
-                j++;
+                y++;
             }
 
-            if (isBlockDirtAndFree(world, i, j, k))
+            if (isBlockDirtAndFree(world, x, y, z))
             {
-                BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
+                BiomeGenBase biome = world.getBiomeGenForCoords(x,z);
                 Block block1 = Blocks.grass;
                 int meta = 0;
                 if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
                 if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                if(world.setBlock(i, j, k, block1, meta, 3)) success = true;
+                if(world.setBlock(x, y, z, block1, meta, 3)) success = true;
             }
 
             l1--;

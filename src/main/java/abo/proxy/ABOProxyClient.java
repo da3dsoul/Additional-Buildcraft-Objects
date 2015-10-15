@@ -49,7 +49,7 @@ public class ABOProxyClient extends ABOProxy {
                 //ABO.bucket.registerIcons();
 
             } catch(Throwable t){
-                ABO.aboLog.info("You are running Cauldron or some shit that doesn't Minecraft.class, some things won't work right due to their DMCA takedown.");
+                ABO.aboLog.info("You are running Cauldron or some shit that doesn't have Minecraft.class, some things won't work right due to their DMCA takedown.");
             }
         }
 		//RenderingEntityBlocks.blockByEntityRenders.put(new EntityRenderIndex(ABO.waterwheelBlock, 0),
