@@ -2,6 +2,7 @@ package abo;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -289,6 +290,8 @@ public class ABO {
             pipeFluidsBalance = buildPipe(PipeFluidsBalance.class, 1, BuildCraftTransport.pipeFluidsWood,
                     new ItemStack(BuildCraftCore.engineBlock, 1, 0), BuildCraftTransport.pipeFluidsWood);
 
+            // Item Pipes
+
             pipeItemsRoundRobin = buildPipe(PipeItemsRoundRobin.class, 1, BuildCraftTransport.pipeItemsStone,
                     Blocks.gravel);
 
@@ -529,9 +532,37 @@ public class ABO {
         }
     }
 
+    @SubscribeEvent
+    public void onBonemeal(BonemealEvent event) {
+        Block var5 = event.block;
+        World par1World = event.world;
+        if (var5 == Blocks.dirt)
+        {
+            if (!par1World.isRemote)
+            {
+                boolean success = false;
+
+                if (isBlockDirtAndFree(par1World, event.x, event.y, event.z))
+                {
+                    BiomeGenBase biome = par1World.getBiomeGenForCoords(event.x, event.z);
+                    Block block1 = Blocks.grass;
+                    int meta = 0;
+                    if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
+                    if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                    success = par1World.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(par1World, event.x, event.y, event.z);
+                }
+
+                if (success && !event.entityPlayer.capabilities.isCreativeMode && par1World.rand.nextInt(20) == 0)
+                {
+                    event.entityPlayer.inventory.getCurrentItem().stackSize--;
+                    if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
+                }
+            }
+        }
+    }
+
     private boolean randomizeGrass(World world, int i, int j, int k)
     {
-        // TODO Write log system
         boolean success = false;
         Random random = new Random();
         int l1 = random.nextInt(4) + 1;
@@ -669,13 +700,11 @@ public class ABO {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
 
-
     }
 
     @EventHandler
     public void post(FMLPostInitializationEvent event) {
         BiomeStoneGen.init();
-        cofhInstalled = Loader.isModLoaded("CoFHCore");
     }
 
     // Side Handling
