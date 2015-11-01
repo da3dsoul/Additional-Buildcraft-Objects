@@ -2,38 +2,29 @@ package abo;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 import abo.pipes.fluids.*;
 import abo.pipes.items.*;
-import buildcraft.BuildCraftMod;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.material.Material;
 import net.minecraft.dispenser.*;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityEgg;
-import net.minecraft.entity.projectile.EntityPotion;
-import net.minecraft.item.ItemPotion;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -44,7 +35,6 @@ import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
-import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,7 +68,6 @@ import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
 import buildcraft.BuildCraftCore;
-import buildcraft.BuildCraftEnergy;
 import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.statements.IActionInternal;
@@ -108,7 +97,7 @@ import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion")
 public class ABO {
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
@@ -140,6 +129,9 @@ public class ABO {
     public static Block blockLargeButtonWood = null;
     public static Item bottle = null;
     public static Item goldenstaff = null;
+
+    public static boolean geostrataInstalled = false;
+    public static boolean cofhInstalled = false;
 
     // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
@@ -249,6 +241,14 @@ public class ABO {
 
         double windmillScalar = 1;
         double waterwheelScalar = 1;
+
+        geostrataInstalled = Loader.isModLoaded("GeoStrata");
+        cofhInstalled = Loader.isModLoaded("CoFHCore");
+
+        if(ABO.cofhInstalled) {
+            ABO.aboLog.info("COFH is Loaded");
+            COFHOverride.overrideCOFHWordGen();
+        }
 
         try {
             initFluidCapacities();
@@ -529,53 +529,29 @@ public class ABO {
         }
     }
 
-    @SubscribeEvent
-    public void onBonemeal(BonemealEvent event) {
-        Block var5 = event.block;
-        World par1World = event.world;
-        if (var5 == Blocks.dirt)
-        {
-            if (!par1World.isRemote)
-            {
-                boolean success = false;
-
-                if (isBlockDirtAndFree(par1World, event.x, event.y, event.z))
-                {
-                    BiomeGenBase biome = par1World.getBiomeGenForCoords(event.x, event.z);
-                    Block block1 = Blocks.grass;
-                    int meta = 0;
-                    if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
-                    if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                    success = par1World.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(par1World, event.x, event.y, event.z);
-                }
-
-                if (success && !event.entityPlayer.capabilities.isCreativeMode && par1World.rand.nextInt(20) == 0)
-                {
-                    event.entityPlayer.inventory.getCurrentItem().stackSize--;
-                    if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
-                }
-            }
-        }
-    }
-
     private boolean randomizeGrass(World world, int i, int j, int k)
     {
+        // TODO Write log system
         boolean success = false;
-        int l1 = new Random().nextInt(4) + 1;
+        Random random = new Random();
+        int l1 = random.nextInt(4) + 1;
+
+        int x = i;
+        int z = k;
 
         do
         {
-            int l = new Random().nextInt(2);
+            int l = random.nextInt(2);
 
-            if(new Random().nextInt(2) == 0)
+            if(random.nextInt(2) == 0)
             {
                 switch (l) {
                     case 0:
-                        i++;
+                        x++;
                         break;
 
                     case 1:
-                        k++;
+                        z++;
                         break;
                 }
             }else
@@ -583,29 +559,28 @@ public class ABO {
                 switch(l)
                 {
                     case 0:
-                        i--;
+                        x--;
                         break;
                     case 1:
-                        k--;
+                        z--;
                         break;
                 }
             }
-            int m = j;
-            j = j - 3;
+            int y = j - 3;
 
-            while (!isBlockDirtAndFree(world, i, j, k) && j <= m + 3)
+            while (!isBlockDirtAndFree(world, x, y, z) && y <= j + 6)
             {
-                j++;
+                y++;
             }
 
-            if (isBlockDirtAndFree(world, i, j, k))
+            if (isBlockDirtAndFree(world, x, y, z))
             {
-                BiomeGenBase biome = world.getBiomeGenForCoords(i, k);
+                BiomeGenBase biome = world.getBiomeGenForCoords(x,z);
                 Block block1 = Blocks.grass;
                 int meta = 0;
                 if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
                 if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                if(world.setBlock(i, j, k, block1, meta, 3)) success = true;
+                if(world.setBlock(x, y, z, block1, meta, 3)) success = true;
             }
 
             l1--;
@@ -639,6 +614,30 @@ public class ABO {
                         bucketEventCanceled = true;
                     }
                 }
+                if(event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() == Items.dye && event.entityPlayer.inventory.getCurrentItem().getItemDamage() == 15) {
+                    Block var5 = event.world.getBlock(event.x,event.y,event.z);
+                    World world = event.world;
+                    if (!world.isRemote)
+                    {
+                        boolean success = false;
+
+                        if (isBlockDirtAndFree(world, event.x, event.y, event.z))
+                        {
+                            BiomeGenBase biome = world.getBiomeGenForCoords(event.x, event.z);
+                            Block block1 = Blocks.grass;
+                            int meta = 0;
+                            if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
+                            if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                            success = world.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(world, event.x, event.y, event.z);
+                        }
+
+                        if (success && !event.entityPlayer.capabilities.isCreativeMode && world.rand.nextInt(20) == 0)
+                        {
+                            event.entityPlayer.inventory.getCurrentItem().stackSize--;
+                            if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
+                        }
+                    }
+                }
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
@@ -670,11 +669,13 @@ public class ABO {
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
 
+
     }
 
     @EventHandler
     public void post(FMLPostInitializationEvent event) {
         BiomeStoneGen.init();
+        cofhInstalled = Loader.isModLoaded("CoFHCore");
     }
 
     // Side Handling

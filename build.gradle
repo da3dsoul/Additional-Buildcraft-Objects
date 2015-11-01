@@ -18,6 +18,7 @@ buildscript {
     }
 }
 
+apply plugin: 'scala'
 apply plugin: 'forge'
 
 version = "MC1.7.10-BC7.1release" + "4.0.1"
@@ -27,6 +28,12 @@ archivesBaseName = "ABO"
 minecraft {
     version = "1.7.10-10.13.2.1277"
     replace '${version}', project.version
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'ABO_at.cfg'
+    }
 }
 
 dependencies {

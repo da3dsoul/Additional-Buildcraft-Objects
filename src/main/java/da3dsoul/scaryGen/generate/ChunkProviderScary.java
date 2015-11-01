@@ -6,6 +6,10 @@ import java.util.*;
 import abo.ABO;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.Galacticraft.GalactiCraftHandler;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.ProjectRed.ProjectRedHandler;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.Reika.ReactorCraft.ReactorOreGeneratorOverride;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.WorldGenMinableOverride;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
@@ -82,6 +86,7 @@ public class ChunkProviderScary implements IChunkProvider {
     public int oceanLevel;
     public Block oceanReplacement;
     public boolean geostrataGen;
+    private boolean initBiomeGenDecorators = false;
 
     {
         caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
@@ -141,22 +146,71 @@ public class ChunkProviderScary implements IChunkProvider {
                 Set<IWorldGenerator> iWorldGenerators = (Set<IWorldGenerator>) worldGenerators.get(null);
                 Map<IWorldGenerator, Integer> iWorldGeneratorIntegerMap = (Map<IWorldGenerator, Integer>) worldGeneratorIndex.get(null);
                 Iterator<IWorldGenerator> it = iWorldGenerators.iterator();
+                HashMap<IWorldGenerator, Integer> toAdd = new HashMap<IWorldGenerator, Integer>();
                 int j = 0;
                 do {
+                    if(!ABO.geostrataInstalled) break;
                     if (!it.hasNext()) break;
                     IWorldGenerator gen = it.next();
                     if (gen.getClass().getSimpleName().equalsIgnoreCase("RockGenerator")) {
                         j++;
                         iWorldGeneratorIntegerMap.remove(gen);
                         it.remove();
+                        continue;
+                    }
+                    if (gen.getClass().getSimpleName().equalsIgnoreCase("ReactorOreGenerator")) {
+                        j++;
+                        toAdd.put(ReactorOreGeneratorOverride.instance, iWorldGeneratorIntegerMap.get(gen));
+                        iWorldGeneratorIntegerMap.remove(gen);
+                        it.remove();
+                    }
+                    if (gen.getClass().getSimpleName().equalsIgnoreCase("OverworldGenerator")) {
+                        j++;
+                        iWorldGeneratorIntegerMap.remove(gen);
+                        it.remove();
+                        GalactiCraftHandler.addGeneratorOverrides(toAdd);
+                    }
+
+                    if (gen.getClass().getSimpleName().equalsIgnoreCase("SimpleGenHandler") || gen.getClass().getSimpleName().equalsIgnoreCase("SimpleGenHandler$")) {
+                        ProjectRedHandler.override(gen);
                     }
                 } while (true);
 
-                ABO.aboLog.info("Unregistered " + j + " ore " + (j > 1 ? "generators" : "generator") + " from Geostrata");
+                ABO.aboLog.info("Unregistered " + j + " ore " + (j > 1 ? "generators" : "generator") + " from World Generation");
 
+                it = toAdd.keySet().iterator();
+                j = 0;
+                do {
+                    if (!it.hasNext()) break;
+                    IWorldGenerator gen = it.next();
+                    iWorldGenerators.add(gen);
+                    iWorldGeneratorIntegerMap.put(gen, toAdd.get(gen));
+                    j++;
+                } while(true);
+
+                ABO.aboLog.info("Added " + j + " generator " + (j > 1 ? "overrides" : "override") + " to World Generation");
             } catch (Throwable t) {
-                ABO.aboLog.warn("Unable to unregister Reika's ore gen for scaryGen");
+                ABO.aboLog.warn("Unable to modify ore gen for scaryGen");
                 t.printStackTrace();
+            }
+            if(ABO.geostrataInstalled) {
+                try {
+                    for(BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
+                        if(biome != null && biome.theBiomeDecorator != null) {
+                            biome.theBiomeDecorator.coalGen = new WorldGenMinableOverride(Blocks.coal_ore, 16);
+                            biome.theBiomeDecorator.ironGen = new WorldGenMinableOverride(Blocks.iron_ore, 8);
+                            biome.theBiomeDecorator.goldGen = new WorldGenMinableOverride(Blocks.gold_ore, 8);
+                            biome.theBiomeDecorator.redstoneGen = new WorldGenMinableOverride(Blocks.redstone_ore, 7);
+                            biome.theBiomeDecorator.diamondGen = new WorldGenMinableOverride(Blocks.diamond_ore, 7);
+                            biome.theBiomeDecorator.lapisGen = new WorldGenMinableOverride(Blocks.lapis_ore, 6);
+                            ABO.aboLog.info("Replaced ore gen for " + biome.biomeName + " with geoStrata custom ore gen");
+                        }
+                    }
+
+                }catch (Throwable e) {
+                    e.printStackTrace();
+                }
+
             }
         }
     }
@@ -378,6 +432,8 @@ public class ChunkProviderScary implements IChunkProvider {
      * and chunk seed
      */
     public Chunk provideChunk(int p_73154_1_, int p_73154_2_) {
+
+
         worldObj.theProfiler.startSection("scaryGen");
         this.rand.setSeed((long) p_73154_1_ * 341873128712L + (long) p_73154_2_ * 132897987541L);
         Block[] ablock = new Block[65536];
@@ -395,6 +451,11 @@ public class ChunkProviderScary implements IChunkProvider {
         worldObj.theProfiler.endStartSection("Ravines");
         this.ravineGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
         worldObj.theProfiler.endSection();
+        if(((ChunkProviderScary)this).geostrataGen) {
+            worldObj.theProfiler.startSection("GeostrataGen");
+            geostrataGen(p_73154_1_, p_73154_2_, ablock, abyte, this.biomesForGeneration);
+            worldObj.theProfiler.endSection();
+        }
 
         if (this.mapFeaturesEnabled) {
             worldObj.theProfiler.startSection("MapFeatures");
@@ -409,11 +470,7 @@ public class ChunkProviderScary implements IChunkProvider {
             worldObj.theProfiler.endSection();
             worldObj.theProfiler.endSection();
         }
-        if(((ChunkProviderScary)this).geostrataGen) {
-            worldObj.theProfiler.startSection("GeostrataGen");
-            geostrataGen(p_73154_1_, p_73154_2_, ablock, abyte, this.biomesForGeneration);
-            worldObj.theProfiler.endSection();
-        }
+
         BlockFalling.fallInstantly = false;
         Chunk chunk = new Chunk(this.worldObj, ablock, abyte, p_73154_1_, p_73154_2_);
         byte[] abyte1 = chunk.getBiomeArray();
