@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -16,6 +17,8 @@ import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import da3dsoul.ShapeGen.ShapeGen;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
@@ -30,6 +33,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.*;
@@ -130,6 +134,7 @@ public class ABO {
     public static Block blockLargeButtonWood = null;
     public static Item bottle = null;
     public static Item goldenstaff = null;
+    public static HashMap<Integer, ShapeGen> shapeGens = new HashMap<Integer, ShapeGen>();
 
     public static boolean geostrataInstalled = false;
     public static boolean cofhInstalled = false;
@@ -497,6 +502,13 @@ public class ABO {
     }
 
     @SubscribeEvent
+    public void tickWorld(TickEvent.WorldTickEvent event) {
+        if(event.side == Side.SERVER || !event.world.isRemote) {
+            shapeGens.get(event.world.provider.dimensionId).tick();
+        }
+    }
+
+    @SubscribeEvent
     public void playerUpdate(LivingEvent.LivingUpdateEvent event) {
         if (ABO.blockLiquidXP != null) {
             if (event.entityLiving instanceof EntityPlayer) {
@@ -705,6 +717,10 @@ public class ABO {
     @EventHandler
     public void post(FMLPostInitializationEvent event) {
         BiomeStoneGen.init();
+
+        for(int i : DimensionManager.getIDs()) {
+            shapeGens.put(i, new ShapeGen(DimensionManager.getWorld(i)));
+        }
     }
 
     // Side Handling
