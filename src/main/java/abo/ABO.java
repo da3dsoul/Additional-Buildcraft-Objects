@@ -29,8 +29,8 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.*;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.item.ItemDye;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
@@ -684,6 +684,71 @@ public class ABO {
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
+            if(event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+                ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
+
+                int range = 150;
+                EntityPlayer entityplayer = event.entityPlayer;
+                World world = entityplayer.worldObj;
+
+                if (itemstack.getItemDamage() == 4)
+                {
+                    ChunkCoordinates chuck = getLooking(world, entityplayer, range);
+
+                    if (chuck == null)
+                    {
+                        return;
+                    }
+
+                    int i = chuck.posX;
+                    int j = chuck.posY;
+                    int k = chuck.posZ;
+
+                    if (!world.canMineBlock(entityplayer, i, j, k))
+                    {
+                        return;
+                    }
+
+                    ShapeGen.getShapeGen(world).shuffle(i, j, k, 3, -1, true, true, true);
+                }else if (itemstack.getItemDamage() == 6)
+                {
+                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -3);
+
+                    if (chuck == null)
+                    {
+                        return;
+                    }
+
+                    int i = chuck.posX;
+                    int j = chuck.posY;
+                    int k = chuck.posZ;
+
+                    if (!world.canMineBlock(entityplayer, i, j, k))
+                    {
+                        return;
+                    }
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 6, true, true);
+                } else if (itemstack.getItemDamage() == 10)
+                {
+                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -3);
+
+                    if (chuck == null)
+                    {
+                        return;
+                    }
+
+                    int i = chuck.posX;
+                    int j = chuck.posY;
+                    int k = chuck.posZ;
+
+                    if (!world.canMineBlock(entityplayer, i, j, k))
+                    {
+                        return;
+                    }
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 6, false, true);
+                }
+            }
+
             if (blockLiquidXP != null) {
                 if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
                     bucketEventCanceled = true;
@@ -694,6 +759,76 @@ public class ABO {
                 bucketEventCanceled = false;
             }
         }
+    }
+
+    public static ChunkCoordinates getLooking(World world, EntityPlayer entityplayer, int range) {
+        return getLookingOffset(world,entityplayer,range,0);
+    }
+
+
+    public static ChunkCoordinates getLookingOffset(World world, EntityPlayer entityplayer, int range, int off)
+    {
+        float f = entityplayer.rotationPitch;
+        float f1 = entityplayer.rotationYaw;
+        double d = entityplayer.posX;
+        double d1 = (entityplayer.posY + 1.6200000000000001D) - (double)entityplayer.yOffset;
+        double d2 = entityplayer.posZ;
+        Vec3 vec3d = Vec3.createVectorHelper(d, d1, d2);
+        float f2 = MathHelper.cos(-f1 * 0.01745329F - (float)Math.PI);
+        float f3 = MathHelper.sin(-f1 * 0.01745329F - (float)Math.PI);
+        float f4 = -MathHelper.cos(-f * 0.01745329F);
+        float f5 = MathHelper.sin(-f * 0.01745329F);
+        float f6 = f3 * f4;
+        float f7 = f2 * f4;
+        double d3 = range;
+        Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+        MovingObjectPosition movingobjectposition = world.rayTraceBlocks(vec3d, vec3d1, false);
+
+        if (movingobjectposition == null)
+        {
+            return null;
+        }
+
+        if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+        {
+            int i = movingobjectposition.blockX;
+            int j = movingobjectposition.blockY;
+            int k = movingobjectposition.blockZ;
+
+            if (movingobjectposition.sideHit == 0)
+            {
+                j -= off;
+            }
+
+            if (movingobjectposition.sideHit == 1)
+            {
+                j += off;
+            }
+
+            if (movingobjectposition.sideHit == 2)
+            {
+                k -= off;
+            }
+
+            if (movingobjectposition.sideHit == 3)
+            {
+                k += off;
+            }
+
+            if (movingobjectposition.sideHit == 4)
+            {
+                i -= off;
+            }
+
+            if (movingobjectposition.sideHit == 5)
+            {
+                i += off;
+            }
+
+            return new ChunkCoordinates(i, j, k);
+        }
+
+        return null;
     }
 
     @EventHandler

@@ -14,14 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import javax.swing.Timer;
 
 import abo.ABO;
@@ -51,6 +44,11 @@ public class ShapeGen
     public static ShapeGen getShapeGen(int i)
     {
         return ABO.shapeGens.get(i);
+    }
+
+    public static ShapeGen getShapeGen(World w)
+    {
+        return ABO.shapeGens.get(w.provider.dimensionId);
     }
 	
 	public static World getWorldFromShapeGen(int i)
@@ -1899,6 +1897,104 @@ public class ShapeGen
     			}
     		}
     	}
+    }
+
+    public void blend(World world, int i, int j, int k, int size, boolean excludeAir, boolean excludeFluids)
+    {
+        int _bSize = size;
+        int _twoBrushSize = 2 * _bSize;
+        BlockIdentity _oldMaterials[][][] = new BlockIdentity[2 * (_bSize + 1) + 1][2 * (_bSize + 1) + 1][2 * (_bSize + 1) + 1];
+        BlockIdentity _newMaterials[][][] = new BlockIdentity[_twoBrushSize + 1][_twoBrushSize + 1][_twoBrushSize + 1];
+
+        for (int _x = 0; _x <= 2 * (_bSize + 1); _x++)
+        {
+            for (int _y = 0; _y <= 2 * (_bSize + 1); _y++)
+            {
+                for (int _z = 0; _z <= 2 * (_bSize + 1); _z++)
+                {
+                    _oldMaterials[_x][_y][_z] = new BlockIdentity(world.getBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z), world.getBlockMetadata((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z));
+                }
+            }
+        }
+
+        for (int _x = 0; _x <= _twoBrushSize; _x++)
+        {
+            for (int _y = 0; _y <= _twoBrushSize; _y++)
+            {
+                for (int _z = 0; _z <= _twoBrushSize; _z++)
+                {
+                    _newMaterials[_x][_y][_z] = _oldMaterials[_x + 1][_y + 1][_z + 1];
+                }
+            }
+        }
+
+        for (int _x = 0; _x <= _twoBrushSize; _x++)
+        {
+            for (int _y = 0; _y <= _twoBrushSize; _y++)
+            {
+                for (int _z = 0; _z <= _twoBrushSize; _z++) {
+                    HashMap<BlockIdentity, Integer> _materialFrequency = new HashMap<BlockIdentity, Integer>();
+                    int _modeMatCount = 0;
+                    BlockIdentity _modeMatId = null;
+                    boolean _tiecheck = true;
+
+                    for (int _m = -1; _m <= 1; _m++) {
+                        for (int _n = -1; _n <= 1; _n++) {
+                            for (int _o = -1; _o <= 1; _o++) {
+                                if (_m != 0 || _n != 0 || _o != 0) {
+                                    if (_materialFrequency.containsKey(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o])) {
+                                        _materialFrequency.put(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o], _materialFrequency.get(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o]) + 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    for (BlockIdentity _i : _materialFrequency.keySet()) {
+                        if (_materialFrequency.get(_i) > _modeMatCount && (!excludeAir || _i.getBlock() != Blocks.air) && (!excludeFluids || !BlockUtils.isFluid(_i.getBlock())) && (_i.getBlock() != Blocks.bedrock)) {
+                            _modeMatCount = _materialFrequency.get(_i);
+                            _modeMatId = _i;
+                        }
+                    }
+
+                    for (BlockIdentity _i : _materialFrequency.keySet()) {
+                        if (_i != _modeMatId && _materialFrequency.get(_i) == _modeMatCount && (!excludeAir || _i.getBlock() != Blocks.air) && (!excludeFluids || !BlockUtils.isFluid(_i.getBlock())) && (_i.getBlock() != Blocks.bedrock)) {
+                            _tiecheck = false;
+                        }
+                    }
+
+                    if (_tiecheck)
+                    {
+                        _newMaterials[_x][_y][_z] = _modeMatId;
+                    }
+                }
+            }
+        }
+
+        double _rPow = Math.pow(_bSize + 1, 2D);
+
+        for (int _x = _twoBrushSize; _x >= 0; _x--)
+        {
+            double _xPow = Math.pow(_x - _bSize - 1, 2D);
+
+            for (int _y = 0; _y <= _twoBrushSize; _y++)
+            {
+                double _yPow = Math.pow(_y - _bSize - 1, 2D);
+
+                for (int _z = _twoBrushSize; _z >= 0; _z--)
+                {
+                    if (_xPow + _yPow + Math.pow(_z - _bSize - 1, 2D) > _rPow || (_newMaterials[_x][_y][_z].getBlock() == Blocks.bedrock) || excludeAir && _newMaterials[_x][_y][_z].getBlock() == Blocks.air || (excludeFluids && BlockUtils.isFluid(_newMaterials[_x][_y][_z].getBlock())))
+                    {
+                        continue;
+                    }
+
+                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getBlock())
+                    {
+                        addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, _newMaterials[_x][_y][_z].getBlock(), _newMaterials[_x][_y][_z].getMeta());
+                    }
+                }
+            }
+        }
     }
     
     private String[] cloneTrim(String[] array, int newSize)
