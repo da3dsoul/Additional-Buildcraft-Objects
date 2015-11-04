@@ -14,7 +14,7 @@ import buildcraft.core.BCCreativeTab;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import da3dsoul.ShapeGen.ShapeGen;
@@ -24,6 +24,7 @@ import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.*;
 import net.minecraft.entity.IProjectile;
@@ -83,9 +84,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -499,13 +497,23 @@ public class ABO {
 
     @SubscribeEvent
     public void tickWorld(TickEvent.WorldTickEvent event) {
-        if(event.side == Side.SERVER || !event.world.isRemote) {
+        if((event.side == Side.SERVER || !event.world.isRemote) && event.phase == TickEvent.Phase.START) {
             if(!shapeGens.containsKey(event.world.provider.dimensionId))
             {
                 shapeGens.put(event.world.provider.dimensionId, new ShapeGen(event.world));
             }
             shapeGens.get(event.world.provider.dimensionId).tick();
         }
+    }
+
+    @SubscribeEvent
+    public void worldUnload(WorldEvent.Unload event) {
+        ShapeGen.stopping = true;
+    }
+
+    @SubscribeEvent
+    public void serverStopping(FMLServerStoppingEvent event) {
+        ShapeGen.stopping = true;
     }
 
     @SubscribeEvent
@@ -539,35 +547,6 @@ public class ABO {
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onBonemeal(BonemealEvent event) {
-        Block var5 = event.block;
-        World par1World = event.world;
-        if (var5 == Blocks.dirt)
-        {
-            if (!par1World.isRemote)
-            {
-                boolean success = false;
-
-                if (isBlockDirtAndFree(par1World, event.x, event.y, event.z))
-                {
-                    BiomeGenBase biome = par1World.getBiomeGenForCoords(event.x, event.z);
-                    Block block1 = Blocks.grass;
-                    int meta = 0;
-                    if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
-                    if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                    success = par1World.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(par1World, event.x, event.y, event.z);
-                }
-
-                if (success && !event.entityPlayer.capabilities.isCreativeMode && par1World.rand.nextInt(20) == 0)
-                {
-                    event.entityPlayer.inventory.getCurrentItem().stackSize--;
-                    if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
                 }
             }
         }
@@ -727,7 +706,7 @@ public class ABO {
                     {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 3, true, false, true);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 1, true, false, false);
                 } else if (itemstack.getItemDamage() == 10)
                 {
                     ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -2);
@@ -745,7 +724,7 @@ public class ABO {
                     {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 2, false, false, true);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 1, false, false, true);
                 }
             }
 

@@ -63,7 +63,6 @@ public class ShapeGen
         blocksToAdd = new LinkedHashMap();
         this.world = world;
         shapeGenID = world.provider.dimensionId;
-        alive = true;
         readFromNBT();
     }
 	
@@ -81,62 +80,26 @@ public class ShapeGen
 
     public void tick()
     {
-        if (server == null)
-        {
-            return;
-        }
-
-        if (world == null)
-        {
-            return;
-        }
-
-        boolean flag = true;
-
-        if (world != null && !world.playerEntities.isEmpty())
-        {
-            flag = false;
-        }
-
-        if (flag)
-        {
-            if (!Instant)
-            {
-                Instant = true;
+        if(!updatingAnywhere) {
+            synchronized (blocks) {
+                blocks.putAll(blocksToAdd);
+                blocksToAdd.clear();
             }
         }
-        else if (Instant)
+
+        if (server == null || world == null)
         {
-            Instant = false;
+            return;
         }
 
-        blocks.putAll(blocksToAdd);
-        blocksToAdd.clear();
-
         update();
-        cleanUpList();
     }
 
     public void update()
     {
-        if (!server.isServerRunning() && !stopping)
+        if (stopping)
         {
             writeToNBT();
-            return;
-        }
-
-        if (world == null || server == null)
-        {
-            return;
-        }
-
-        if (adding)
-        {
-            if (!updatingAnywhere)
-            {
-                updatingAnywhere = true;
-            }
-
             return;
         }
 
@@ -144,21 +107,12 @@ public class ShapeGen
 
         if (blocks == null || blocks.isEmpty())
         {
-            if (updatingAnywhere)
-            {
-                updatingAnywhere = false;
-            }
-
             return;
-        }
-
-        if (!updatingAnywhere)
-        {
-            updatingAnywhere = true;
         }
 
         Notify = true;
 
+        updatingAnywhere = true;
         synchronized (blocks)
         {
             for (Iterator it = blocks.entrySet().iterator(); c <= (Instant ? 16384 : 512) && it.hasNext(); it.remove())
@@ -192,6 +146,7 @@ public class ShapeGen
                 c++;
             }
         }
+        updatingAnywhere = false;
     }
 
     public synchronized void addBlock(int i, int j, int k, Block id)
@@ -214,8 +169,6 @@ public class ShapeGen
 
     public synchronized void addBlock(int i, int j, int k, Block id, int l)
     {
-        if (!alive) return;
-
         if (updatingAnywhere)
         {
             blocksToAdd.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "," + l);
@@ -240,7 +193,7 @@ public class ShapeGen
 
     public synchronized void addBlocks(Map list)
     {
-        if (!alive)
+        if (updatingAnywhere)
         {
             blocksToAdd.putAll(list);
             return;
@@ -276,10 +229,6 @@ public class ShapeGen
         {
             blocks.remove("" + i + "," + j + "," + k);
         }
-    }
-
-    public void cleanUpList()
-    {
     }
 
     public void clearBlocks()
@@ -898,10 +847,6 @@ public class ShapeGen
 
     public void placeCone(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         int endPoint[] =
         {
@@ -929,10 +874,6 @@ public class ShapeGen
     public void placeConeHollow(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta,
             int thickness, boolean cap, boolean fillair)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         int endPoint[] =
         {
@@ -970,10 +911,6 @@ public class ShapeGen
     public void placeConeHollowInverted(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta,
             int thickness, boolean cap, boolean fillair)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         int endPoint[] =
         {
@@ -1020,10 +957,6 @@ public class ShapeGen
 
     public void placeConeInverted(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         int endPoint[] =
         {
@@ -1061,10 +994,6 @@ public class ShapeGen
 
     public void placeCylinder(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         for (int i = -radius; i <= radius; i++)
         {
@@ -1091,10 +1020,6 @@ public class ShapeGen
     public void placeCylinderHollow(int X, int Y, int Z, int radius, int height, int thickness, boolean cap,
             boolean fillair, Block blockID, int blockMeta, boolean captop)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         for (int i = -radius; i <= radius; i++)
         {
@@ -1134,10 +1059,6 @@ public class ShapeGen
     public void placeDome(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
             boolean fillair, int metadata)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
         {
@@ -1241,10 +1162,6 @@ public class ShapeGen
     public void placeDomeInverted(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
             boolean fillair, int metadata)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
         {
@@ -1348,10 +1265,6 @@ public class ShapeGen
             double sizeZ, Block BlockID, boolean inverted, boolean hollow, int thickness, boolean fillair,
             int metadata)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         if (sizeX % 2D == 0.0D && sizeZ % 2D != 0.0D)
         {
@@ -1469,10 +1382,6 @@ public class ShapeGen
     public void placeSphere(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
             boolean fillair, boolean noisy, int metadata)
     {
-        if (!alive)
-        {
-            return;
-        }
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
         {
@@ -1646,16 +1555,12 @@ public class ShapeGen
     public void placeSphereTopsoil(int X, int Y, int Z, float radius, Block BlockID, Block interID, Block topsoilID,
             int blockmetadata, int intermetadata, int topmetadata)
     {
-        if (!alive)
-        {
-            return;
-        }
 
-        for (int y = 0; y < (int)Math.ceil(radius); y++)
+        for (int y = 0; y <= (int)Math.ceil(radius); y++)
         {
-            for (int z = 0; z < (int)Math.ceil(radius); z++)
+            for (int z = 0; z <= (int)Math.ceil(radius); z++)
             {
-                for (int x = 0; x < (int)Math.ceil(radius); x++)
+                for (int x = 0; x <= (int)Math.ceil(radius); x++)
                 {
                     float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
 
@@ -1769,10 +1674,6 @@ public class ShapeGen
     public void placeTopsoil(int X, int Y, int Z, int radius, Block interID, Block topsoilID, int intermetadata,
             int topmetadata, EntityPlayer player, boolean fromBiome)
     {
-        if (!alive)
-        {
-            return;
-        }
         
         for (int i = X - radius; i <= X + radius; i++)
         {
@@ -2394,9 +2295,7 @@ public class ShapeGen
     public static boolean Instant = false;
     public static boolean Notify = true;
     private static MinecraftServer server;
-    public boolean alive;
     public boolean updatingAnywhere;
-    public boolean adding;
     private Map<String,String> blocks;
     private Map<String, String> blocksToAdd;
     private final byte otherCoordPairs[] =
