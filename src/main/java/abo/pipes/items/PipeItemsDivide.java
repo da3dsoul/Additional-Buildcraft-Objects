@@ -14,7 +14,6 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
-import buildcraft.core.ItemWrench;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TransportConstants;
 import buildcraft.transport.TravelingItem;

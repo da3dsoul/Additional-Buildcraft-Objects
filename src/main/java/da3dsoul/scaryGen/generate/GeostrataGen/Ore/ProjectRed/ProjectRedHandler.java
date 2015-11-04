@@ -2,13 +2,11 @@ package da3dsoul.scaryGen.generate.GeostrataGen.Ore.ProjectRed;
 
 import abo.ABO;
 import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.registry.GameRegistry;
 import mrtjp.core.world.GenLogicUniform;
 import mrtjp.core.world.ISimpleStructureGen;
 import mrtjp.core.world.SimpleGenHandler$;
 import mrtjp.projectred.exploration.OreDefs;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import scala.collection.Iterator;
 import scala.collection.Seq;
 

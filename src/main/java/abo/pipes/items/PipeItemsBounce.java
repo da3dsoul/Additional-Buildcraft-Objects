@@ -4,10 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-import abo.PipeIconProvider;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
-import buildcraft.api.core.Position;
 import buildcraft.transport.ISolidSideTile;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;

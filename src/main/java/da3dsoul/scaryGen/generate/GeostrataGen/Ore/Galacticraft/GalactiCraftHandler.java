@@ -1,10 +1,8 @@
 package da3dsoul.scaryGen.generate.GeostrataGen.Ore.Galacticraft;
 
 import cpw.mods.fml.common.IWorldGenerator;
-import cpw.mods.fml.common.registry.GameRegistry;
 import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.world.gen.OverworldGenerator;
 
 import java.util.HashMap;
 

@@ -1,11 +1,7 @@
 package da3dsoul.ShapeGen;
 
-import com.sun.swing.internal.plaf.metal.resources.metal;
 import net.minecraft.block.Block;
 
-/**
- * Created by Thomas Baer on 11/3/2015.
- */
 public class BlockIdentity {
 
     private final Block block;
@@ -33,7 +29,17 @@ public class BlockIdentity {
     }
 
     @Override
+    public int hashCode() {
+        return Block.getIdFromBlock(block) << 8 | meta;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new BlockIdentity(block,meta);
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return "" + Block.blockRegistry.getNameForObject(block) + "," + meta;
     }
 }

@@ -22,7 +22,6 @@ import org.lwjgl.opengl.GL11;
 import abo.pipes.items.PipeItemsEnderExtraction;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
-import buildcraft.core.DefaultProps;
 import buildcraft.transport.pipes.PipeItemsEmerald.FilterMode;
 
 public class GuiPipeItemsEnderExtraction extends GuiBuildCraft implements IButtonClickEventListener {

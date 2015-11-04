@@ -2,7 +2,6 @@ package abo;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,7 +32,6 @@ import net.minecraft.item.ItemDye;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.*;
@@ -99,8 +97,6 @@ import da3dsoul.scaryGen.generate.WorldTypeScary;
 import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
-
-import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE;
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion")
 public class ABO {
@@ -466,7 +462,7 @@ public class ABO {
         if(!spawnLakes) return;
         if(!respawnLakes) return;
         if (event.rand.nextInt(16) == 0
-                && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, LAKE)) {
+                && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, PopulateChunkEvent.Populate.EventType.LAKE)) {
             int k1 = event.chunkX + event.rand.nextInt(16) + 8;
             int l1 = 45 + event.rand.nextInt(211);
             int i2 = event.chunkZ + event.rand.nextInt(16) + 8;
@@ -504,6 +500,10 @@ public class ABO {
     @SubscribeEvent
     public void tickWorld(TickEvent.WorldTickEvent event) {
         if(event.side == Side.SERVER || !event.world.isRemote) {
+            if(!shapeGens.containsKey(event.world.provider.dimensionId))
+            {
+                shapeGens.put(event.world.provider.dimensionId, new ShapeGen(event.world));
+            }
             shapeGens.get(event.world.provider.dimensionId).tick();
         }
     }
@@ -712,7 +712,7 @@ public class ABO {
                     ShapeGen.getShapeGen(world).shuffle(i, j, k, 3, -1, true, true, true);
                 }else if (itemstack.getItemDamage() == 6)
                 {
-                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -3);
+                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -2);
 
                     if (chuck == null)
                     {
@@ -727,10 +727,10 @@ public class ABO {
                     {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 6, true, true);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 3, true, false, true);
                 } else if (itemstack.getItemDamage() == 10)
                 {
-                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -3);
+                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -2);
 
                     if (chuck == null)
                     {
@@ -745,7 +745,7 @@ public class ABO {
                     {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 6, false, true);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 2, false, false, true);
                 }
             }
 
@@ -852,10 +852,6 @@ public class ABO {
     @EventHandler
     public void post(FMLPostInitializationEvent event) {
         BiomeStoneGen.init();
-
-        for(int i : DimensionManager.getIDs()) {
-            shapeGens.put(i, new ShapeGen(DimensionManager.getWorld(i)));
-        }
     }
 
     // Side Handling

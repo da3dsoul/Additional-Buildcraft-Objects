@@ -18,7 +18,6 @@ buildscript {
     }
 }
 
-apply plugin: 'scala'
 apply plugin: 'forge'
 
 version = "MC1.7.10-BC7.1release" + "4.0.2"

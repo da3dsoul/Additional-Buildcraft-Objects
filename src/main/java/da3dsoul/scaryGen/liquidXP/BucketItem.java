@@ -2,20 +2,13 @@ package da3dsoul.scaryGen.liquidXP;
 
 import abo.ABO;
 import abo.ItemIconProvider;
-import cpw.mods.fml.common.eventhandler.Event;
-import mods.immibis.lxp.LiquidXPMod;
-import mods.immibis.lxp.R;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.entity.player.FillBucketEvent;
 
 public class BucketItem extends mods.immibis.lxp.BucketItem {
 

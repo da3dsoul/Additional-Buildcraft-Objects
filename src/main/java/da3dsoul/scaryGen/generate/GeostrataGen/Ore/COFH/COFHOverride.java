@@ -1,22 +1,12 @@
 package da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH;
 
 import abo.ABO;
-import cofh.api.world.IFeatureGenerator;
 import cofh.api.world.IGeneratorParser;
 import cofh.core.world.FeatureParser;
-import cofh.core.world.WorldHandler;
 import cofh.core.world.decoration.ClusterParser;
-import cofh.lib.util.WeightedRandomBlock;
-import cofh.lib.world.WorldGenMinableCluster;
-import cofh.lib.world.WorldGenSparseMinableCluster;
-import cofh.lib.world.feature.FeatureGenUniform;
-import cpw.mods.fml.common.IWorldGenerator;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.gen.feature.WorldGenerator;
 import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class COFHOverride {

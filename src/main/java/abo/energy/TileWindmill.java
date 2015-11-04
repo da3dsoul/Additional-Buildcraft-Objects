@@ -1,17 +1,11 @@
 package abo.energy;
 
 import buildcraft.core.lib.utils.MathUtils;
-import cofh.api.energy.IEnergyHandler;
-import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.transport.TileGenericPipe;
 
 public class TileWindmill extends TileConstantPowerProvider {
 

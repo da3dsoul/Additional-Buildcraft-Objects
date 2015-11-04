@@ -15,7 +15,6 @@ import da3dsoul.scaryGen.generate.GeostrataGen.Ore.WorldGenMinableOverride;
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.feature.WorldGenMinable;
 
 public class ReactorOreGeneratorOverride implements RetroactiveGenerator {
     public static final ReactorOreGeneratorOverride instance = new ReactorOreGeneratorOverride();

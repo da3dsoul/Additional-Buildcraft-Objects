@@ -5,17 +5,12 @@ import buildcraft.core.lib.utils.MathUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 import abo.ABO;
-import buildcraft.api.transport.IPipeTile;
-import buildcraft.transport.TileGenericPipe;
-import cofh.api.energy.IEnergyHandler;
 
 public class TileWaterwheel extends TileConstantPowerProvider {
 

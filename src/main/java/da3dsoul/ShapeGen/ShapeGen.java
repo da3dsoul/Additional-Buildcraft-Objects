@@ -5,8 +5,6 @@
 
 package da3dsoul.ShapeGen;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -15,19 +13,16 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.*;
-import javax.swing.Timer;
 
 import abo.ABO;
 import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -122,24 +117,114 @@ public class ShapeGen
         cleanUpList();
     }
 
+    public void update()
+    {
+        if (!server.isServerRunning() && !stopping)
+        {
+            writeToNBT();
+            return;
+        }
+
+        if (world == null || server == null)
+        {
+            return;
+        }
+
+        if (adding)
+        {
+            if (!updatingAnywhere)
+            {
+                updatingAnywhere = true;
+            }
+
+            return;
+        }
+
+        int c = 0;
+
+        if (blocks == null || blocks.isEmpty())
+        {
+            if (updatingAnywhere)
+            {
+                updatingAnywhere = false;
+            }
+
+            return;
+        }
+
+        if (!updatingAnywhere)
+        {
+            updatingAnywhere = true;
+        }
+
+        Notify = true;
+
+        synchronized (blocks)
+        {
+            for (Iterator it = blocks.entrySet().iterator(); c <= (Instant ? 16384 : 512) && it.hasNext(); it.remove())
+            {
+                java.util.Map.Entry block = (java.util.Map.Entry)it.next();
+                String a[] = ((String)block.getKey()).split(",");
+                int i = Integer.parseInt(a[0]);
+                int j = Integer.parseInt(a[1]);
+                int k = Integer.parseInt(a[2]);
+                String[] b = ((String)block.getValue()).split(",");
+                int meta = Integer.parseInt(b[1]);
+                Block id = (Block)Block.blockRegistry.getObject(b[0]);
+
+                if (world.getBlock(i, j, k) == id && world.getBlockMetadata(i, j, k) == meta)
+                {
+                    continue;
+                }
+
+                if(!id.canPlaceBlockAt(world, i, j, k)) continue;
+                if(!id.canBlockStay(world, i, j, k)) continue;
+
+                if (Notify)
+                {
+                    world.setBlock(i, j, k, id, meta, 3);
+                }
+                else
+                {
+                    world.setBlock(i, j, k, id, meta, 2);
+                }
+
+                c++;
+            }
+        }
+    }
+
     public synchronized void addBlock(int i, int j, int k, Block id)
     {
         addBlock(i, j, k, id, 0);
+    }
+
+    public synchronized void addBlock(int a[], Block blockID)
+    {
+        if (a.length < 3)
+        {
+            return;
+        }
+        else
+        {
+            addBlock(a[0], a[1], a[2], blockID);
+            return;
+        }
     }
 
     public synchronized void addBlock(int i, int j, int k, Block id, int l)
     {
         if (!alive) return;
 
-        if (adding)
+        if (updatingAnywhere)
         {
-            blocksToAdd.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "|" + l);
+            blocksToAdd.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "," + l);
             return;
         }
 
         synchronized (blocks)
         {
-            blocks.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "|" + l);
+            blocks.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "," + l);
         }
     }
 
@@ -170,6 +255,27 @@ public class ShapeGen
     public void addBlocksAtStart(Map list)
     {
         addBlocks(list);
+    }
+
+    public void removeBlocksUpdate(Map list)
+    {
+        synchronized (blocks)
+        {
+            blocks.remove(list);
+        }
+    }
+
+    public void removeBlockUpdate(int i, int j, int k, int id)
+    {
+        removeBlockUpdate(i, j, k, id, 0);
+    }
+
+    public void removeBlockUpdate(int i, int j, int k, int id, int l)
+    {
+        synchronized (blocks)
+        {
+            blocks.remove("" + i + "," + j + "," + k);
+        }
     }
 
     public void cleanUpList()
@@ -231,7 +337,7 @@ public class ShapeGen
             ai1[byte2] = MathHelper.floor_double((double) arrayStart[byte2] + (double) j * d1 + 0.5D);
             Block id = world.getBlock(ai1[0], ai1[1], ai1[2]);
             int meta = world.getBlockMetadata(ai1[0], ai1[1], ai1[2]);
-            String returnVal = ai1[0]+ "|" + ai1[1] + "|" + ai1[2] + "|" + Block.blockRegistry.getNameForObject(id) + "|" + meta;
+            String returnVal = ai1[0]+ "," + ai1[1] + "," + ai1[2] + "," + Block.blockRegistry.getNameForObject(id) + "," + meta;
             returnList.add(returnVal);
         }
 
@@ -1852,7 +1958,7 @@ public class ShapeGen
     				if(excludeAir && j.isAir(world,x + minX,y + minY,z + minZ)) continue;
     				if(excludeLiquids && (BlockUtils.isFluid(j))) continue;
     				if(excludeBedrock && j == Blocks.bedrock) continue;
-    				blocks[i] = Block.blockRegistry.getNameForObject(j) + "|" + world.getBlockMetadata(x + minX, y + minY, z + minZ);
+    				blocks[i] = Block.blockRegistry.getNameForObject(j) + "," + world.getBlockMetadata(x + minX, y + minY, z + minZ);
     				i++;
     			}
     		}
@@ -1890,7 +1996,7 @@ public class ShapeGen
     					if(index < blocks.length) break;
     					index -= blocks.length;
     				}while(true);
-    				String[] id = blocks[index].split("|");
+    				String[] id = blocks[index].split(",");
 					Block block2 = (Block) Block.blockRegistry.getObject(id[0]);
 					int meta2 = Integer.parseInt(id[1]);
     				addBlock(x + minX, y + minY, z + minZ, block2, meta2);
@@ -1899,7 +2005,142 @@ public class ShapeGen
     	}
     }
 
-    public void blend(World world, int i, int j, int k, int size, boolean excludeAir, boolean excludeFluids)
+    /*
+    Ellipsoid Math
+    if(isInEllipsoid)
+    ((x-i)^2) / (a^2) + ((y-j)^2) / (b^2) + ((z-k)^2) / (c^2) < 1
+
+
+     */
+
+    public void blend(World world, int i, int j, int k, int radius, int falloff, boolean allowAir, boolean allowFluids, boolean rounded) {
+        blend(world, i - radius, j - radius, k - radius, i + radius, j + radius, k + radius, falloff, allowAir, allowFluids, rounded);
+    }
+
+    public void blend(World world, int i, int j, int k, int radius, boolean allowAir, boolean allowFluids) {
+        blend(world, i - radius, j - radius, k - radius, i + radius, j + radius, k + radius, 1, allowAir, allowFluids, true);
+    }
+    
+    public void blend(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int falloff, boolean allowAir, boolean allowFluids, boolean rounded) {
+        if(minX == maxX || minY == maxY || minZ == maxZ) return;
+        int temp1 = 0;
+        if(minX > maxX) {
+            temp1 = minX;
+            minX = maxX;
+            maxX = temp1;
+        }
+        if(minY > maxY) {
+            temp1 = minY;
+            minY = maxY;
+            maxY = temp1;
+        }
+        if(minZ > maxZ) {
+            temp1 = minZ;
+            minZ = maxZ;
+            maxZ = temp1;
+        }
+        int lengthX = maxX - minX + 1;
+        int lengthY = maxY - minY + 1;
+        int lengthZ = maxZ - minZ + 1;
+        BlockIdentity oldBlocks[][][] = new BlockIdentity[lengthX + falloff * 2][lengthY + falloff * 2][lengthZ + falloff * 2];
+        BlockIdentity newBlocks[][][] = new BlockIdentity[lengthX][lengthY][lengthZ];
+        HashMap<BlockIdentity, Float> weightedBlockValue = new HashMap<BlockIdentity, Float>((falloff * 2 + 1) * (falloff * 2 + 1) - 1);
+
+        int xIndex = 0;
+        int yIndex = 0;
+        int zIndex = 0;
+        int x;
+        int y;
+        int z;
+
+        for(x = minX - falloff; x <= maxX + falloff; x++) {
+            for(z = minZ - falloff; z <= maxZ + falloff; z++) {
+                for(y = minY - falloff; y <= maxY + falloff; y++) {
+                    xIndex = x - minX + falloff;
+                    yIndex = y - minY + falloff;
+                    zIndex = z - minZ + falloff;
+                    oldBlocks[xIndex][yIndex][zIndex] = new BlockIdentity(world.getBlock(x,y,z), world.getBlockMetadata(x,y,z));
+                }
+            }
+        }
+
+        float weight;
+        float maxWeight = 0;
+        BlockIdentity weightedMaxBlock = null;
+
+        for(x = 0; x < lengthX; x++) {
+            for(z = 0; z < lengthZ; z++) {
+                for(y = 0; y < lengthY; y++) {
+                    newBlocks[x][y][z] = oldBlocks[x + falloff][y + falloff][z + falloff];
+
+                    weightedBlockValue.clear();
+                    for(int i = -falloff; i <= falloff; i++) {
+                        for(int j = -falloff; j <= falloff; j++) {
+                            for(int k = -falloff; k <= falloff; k++) {
+                                if(i == 0 && j == 0 && k == 0) continue;
+                                weight = 1.0F / (float)Math.sqrt((i * i + j * j + k * k));
+                                xIndex = falloff + x + i;
+                                yIndex = falloff + y + j;
+                                zIndex = falloff + z + k;
+
+                                if(weightedBlockValue.containsKey(oldBlocks[xIndex][yIndex][zIndex])) {
+                                    weightedBlockValue.put(oldBlocks[xIndex][yIndex][zIndex], weightedBlockValue.get(oldBlocks[xIndex][yIndex][zIndex]) + weight);
+                                } else {
+                                    weightedBlockValue.put(oldBlocks[xIndex][yIndex][zIndex], weight);
+                                }
+                            }
+                        }
+                    }
+
+                    for(BlockIdentity identity : weightedBlockValue.keySet()) {
+                        if(!allowAir && identity.getBlock().getMaterial() == Material.air) continue;
+                        if(!allowFluids && BlockUtils.isFluid(identity.getBlock())) continue;
+
+                        if(weightedBlockValue.get(identity) > maxWeight) {
+                            maxWeight = weightedBlockValue.get(identity);
+                            weightedMaxBlock = identity;
+                        }
+                    }
+
+                    boolean tiedWeights = false;
+                    for(BlockIdentity identity : weightedBlockValue.keySet()) {
+                        if(identity != weightedMaxBlock && weightedBlockValue.get(identity) == maxWeight) {
+                            tiedWeights = true;
+                            break;
+                        }
+                    }
+
+                    if(!tiedWeights) {
+                        newBlocks[x][y][z] = weightedMaxBlock;
+                    }
+                }
+            }
+        }
+
+        for(x = minX; x <= maxX; x++) {
+            for(z = minZ; z <= maxZ; z++) {
+                for(y = minY; y <= maxY; y++) {
+                    if(rounded) {
+                        double i = ((double)minX + (double)maxX) / 2D;
+                        double j = (minY + maxY) / 2D;
+                        double k = (minZ + maxZ) / 2D;
+                        double a = (maxX - minX) / 2D;
+                        double b = (maxY - minY) / 2D;
+                        double c = (maxZ - minZ) / 2D;
+                        if((Math.pow((x - i),2D) / Math.pow(a,2D) + Math.pow((y - j),2D) / Math.pow(b,2D) + Math.pow((z - k),2D) / Math.pow(c,2D)) > 1D) continue;
+                    }
+                    xIndex = x - minX;
+                    yIndex = y - minY;
+                    zIndex = z - minZ;
+
+                    addBlock(x,y,z,newBlocks[xIndex][yIndex][zIndex].getBlock(), newBlocks[xIndex][yIndex][zIndex].getMeta());
+                }
+            }
+        }
+
+    }
+
+    public void blendOld(World world, int i, int j, int k, int size, boolean excludeAir, boolean excludeFluids)
     {
         int _bSize = size;
         int _twoBrushSize = 2 * _bSize;
@@ -1936,14 +2177,17 @@ public class ShapeGen
                     HashMap<BlockIdentity, Integer> _materialFrequency = new HashMap<BlockIdentity, Integer>();
                     int _modeMatCount = 0;
                     BlockIdentity _modeMatId = null;
-                    boolean _tiecheck = true;
+                    boolean _tiecheck = false;
 
                     for (int _m = -1; _m <= 1; _m++) {
                         for (int _n = -1; _n <= 1; _n++) {
                             for (int _o = -1; _o <= 1; _o++) {
                                 if (_m != 0 || _n != 0 || _o != 0) {
+
                                     if (_materialFrequency.containsKey(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o])) {
                                         _materialFrequency.put(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o], _materialFrequency.get(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o]) + 1);
+                                    } else {
+                                        _materialFrequency.put(_oldMaterials[_x + 1 + _m][_y + 1 + _n][_z + 1 + _o], 1);
                                     }
                                 }
                             }
@@ -1951,19 +2195,20 @@ public class ShapeGen
                     }
 
                     for (BlockIdentity _i : _materialFrequency.keySet()) {
-                        if (_materialFrequency.get(_i) > _modeMatCount && (!excludeAir || _i.getBlock() != Blocks.air) && (!excludeFluids || !BlockUtils.isFluid(_i.getBlock())) && (_i.getBlock() != Blocks.bedrock)) {
+                        if (_materialFrequency.get(_i) > _modeMatCount && (excludeAir && _i.getBlock().getMaterial() != Material.air) && (excludeFluids && !BlockUtils.isFluid(_i.getBlock())) && (_i.getBlock() != Blocks.bedrock)) {
                             _modeMatCount = _materialFrequency.get(_i);
                             _modeMatId = _i;
                         }
                     }
 
                     for (BlockIdentity _i : _materialFrequency.keySet()) {
-                        if (_i != _modeMatId && _materialFrequency.get(_i) == _modeMatCount && (!excludeAir || _i.getBlock() != Blocks.air) && (!excludeFluids || !BlockUtils.isFluid(_i.getBlock())) && (_i.getBlock() != Blocks.bedrock)) {
-                            _tiecheck = false;
+                        if (!_i.equals(_modeMatId) && _materialFrequency.get(_i) == _modeMatCount) {
+                            _tiecheck = true;
+                            break;
                         }
                     }
 
-                    if (_tiecheck)
+                    if (!_tiecheck)
                     {
                         _newMaterials[_x][_y][_z] = _modeMatId;
                     }
@@ -1983,12 +2228,15 @@ public class ShapeGen
 
                 for (int _z = _twoBrushSize; _z >= 0; _z--)
                 {
-                    if (_xPow + _yPow + Math.pow(_z - _bSize - 1, 2D) > _rPow || (_newMaterials[_x][_y][_z].getBlock() == Blocks.bedrock) || excludeAir && _newMaterials[_x][_y][_z].getBlock() == Blocks.air || (excludeFluids && BlockUtils.isFluid(_newMaterials[_x][_y][_z].getBlock())))
+                    if(_newMaterials[_x][_y][_z] == null || _newMaterials[_x][_y][_z].getBlock() == null) {
+                        continue;
+                    }
+                    if (_xPow + _yPow + Math.pow(_z - _bSize - 1, 2D) > _rPow || (_newMaterials[_x][_y][_z].getBlock() == Blocks.bedrock) || (excludeAir && _newMaterials[_x][_y][_z].getBlock().getMaterial() == Material.air) || (excludeFluids && BlockUtils.isFluid(_newMaterials[_x][_y][_z].getBlock())))
                     {
                         continue;
                     }
 
-                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getBlock())
+                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getBlock() || world.getBlockMetadata((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getMeta())
                     {
                         addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, _newMaterials[_x][_y][_z].getBlock(), _newMaterials[_x][_y][_z].getMeta());
                     }
@@ -2037,7 +2285,7 @@ public class ShapeGen
                     break;
                 }
 
-                String as1[] = s.split("|");
+                String as1[] = s.split(",");
 
                 if (as1.length == 5)
                 {
@@ -2056,110 +2304,6 @@ public class ShapeGen
             read.close();
         }
         catch (Exception exception) { }
-    }
-
-    public void removeBlocksUpdate(Map list)
-    {
-        synchronized (blocks)
-        {
-            blocks.remove(list);
-        }
-    }
-
-    public void removeBlockUpdate(int i, int j, int k, int id)
-    {
-        removeBlockUpdate(i, j, k, id, 0);
-    }
-
-    public void removeBlockUpdate(int i, int j, int k, int id, int l)
-    {
-        synchronized (blocks)
-        {
-            blocks.remove("" + i + "|" + j + "|" + k);
-        }
-    }
-
-    public void update()
-    {
-        if (!server.isServerRunning() && !stopping)
-        {
-            writeToNBT();
-            return;
-        }
-
-        if (world == null || server == null)
-        {
-            return;
-        }
-
-        if (adding)
-        {
-            if (!updatingAnywhere)
-            {
-                updatingAnywhere = true;
-            }
-
-            return;
-        }
-
-        int c = 0;
-
-        if (blocks == null || blocks.isEmpty())
-        {
-            if (updatingAnywhere)
-            {
-                updatingAnywhere = false;
-            }
-
-            return;
-        }
-
-        if (!updatingAnywhere)
-        {
-            updatingAnywhere = true;
-        }
-
-        if (world.playerEntities.isEmpty() && !Instant)
-        {
-            Instant = true;
-            Notify = true;
-        }
-        else if (Instant && !world.playerEntities.isEmpty())
-        {
-            Instant = false;
-            Notify = false;
-        }
-
-        synchronized (blocks)
-        {
-            for (Iterator it = blocks.entrySet().iterator(); c <= (Instant ? 16384 : 512) && it.hasNext(); it.remove())
-            {
-                java.util.Map.Entry block = (java.util.Map.Entry)it.next();
-                String a[] = ((String)block.getKey()).split("|");
-                int i = Integer.parseInt(a[0]);
-                int j = Integer.parseInt(a[1]);
-                int k = Integer.parseInt(a[2]);
-                String[] b = ((String)block.getValue()).split("|");
-                int meta = Integer.parseInt(b[1]);
-                Block id = (Block)Block.blockRegistry.getObject(b[0]);
-
-                if (world.getBlock(i, j, k) == id && world.getBlockMetadata(i, j, k) == meta)
-                {
-                    continue;
-                }
-
-                if (Notify)
-                {
-                    world.setBlock(i, j, k, id, meta, 3);
-                }
-                else
-                {
-                    world.setBlock(i, j, k, id, meta, 2);
-                }
-
-                c++;
-            }
-        }
     }
 
     public void writeToNBT()
@@ -2182,7 +2326,7 @@ public class ShapeGen
                 {
                     java.util.Map.Entry block = (java.util.Map.Entry)it.next();
                     String sep = System.getProperty("line.separator");
-                    s = (String)block.getKey() + "|" + (String)block.getValue() + sep;
+                    s = (String)block.getKey() + "," + (String)block.getValue() + sep;
                 }
             }
 
@@ -2202,7 +2346,7 @@ public class ShapeGen
             int l = par4;
             int i1 = (par5 + par2Random.nextInt(8)) - par2Random.nextInt(8);
 
-            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split("|")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split("|")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split("|")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
+            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split(",")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
             {
                 addBlock(k, l, i1, id);
             }
@@ -2221,7 +2365,7 @@ public class ShapeGen
             int l = par4;
             int i1 = (par5 + par2Random.nextInt(8)) - par2Random.nextInt(8);
 
-            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split("|")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split("|")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split("|")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
+            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split(",")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
             {
                 addBlock(k, l, i1, tallGrassID, tallGrassMetadata);
             }
@@ -2244,28 +2388,13 @@ public class ShapeGen
 
     private String toString(int i, int j, int k)
     {
-        return (new StringBuilder()).append(i).append("|").append(j).append("|").append(k).toString();
-    }
-
-    public synchronized void addBlock(int a[], Block blockID)
-    {
-        if (a.length < 3)
-        {
-            return;
-        }
-        else
-        {
-            addBlock(a[0], a[1], a[2], blockID);
-            return;
-        }
+        return "" + i + "," + j + "," + k;
     }
 
     public static boolean Instant = false;
     public static boolean Notify = true;
-    public static boolean persistantOrder;
-    public static boolean persistantOrder1;
     private static MinecraftServer server;
-    public static boolean alive;
+    public boolean alive;
     public boolean updatingAnywhere;
     public boolean adding;
     private Map<String,String> blocks;

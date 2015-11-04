@@ -1,11 +1,7 @@
 package da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH;
 
-import Reika.DragonAPI.Interfaces.Registry.OreType;
-import Reika.DragonAPI.Libraries.Registry.ReikaOreHelper;
-import Reika.DragonAPI.ModRegistry.ModOreList;
 import Reika.GeoStrata.Registry.RockTypes;
 import Reika.GeoStrata.TileEntityGeoOre;
-import abo.ABO;
 import cofh.lib.util.WeightedRandomBlock;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;

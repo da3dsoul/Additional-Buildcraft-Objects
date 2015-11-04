@@ -5,13 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import buildcraft.api.tools.IToolWrench;
-import buildcraft.core.ItemWrench;
 import buildcraft.core.lib.inventory.InvUtils;
 import buildcraft.core.lib.inventory.Transactor;
 import buildcraft.core.lib.inventory.TransactorSimple;
-import buildcraft.transport.pipes.PipeItemsEmerald;
 import buildcraft.transport.pipes.PipeItemsIron;
-import buildcraft.transport.pipes.PipeItemsWood;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;

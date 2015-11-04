@@ -5,8 +5,6 @@
 
 package da3dsoul.scaryGen.generate.GeostrataGen.Ore.Galacticraft;
 
-import Reika.DragonAPI.Libraries.Registry.ReikaOreHelper;
-import Reika.GeoStrata.Blocks.BlockOreTile;
 import Reika.GeoStrata.Registry.RockTypes;
 import Reika.GeoStrata.TileEntityGeoOre;
 import cpw.mods.fml.common.IWorldGenerator;

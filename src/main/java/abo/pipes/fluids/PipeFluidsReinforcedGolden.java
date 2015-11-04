@@ -8,9 +8,7 @@ import abo.ABO;
 import abo.PipeIcons;
 import abo.pipes.ABOPipe;
 import buildcraft.api.core.IIconProvider;
-import buildcraft.BuildCraftTransport;
 import buildcraft.transport.PipeTransportFluids;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 
 public class PipeFluidsReinforcedGolden extends ABOPipe<PipeTransportFluidsReinforced> {
 

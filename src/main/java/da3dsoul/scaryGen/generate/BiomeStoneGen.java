@@ -1,20 +1,13 @@
 package da3dsoul.scaryGen.generate;
 
 import abo.ABO;
-import com.google.common.collect.ImmutableList;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class BiomeStoneGen {
     public static Block[][] biomeStoneArray;
