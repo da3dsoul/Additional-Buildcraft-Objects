@@ -146,8 +146,9 @@ public class ChunkProviderScary implements IChunkProvider {
                 Iterator<IWorldGenerator> it = iWorldGenerators.iterator();
                 HashMap<IWorldGenerator, Integer> toAdd = new HashMap<IWorldGenerator, Integer>();
                 int j = 0;
+                ABO.aboLog.info("GeoStrata is " + (ABO.geostrataInstalled ? "" : "not ") + "Installed");
                 do {
-                    if(!ABO.geostrataInstalled) break;
+                    if (!ABO.geostrataInstalled) break;
                     if (!it.hasNext()) break;
                     IWorldGenerator gen = it.next();
                     if (gen.getClass().getSimpleName().equalsIgnoreCase("RockGenerator")) {

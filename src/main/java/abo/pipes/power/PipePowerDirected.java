@@ -1,5 +1,9 @@
 package abo.pipes.power;
 
+import buildcraft.BuildCraftTransport;
+import buildcraft.api.statements.IActionInternal;
+import buildcraft.api.statements.StatementSlot;
+import buildcraft.transport.statements.ActionPipeDirection;
 import cofh.api.energy.IEnergyConnection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -14,6 +18,10 @@ import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.pipes.PipeLogicIron;
 import buildcraft.transport.pipes.PipePowerWood;
 import buildcraft.transport.pipes.PipeStructureCobblestone;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IPipeTransportPowerHook {
 
@@ -81,26 +89,60 @@ public class PipePowerDirected extends ABOPipe<PipeTransportPower> implements IP
 		}
 	}
 
-	@Override
-	public int receiveEnergy(ForgeDirection from, int val) {
-		int metadata = container.getBlockMetadata();
+    @Override
+    public boolean outputOpen(ForgeDirection to) {
+        return container.getBlockMetadata() == to.ordinal();
+    }
 
-		if (metadata != from.ordinal() && val > 0.0) {
-			transport.internalNextPower[from.ordinal()] += val;
+    protected void actionsActivated(Collection<StatementSlot> actions) {
+        super.actionsActivated(actions);
+        Iterator var2 = actions.iterator();
 
-			if (transport.internalNextPower[from.ordinal()] > transport.maxPower) {
-				val = (int) transport.internalNextPower[from.ordinal()] - transport.maxPower;
-				transport.internalNextPower[from.ordinal()] = transport.maxPower;
-			}
-		}
-		return val;
-	}
+        while(var2.hasNext()) {
+            StatementSlot action = (StatementSlot)var2.next();
+            if(action.statement instanceof ActionPipeDirection) {
+                this.logic.setFacing(((ActionPipeDirection)action.statement).direction);
+                break;
+            }
+        }
 
-	@Override
-	public int requestEnergy(ForgeDirection from, int amount) {
-		int metadata = container.getBlockMetadata();
+    }
 
-		if (metadata == from.ordinal()) { return amount; }
-		return 0;
-	}
+    public LinkedList<IActionInternal> getActions() {
+        LinkedList action = super.getActions();
+        ForgeDirection[] var2 = ForgeDirection.VALID_DIRECTIONS;
+        int var3 = var2.length;
+
+        for(int var4 = 0; var4 < var3; ++var4) {
+            ForgeDirection direction = var2[var4];
+            if(this.container.isPipeConnected(direction)) {
+                action.add(BuildCraftTransport.actionPipeDirection[direction.ordinal()]);
+            }
+        }
+
+        return action;
+    }
+
+    @Override
+    public int receiveEnergy(ForgeDirection from, int val) {
+        int metadata = container.getBlockMetadata();
+
+        if (metadata != from.ordinal() && val > 0.0) {
+            transport.internalNextPower[from.ordinal()] += val;
+
+            if (transport.internalNextPower[from.ordinal()] > transport.maxPower) {
+                val = (int) transport.internalNextPower[from.ordinal()] - transport.maxPower;
+                transport.internalNextPower[from.ordinal()] = transport.maxPower;
+            }
+        }
+        return val;
+    }
+
+    @Override
+    public int requestEnergy(ForgeDirection from, int amount) {
+        int metadata = container.getBlockMetadata();
+
+        if (metadata == from.ordinal()) { return amount; }
+        return 0;
+    }
 }

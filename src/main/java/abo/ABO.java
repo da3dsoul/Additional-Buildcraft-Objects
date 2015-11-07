@@ -1,73 +1,13 @@
 package abo;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
-
-import abo.pipes.fluids.*;
-import abo.pipes.items.*;
-import buildcraft.api.transport.PipeManager;
-import buildcraft.core.BCCreativeTab;
-import buildcraft.transport.PipeTransportFluids;
-import buildcraft.transport.stripes.StripesHandlerRightClick;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import da3dsoul.ShapeGen.ShapeGen;
-import da3dsoul.scaryGen.blocks.BlockLargeButton;
-import da3dsoul.scaryGen.generate.BiomeStoneGen;
-import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
-import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
-import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
-import da3dsoul.scaryGen.projectile.EntityThrownBottle;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.dispenser.*;
-import net.minecraft.entity.IProjectile;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemDye;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
-import net.minecraftforge.event.terraingen.PopulateChunkEvent;
-import net.minecraftforge.event.terraingen.TerrainGen;
-import net.minecraftforge.fluids.FluidContainerRegistry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.InventoryEnderChest;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.oredict.OreDictionary;
 import abo.actions.ABOActionProvider;
 import abo.actions.ActionSwitchOnPipe;
 import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
-import abo.energy.BlockNull;
-import abo.energy.BlockNullCollide;
-import abo.energy.BlockWaterwheel;
-import abo.energy.BlockWindmill;
-import abo.energy.ItemWaterwheel;
+import abo.energy.*;
 import abo.gui.ABOGuiHandler;
+import abo.pipes.fluids.*;
+import abo.pipes.items.*;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
@@ -76,25 +16,84 @@ import buildcraft.BuildCraftTransport;
 import buildcraft.api.core.IIconProvider;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementManager;
+import buildcraft.api.transport.PipeManager;
+import buildcraft.core.BCCreativeTab;
 import buildcraft.core.InterModComms;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
+import buildcraft.transport.PipeTransportFluids;
+import buildcraft.transport.stripes.StripesHandlerRightClick;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import da3dsoul.ShapeGen.ShapeGen;
+import da3dsoul.scaryGen.SaveHandler.EnderInventorySaveHandler;
+import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.entity.EntityItemBat;
+import da3dsoul.scaryGen.generate.BiomeStoneGen;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
 import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
+import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
+import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
+import da3dsoul.scaryGen.projectile.EntityThrownBottle;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.IBlockSource;
+import net.minecraft.dispenser.IPosition;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.InventoryEnderChest;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.TerrainGen;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.oredict.OreDictionary;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Random;
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion")
 public class ABO {
@@ -163,73 +162,13 @@ public class ABO {
 
     public IIconProvider itemIconProvider = new ItemIconProvider();
     public IIconProvider pipeIconProvider = new PipeIconProvider();
-    private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
+    public InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
 
     // Mod Init Handling
     private boolean bucketEventCanceled = false;
+    private EnderInventorySaveHandler enderInventorySaveHandler = null;
 
-    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas, int count, Object... ingredients) {
-        ItemPipe res = buildPipe(clas);
-
-        addRecipe(res, count, ingredients);
-
-        return res;
-    }
-
-    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas) {
-
-        ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("pipes"));
-        res.setUnlocalizedName(clas.getSimpleName());
-        ABOProxy.proxy.registerPipe(res);
-
-        return res;
-    }
-
-    private static void addRecipe(Item item, int count, Object... ingredients) {
-
-        if (ingredients.length == 3) {
-            for (int i = 0; i < 17; i++) {
-                ABORecipe recipe = new ABORecipe();
-                recipe.result = new ItemStack(item, count, i);
-                if (ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe) {
-                    recipe.input = new Object[]{"ABC", 'A', new ItemStack((ItemPipe) ingredients[0], 1, i), 'B',
-                            ingredients[1], 'C', new ItemStack((ItemPipe) ingredients[2], 1, i)};
-                } else {
-                    recipe.input = new Object[]{"ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2]};
-                }
-
-                aboRecipes.add(recipe);
-            }
-        } else if (ingredients.length == 2) {
-            for (int i = 0; i < 17; i++) {
-                ABORecipe recipe = new ABORecipe();
-
-                Object left = ingredients[0];
-                Object right = ingredients[1];
-
-                if (ingredients[0] instanceof ItemPipe) {
-                    left = new ItemStack((Item) left, 1, i);
-                }
-
-                if (ingredients[1] instanceof ItemPipe) {
-                    right = new ItemStack((Item) right, 1, i);
-                }
-
-                recipe.isShapeless = true;
-                recipe.result = new ItemStack(item, 1, i);
-                recipe.input = new Object[]{left, right};
-
-                aboRecipes.add(recipe);
-            }
-        }
-    }
-
-    private static void addFullRecipe(ItemStack stack, Object[] ingredients) {
-        ABORecipe recipe = new ABORecipe();
-        recipe.result = stack;
-        recipe.input = ingredients;
-        aboRecipes.add(recipe);
-    }
+    // Start
 
     @SuppressWarnings("deprecation")
     @EventHandler
@@ -245,7 +184,7 @@ public class ABO {
         geostrataInstalled = Loader.isModLoaded("GeoStrata");
         cofhInstalled = Loader.isModLoaded("CoFHCore");
 
-        if(ABO.cofhInstalled) {
+        if (ABO.cofhInstalled) {
             ABO.aboLog.info("COFH is Loaded");
             COFHOverride.overrideCOFHWordGen();
         }
@@ -442,23 +381,78 @@ public class ABO {
         }
     }
 
-    private void initFluidCapacities() {
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsInsertion.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+    @EventHandler
+    public void init(FMLInitializationEvent evt) {
 
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsBalance.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
-        PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        loadRecipes();
 
+        if (blockLiquidXP != null) {
+            BlockLiquidXP.init();
+        }
+
+        ABOProxy.proxy.registerTileEntities();
+        ABOProxy.proxy.registerBlockRenderers();
+
+        ABOProxy.proxy.registerEntities();
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
+
+    }
+
+    @EventHandler
+    public void post(FMLPostInitializationEvent event) {
+        BiomeStoneGen.init();
+    }
+
+    @EventHandler
+    public void aboutToStart(FMLServerAboutToStartEvent event) {
+        this.shapeGens.clear();
+        ShapeGen.stopping = false;
+    }
+
+    @EventHandler
+    public void start(FMLServerStartingEvent event) {
+        loadEnderInventory();
+    }
+
+    @EventHandler
+    public void stop(FMLServerStoppingEvent event) {
+        ShapeGen.stopping = true;
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != null) {
+            if (event.phase == TickEvent.Phase.START) {
+                if (enderInventorySaveHandler == null) {
+                    WorldServer maxPasses = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(0);
+                    enderInventorySaveHandler = (EnderInventorySaveHandler) maxPasses.mapStorage.loadData(EnderInventorySaveHandler.class, "EnderInventory");
+                    if (enderInventorySaveHandler == null) {
+                        enderInventorySaveHandler = new EnderInventorySaveHandler("EnderInventory");
+                        maxPasses.mapStorage.setData("EnderInventory", enderInventorySaveHandler);
+                    }
+                }
+
+                World[] dims = DimensionManager.getWorlds();
+                for(World world : dims) {
+                    if(world != null) {
+                        ShapeGen.getShapeGen(world).tick();
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void tickWorld(TickEvent.WorldTickEvent event) {
     }
 
     @SubscribeEvent
     public void populate(PopulateChunkEvent.Pre event) {
         if (ABO.blockLiquidXP == null) return;
-        if(!spawnLakes) return;
-        if(!respawnLakes) return;
+        if (!spawnLakes) return;
+        if (!respawnLakes) return;
         if (event.rand.nextInt(16) == 0
                 && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, PopulateChunkEvent.Populate.EventType.LAKE)) {
             int k1 = event.chunkX + event.rand.nextInt(16) + 8;
@@ -473,9 +467,9 @@ public class ABO {
     @SubscribeEvent
     public void decorate(DecorateBiomeEvent.Decorate event) {
         if (ABO.blockLiquidXP == null) return;
-        if(!spawnLakes) return;
-        if(respawnLakes) return;
-        if(event.type != DecorateBiomeEvent.Decorate.EventType.LAKE) return;
+        if (!spawnLakes) return;
+        if (respawnLakes) return;
+        if (event.type != DecorateBiomeEvent.Decorate.EventType.LAKE) return;
         if (event.rand.nextInt(16) == 0
                 && TerrainGen.decorate(event.world, event.rand, event.chunkX, event.chunkZ, event.type)) {
             int k1 = event.chunkX + event.rand.nextInt(16) + 8;
@@ -485,35 +479,6 @@ public class ABO {
                 new WorldGenXPLake().generate(event.world, event.rand, k1, l1, i2);
             }
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-        if(ABO.blockLiquidXP != null) {
-            BlockLiquidXP.initAprilFools(event);
-        }
-    }
-
-    @SubscribeEvent
-    public void tickWorld(TickEvent.WorldTickEvent event) {
-        if((event.side == Side.SERVER || !event.world.isRemote) && event.phase == TickEvent.Phase.START) {
-            if(!shapeGens.containsKey(event.world.provider.dimensionId))
-            {
-                shapeGens.put(event.world.provider.dimensionId, new ShapeGen(event.world));
-            }
-            shapeGens.get(event.world.provider.dimensionId).tick();
-        }
-    }
-
-    @SubscribeEvent
-    public void worldUnload(WorldEvent.Unload event) {
-        ShapeGen.stopping = true;
-    }
-
-    @SubscribeEvent
-    public void serverStopping(FMLServerStoppingEvent event) {
-        ShapeGen.stopping = true;
     }
 
     @SubscribeEvent
@@ -552,83 +517,9 @@ public class ABO {
         }
     }
 
-    private boolean randomizeGrass(World world, int i, int j, int k)
-    {
-        boolean success = false;
-        Random random = new Random();
-        int l1 = random.nextInt(4) + 1;
-
-        int x = i;
-        int z = k;
-
-        do
-        {
-            int l = random.nextInt(2);
-
-            if(random.nextInt(2) == 0)
-            {
-                switch (l) {
-                    case 0:
-                        x++;
-                        break;
-
-                    case 1:
-                        z++;
-                        break;
-                }
-            }else
-            {
-                switch(l)
-                {
-                    case 0:
-                        x--;
-                        break;
-                    case 1:
-                        z--;
-                        break;
-                }
-            }
-            int y = j - 3;
-
-            while (!isBlockDirtAndFree(world, x, y, z) && y <= j + 6)
-            {
-                y++;
-            }
-
-            if (isBlockDirtAndFree(world, x, y, z))
-            {
-                BiomeGenBase biome = world.getBiomeGenForCoords(x,z);
-                Block block1 = Blocks.grass;
-                int meta = 0;
-                if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
-                if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                if(world.setBlock(x, y, z, block1, meta, 3)) success = true;
-            }
-
-            l1--;
-        }
-        while (l1 > 0);
-
-        return success;
-    }
-
-    private boolean isBlockDirtAndFree(World world, int i, int j, int k)
-    {
-        if (world.getBlock(i, j, k) != Blocks.dirt)
-        {
-            return false;
-        }
-
-        if (world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     @SubscribeEvent
     public void onRightClick(PlayerInteractEvent event) {
+        if(event.world.isRemote) return;
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             if (event.entityLiving instanceof EntityPlayer) {
                 if (ABO.blockLiquidXP != null) {
@@ -636,46 +527,41 @@ public class ABO {
                         bucketEventCanceled = true;
                     }
                 }
-                if(event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() == Items.dye && event.entityPlayer.inventory.getCurrentItem().getItemDamage() == 15) {
-                    Block var5 = event.world.getBlock(event.x,event.y,event.z);
+                if (event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() == Items.dye && event.entityPlayer.inventory.getCurrentItem().getItemDamage() == 15) {
+                    Block var5 = event.world.getBlock(event.x, event.y, event.z);
                     World world = event.world;
-                    if (!world.isRemote)
-                    {
-                        boolean success = false;
+                    boolean success = false;
 
-                        if (isBlockDirtAndFree(world, event.x, event.y, event.z))
-                        {
-                            BiomeGenBase biome = world.getBiomeGenForCoords(event.x, event.z);
-                            Block block1 = Blocks.grass;
-                            int meta = 0;
-                            if(biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore) block1 = Blocks.mycelium;
-                            if(biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
-                            success = world.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(world, event.x, event.y, event.z);
-                        }
+                    if (isBlockDirtAndFree(world, event.x, event.y, event.z)) {
+                        BiomeGenBase biome = world.getBiomeGenForCoords(event.x, event.z);
+                        Block block1 = Blocks.grass;
+                        int meta = 0;
+                        if (biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore)
+                            block1 = Blocks.mycelium;
+                        if (biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                        success = world.setBlock(event.x, event.y, event.z, block1, meta, 3) && randomizeGrass(world, event.x, event.y, event.z);
+                    }
 
-                        if (success && !event.entityPlayer.capabilities.isCreativeMode && world.rand.nextInt(20) == 0)
-                        {
-                            event.entityPlayer.inventory.getCurrentItem().stackSize--;
-                            if(event.entityPlayer.inventory.getCurrentItem().stackSize <= 0 ) event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
-                        }
+                    if (success && !event.entityPlayer.capabilities.isCreativeMode && world.rand.nextInt(20) == 0) {
+                        event.entityPlayer.inventory.getCurrentItem().stackSize--;
+                        if (event.entityPlayer.inventory.getCurrentItem().stackSize <= 0)
+                            event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
                     }
                 }
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if(event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+            /*if (event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
                 ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
 
                 int range = 150;
                 EntityPlayer entityplayer = event.entityPlayer;
                 World world = entityplayer.worldObj;
 
-                if (itemstack.getItemDamage() == 4)
-                {
+                if (itemstack.getItemDamage() == 4) {
                     ChunkCoordinates chuck = getLooking(world, entityplayer, range);
 
-                    if (chuck == null)
-                    {
+                    if (chuck == null) {
                         return;
                     }
 
@@ -683,18 +569,15 @@ public class ABO {
                     int j = chuck.posY;
                     int k = chuck.posZ;
 
-                    if (!world.canMineBlock(entityplayer, i, j, k))
-                    {
+                    if (!world.canMineBlock(entityplayer, i, j, k)) {
                         return;
                     }
 
                     ShapeGen.getShapeGen(world).shuffle(i, j, k, 3, -1, true, true, true);
-                }else if (itemstack.getItemDamage() == 6)
-                {
-                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -2);
+                } else if (itemstack.getItemDamage() == 6) {
+                    ChunkCoordinates chuck = getLooking(world, entityplayer, range);
 
-                    if (chuck == null)
-                    {
+                    if (chuck == null) {
                         return;
                     }
 
@@ -702,17 +585,14 @@ public class ABO {
                     int j = chuck.posY;
                     int k = chuck.posZ;
 
-                    if (!world.canMineBlock(entityplayer, i, j, k))
-                    {
+                    if (!world.canMineBlock(entityplayer, i, j, k)) {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 1, true, false, false);
-                } else if (itemstack.getItemDamage() == 10)
-                {
-                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, -2);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 2, true, false, false);
+                } else if (itemstack.getItemDamage() == 10) {
+                    ChunkCoordinates chuck = getLooking(world, entityplayer, range);
 
-                    if (chuck == null)
-                    {
+                    if (chuck == null) {
                         return;
                     }
 
@@ -720,13 +600,27 @@ public class ABO {
                     int j = chuck.posY;
                     int k = chuck.posZ;
 
-                    if (!world.canMineBlock(entityplayer, i, j, k))
-                    {
+                    if (!world.canMineBlock(entityplayer, i, j, k)) {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 1, false, false, true);
+                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 2, false, false, true);
+                } else if (itemstack.getItemDamage() == 12) {
+                    ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, 1);
+
+                    if (chuck == null) {
+                        return;
+                    }
+
+                    int i = chuck.posX;
+                    int j = chuck.posY;
+                    int k = chuck.posZ;
+
+                    if (!world.canMineBlock(entityplayer, i, j, k)) {
+                        return;
+                    }
+                    ShapeGen.getShapeGen(world).makeLaputa(i, 160, k);
                 }
-            }
+            }*/
 
             if (blockLiquidXP != null) {
                 if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
@@ -740,67 +634,129 @@ public class ABO {
         }
     }
 
-    public static ChunkCoordinates getLooking(World world, EntityPlayer entityplayer, int range) {
-        return getLookingOffset(world,entityplayer,range,0);
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onTextureStitchPre(TextureStitchEvent.Pre event) {
+        if (ABO.blockLiquidXP != null) {
+            BlockLiquidXP.initAprilFools(event);
+        }
+    }
+
+    @EventHandler
+    public void processIMCRequests(FMLInterModComms.IMCEvent event) {
+        InterModComms.processIMC(event);
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void textureHook(TextureStitchEvent.Pre event) {
+        if (event.map.getTextureType() == 1) {
+            itemIconProvider.registerIcons(event.map);
+        }
+    }
+
+    // End
+
+    // Start
+
+    private void loadEnderInventory() {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+            try {
+                File file = new File(getWorldDir(), "ABO-EnderInventory.nbt");
+                NBTTagCompound nbt = CompressedStreamTools.read(file);
+                if (nbt != null) {
+                    NBTTagList list = nbt.getTagList("EnderInventory", 10);
+                    theInventoryEnderChest.loadInventoryFromNBT(list);
+                }
+                file.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public InventoryEnderChest getInventoryEnderChest() {
+        return this.theInventoryEnderChest;
+    }
+
+    // End
+
+    // Start
+
+    public void loadRecipes() {
+        // Add pipe recipes
+        for (ABORecipe recipe : aboRecipes) {
+            if (recipe.isShapeless) {
+                GameRegistry.addShapelessRecipe(recipe.result, recipe.input);
+            } else {
+                GameRegistry.addShapedRecipe(recipe.result, recipe.input);
+            }
+
+        }
     }
 
 
-    public static ChunkCoordinates getLookingOffset(World world, EntityPlayer entityplayer, int range, int off)
-    {
+    private static class ABORecipe {
+        boolean isShapeless = false;
+        ItemStack result;
+        Object[] input;
+    }
+
+    // End
+
+    // Start
+
+    public static ChunkCoordinates getLooking(World world, EntityPlayer entityplayer, int range) {
+        return getLookingOffset(world, entityplayer, range, 0);
+    }
+
+    public static ChunkCoordinates getLookingOffset(World world, EntityPlayer entityplayer, int range, int off) {
         float f = entityplayer.rotationPitch;
         float f1 = entityplayer.rotationYaw;
         double d = entityplayer.posX;
-        double d1 = (entityplayer.posY + 1.6200000000000001D) - (double)entityplayer.yOffset;
+        double d1 = (entityplayer.posY + 1.6200000000000001D) - (double) entityplayer.yOffset;
         double d2 = entityplayer.posZ;
         Vec3 vec3d = Vec3.createVectorHelper(d, d1, d2);
-        float f2 = MathHelper.cos(-f1 * 0.01745329F - (float)Math.PI);
-        float f3 = MathHelper.sin(-f1 * 0.01745329F - (float)Math.PI);
+        float f2 = MathHelper.cos(-f1 * 0.01745329F - (float) Math.PI);
+        float f3 = MathHelper.sin(-f1 * 0.01745329F - (float) Math.PI);
         float f4 = -MathHelper.cos(-f * 0.01745329F);
         float f5 = MathHelper.sin(-f * 0.01745329F);
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double d3 = range;
-        Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+        Vec3 vec3d1 = vec3d.addVector((double) f6 * d3, (double) f5 * d3, (double) f7 * d3);
         MovingObjectPosition movingobjectposition = world.rayTraceBlocks(vec3d, vec3d1, false);
 
-        if (movingobjectposition == null)
-        {
+        if (movingobjectposition == null) {
             return null;
         }
 
-        if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
-        {
+        if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             int i = movingobjectposition.blockX;
             int j = movingobjectposition.blockY;
             int k = movingobjectposition.blockZ;
 
-            if (movingobjectposition.sideHit == 0)
-            {
+            if (movingobjectposition.sideHit == 0) {
                 j -= off;
             }
 
-            if (movingobjectposition.sideHit == 1)
-            {
+            if (movingobjectposition.sideHit == 1) {
                 j += off;
             }
 
-            if (movingobjectposition.sideHit == 2)
-            {
+            if (movingobjectposition.sideHit == 2) {
                 k -= off;
             }
 
-            if (movingobjectposition.sideHit == 3)
-            {
+            if (movingobjectposition.sideHit == 3) {
                 k += off;
             }
 
-            if (movingobjectposition.sideHit == 4)
-            {
+            if (movingobjectposition.sideHit == 4) {
                 i -= off;
             }
 
-            if (movingobjectposition.sideHit == 5)
-            {
+            if (movingobjectposition.sideHit == 5) {
                 i += off;
             }
 
@@ -810,30 +766,149 @@ public class ABO {
         return null;
     }
 
-    @EventHandler
-    public void init(FMLInitializationEvent evt) {
+    private boolean randomizeGrass(World world, int i, int j, int k) {
+        boolean success = false;
+        Random random = new Random();
+        int l1 = random.nextInt(4) + 1;
 
-        loadRecipes();
+        int x = i;
+        int z = k;
 
-        if(blockLiquidXP != null) {
-            BlockLiquidXP.init();
+        do {
+            int l = random.nextInt(2);
+
+            if (random.nextInt(2) == 0) {
+                switch (l) {
+                    case 0:
+                        x++;
+                        break;
+
+                    case 1:
+                        z++;
+                        break;
+                }
+            } else {
+                switch (l) {
+                    case 0:
+                        x--;
+                        break;
+                    case 1:
+                        z--;
+                        break;
+                }
+            }
+            int y = j - 3;
+
+            while (!isBlockDirtAndFree(world, x, y, z) && y <= j + 6) {
+                y++;
+            }
+
+            if (isBlockDirtAndFree(world, x, y, z)) {
+                BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
+                Block block1 = Blocks.grass;
+                int meta = 0;
+                if (biome == BiomeGenBase.mushroomIsland || biome == BiomeGenBase.mushroomIslandShore)
+                    block1 = Blocks.mycelium;
+                if (biome == BiomeGenBase.megaTaiga || biome == BiomeGenBase.megaTaigaHills) meta = 1;
+                if (world.setBlock(x, y, z, block1, meta, 3)) success = true;
+            }
+
+            l1--;
+        }
+        while (l1 > 0);
+
+        return success;
+    }
+
+    private boolean isBlockDirtAndFree(World world, int i, int j, int k) {
+        if (world.getBlock(i, j, k) != Blocks.dirt) {
+            return false;
         }
 
-        ABOProxy.proxy.registerTileEntities();
-        ABOProxy.proxy.registerBlockRenderers();
+        if (world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2) {
+            return false;
+        }
 
-        ABOProxy.proxy.registerEntities();
-
-        NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
-
+        return true;
     }
 
-    @EventHandler
-    public void post(FMLPostInitializationEvent event) {
-        BiomeStoneGen.init();
+    public static File getWorldDir() {
+        try {
+            return new File(FMLCommonHandler.instance().getSavesDirectory().getCanonicalPath()
+                    + File.separator
+                    + FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getSaveHandler()
+                    .getWorldDirectoryName());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
-    // Side Handling
+    // End
+
+    // Start
+
+    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas, int count, Object... ingredients) {
+        ItemPipe res = buildPipe(clas);
+
+        addRecipe(res, count, ingredients);
+
+        return res;
+    }
+
+    public static ItemPipe buildPipe(Class<? extends Pipe<?>> clas) {
+
+        ItemPipe res = BlockGenericPipe.registerPipe(clas, BCCreativeTab.get("pipes"));
+        res.setUnlocalizedName(clas.getSimpleName());
+        ABOProxy.proxy.registerPipe(res);
+
+        return res;
+    }
+
+    private static void addRecipe(Item item, int count, Object... ingredients) {
+
+        if (ingredients.length == 3) {
+            for (int i = 0; i < 17; i++) {
+                ABORecipe recipe = new ABORecipe();
+                recipe.result = new ItemStack(item, count, i);
+                if (ingredients[0] instanceof ItemPipe && ingredients[2] instanceof ItemPipe) {
+                    recipe.input = new Object[]{"ABC", 'A', new ItemStack((ItemPipe) ingredients[0], 1, i), 'B',
+                            ingredients[1], 'C', new ItemStack((ItemPipe) ingredients[2], 1, i)};
+                } else {
+                    recipe.input = new Object[]{"ABC", 'A', ingredients[0], 'B', ingredients[1], 'C', ingredients[2]};
+                }
+
+                aboRecipes.add(recipe);
+            }
+        } else if (ingredients.length == 2) {
+            for (int i = 0; i < 17; i++) {
+                ABORecipe recipe = new ABORecipe();
+
+                Object left = ingredients[0];
+                Object right = ingredients[1];
+
+                if (ingredients[0] instanceof ItemPipe) {
+                    left = new ItemStack((Item) left, 1, i);
+                }
+
+                if (ingredients[1] instanceof ItemPipe) {
+                    right = new ItemStack((Item) right, 1, i);
+                }
+
+                recipe.isShapeless = true;
+                recipe.result = new ItemStack(item, 1, i);
+                recipe.input = new Object[]{left, right};
+
+                aboRecipes.add(recipe);
+            }
+        }
+    }
+
+    private static void addFullRecipe(ItemStack stack, Object[] ingredients) {
+        ABORecipe recipe = new ABORecipe();
+        recipe.result = stack;
+        recipe.input = ingredients;
+        aboRecipes.add(recipe);
+    }
 
     @SuppressWarnings("unchecked")
     private void addEntity(Class<? extends Entity> entityClass, String name, int entityID, boolean addEgg) {
@@ -849,103 +924,18 @@ public class ABO {
         }
     }
 
-    @SubscribeEvent
-    public void save(WorldEvent.Save event) {
-        saveEnderInventory(event.world.isRemote);
-    }
+    private void initFluidCapacities() {
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsGoldenIron.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsInsertion.class, Integer.valueOf(8 * BuildCraftTransport.pipeFluidsBaseFlowRate));
 
-    // Ender Pipe Handling
-
-    @SubscribeEvent
-    public void stop(WorldEvent.Unload event) {
-        saveEnderInventory(event.world.isRemote);
-        loadedEnderInventory = "";
-    }
-
-    @SubscribeEvent
-    public void load(WorldEvent.Load event) {
-        if (loadedEnderInventory != event.world.getSaveHandler().getWorldDirectoryName()) {
-            loadEnderInventory(event.world.isRemote);
-            loadedEnderInventory = event.world.getSaveHandler().getWorldDirectoryName();
-        }
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGolden.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsReinforcedGoldenIron.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsBalance.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsValve.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
+        PipeTransportFluids.fluidCapacities.put(PipeFluidsDrain.class, Integer.valueOf(2 * FluidContainerRegistry.BUCKET_VOLUME));
 
     }
 
-    @SubscribeEvent
-    @SideOnly(Side.CLIENT)
-    public void textureHook(TextureStitchEvent.Pre event) {
-        if (event.map.getTextureType() == 1) {
-            itemIconProvider.registerIcons(event.map);
-        }
-    }
-
-    @EventHandler
-    public void processIMCRequests(FMLInterModComms.IMCEvent event) {
-        InterModComms.processIMC(event);
-    }
-
-    // Item Init Handling
-
-    private void loadEnderInventory(boolean isRemote) {
-        if (!isRemote) {
-            try {
-                File file = new File(getWorldDir(), "ABO-EnderInventory.nbt");
-                NBTTagCompound nbt = CompressedStreamTools.read(file);
-                if (nbt != null) {
-                    NBTTagList list = nbt.getTagList("EnderInventory", 10);
-                    theInventoryEnderChest.loadInventoryFromNBT(list);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void saveEnderInventory(boolean isRemote) {
-        if (!isRemote) {
-            try {
-                File file = new File(getWorldDir(), "ABO-EnderInventory.nbt");
-                NBTTagCompound nbt = new NBTTagCompound();
-                NBTTagList list = theInventoryEnderChest.saveInventoryToNBT();
-                nbt.setTag("EnderInventory", list);
-                CompressedStreamTools.write(nbt, file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // Recipe Handling
-
-    public InventoryEnderChest getInventoryEnderChest() {
-        return this.theInventoryEnderChest;
-    }
-
-    private File getWorldDir() throws IOException {
-
-        return new File(FMLCommonHandler.instance().getSavesDirectory().getCanonicalPath()
-                + File.separator
-                + FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getSaveHandler()
-                .getWorldDirectoryName());
-
-    }
-
-    public void loadRecipes() {
-        // Add pipe recipes
-        for (ABORecipe recipe : aboRecipes) {
-            if (recipe.isShapeless) {
-                GameRegistry.addShapelessRecipe(recipe.result, recipe.input);
-            } else {
-                GameRegistry.addShapedRecipe(recipe.result, recipe.input);
-            }
-
-        }
-    }
-
-    private static class ABORecipe {
-        boolean isShapeless = false;
-        ItemStack result;
-        Object[] input;
-    }
+    // End
 
 }

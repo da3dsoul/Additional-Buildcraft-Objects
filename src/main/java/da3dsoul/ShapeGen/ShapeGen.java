@@ -16,11 +16,14 @@ import java.util.*;
 
 import abo.ABO;
 import cpw.mods.fml.common.FMLCommonHandler;
+import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenBigTree;
+import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenElevatedMangroveTree;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.MathHelper;
@@ -30,33 +33,37 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class ShapeGen
 {
-	
-	public static MinecraftServer getServerFromShapeGen()
+
+    public static MinecraftServer getServerFromShapeGen()
     {
         return server;
     }
 
     public static ShapeGen getShapeGen(int i)
     {
+        if(!ABO.shapeGens.containsKey(i))
+        {
+            ABO.shapeGens.put(i, new ShapeGen(FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(i)));
+        }
         return ABO.shapeGens.get(i);
     }
 
     public static ShapeGen getShapeGen(World w)
     {
-        return ABO.shapeGens.get(w.provider.dimensionId);
+        return getShapeGen(w.provider.dimensionId);
     }
-	
-	public static World getWorldFromShapeGen(int i)
+
+    public static World getWorldFromShapeGen(int i)
     {
         return server.worldServerForDimension(i);
     }
-	
-	public World getWorldFromShapeGen()
+
+    public World getWorldFromShapeGen()
     {
         return world;
     }
-	
-	public ShapeGen(World world)
+
+    public ShapeGen(World world)
     {
         server = FMLCommonHandler.instance().getMinecraftServerInstance();
         blocks = Collections.synchronizedMap(new LinkedHashMap());
@@ -65,8 +72,8 @@ public class ShapeGen
         shapeGenID = world.provider.dimensionId;
         readFromNBT();
     }
-	
-	public int getLength()
+
+    public int getLength()
     {
         if (blocks == null || blocks.isEmpty())
         {
@@ -76,15 +83,25 @@ public class ShapeGen
         {
             return blocks.size();
         }
-    }    
+    }
 
     public void tick()
     {
-        if(!updatingAnywhere) {
-            synchronized (blocks) {
-                blocks.putAll(blocksToAdd);
-                blocksToAdd.clear();
+        if(msSinceLastTick != 0)
+            msSinceLastTick = System.nanoTime() / 1000000 - msSinceLastTick;
+        update();
+        msSinceLastTick = System.nanoTime() / 1000000;
+    }
+
+    public void update()
+    {
+        if (stopping)
+        {
+            if(!saved) {
+                writeToNBT();
+                saved = true;
             }
+            return;
         }
 
         if (server == null || world == null)
@@ -92,16 +109,7 @@ public class ShapeGen
             return;
         }
 
-        update();
-    }
-
-    public void update()
-    {
-        if (stopping)
-        {
-            writeToNBT();
-            return;
-        }
+        if(msSinceLastTick >= 100) return;
 
         int c = 0;
 
@@ -110,46 +118,37 @@ public class ShapeGen
             return;
         }
 
-        Notify = true;
-
         updatingAnywhere = true;
-        synchronized (blocks)
+        for (Iterator<Map.Entry<String,BlockIdentity>> it = blocks.entrySet().iterator(); c <= (512) && it.hasNext(); it.remove())
         {
-            for (Iterator it = blocks.entrySet().iterator(); c <= (Instant ? 16384 : 512) && it.hasNext(); it.remove())
+            java.util.Map.Entry<String, BlockIdentity> block = (java.util.Map.Entry)it.next();
+            String a[] = ((String)block.getKey()).split(",");
+            int i = Integer.parseInt(a[0]);
+            int j = Integer.parseInt(a[1]);
+            int k = Integer.parseInt(a[2]);
+
+            Block id = block.getValue().getBlock();
+            int meta = block.getValue().getMeta();
+
+            if (world.getBlock(i, j, k) == id && world.getBlockMetadata(i, j, k) == meta)
             {
-                java.util.Map.Entry block = (java.util.Map.Entry)it.next();
-                String a[] = ((String)block.getKey()).split(",");
-                int i = Integer.parseInt(a[0]);
-                int j = Integer.parseInt(a[1]);
-                int k = Integer.parseInt(a[2]);
-                String[] b = ((String)block.getValue()).split(",");
-                int meta = Integer.parseInt(b[1]);
-                Block id = (Block)Block.blockRegistry.getObject(b[0]);
-
-                if (world.getBlock(i, j, k) == id && world.getBlockMetadata(i, j, k) == meta)
-                {
-                    continue;
-                }
-
-                if(!id.canPlaceBlockAt(world, i, j, k)) continue;
-                if(!id.canBlockStay(world, i, j, k)) continue;
-
-                if (Notify)
-                {
-                    world.setBlock(i, j, k, id, meta, 3);
-                }
-                else
-                {
-                    world.setBlock(i, j, k, id, meta, 2);
-                }
-
-                c++;
+                continue;
             }
+
+            if(!id.canBlockStay(world, i, j, k)) continue;
+
+            world.setBlock(i, j, k, id, meta, 3);
+
+
+            c++;
         }
         updatingAnywhere = false;
+
+        blocks.putAll(blocksToAdd);
+        blocksToAdd.clear();
     }
 
-    public synchronized void addBlock(int i, int j, int k, Block id)
+    public void addBlock(int i, int j, int k, Block id)
     {
         addBlock(i, j, k, id, 0);
     }
@@ -166,19 +165,45 @@ public class ShapeGen
             return;
         }
     }
+    public void addBlockWithRandomMeta(int i, int j, int k, Block id, int startMeta, int endMeta) {
+        if(startMeta == 0 && endMeta == 0) {
+            addBlock(i,j,k,id,0);
+            return;
+        }
+        int meta = world.rand.nextInt(endMeta - startMeta + 1) + startMeta;
+        addBlock(i,j,k,id,meta);
+    }
 
-    public synchronized void addBlock(int i, int j, int k, Block id, int l)
+    public void addBlock(int i, int j, int k, Block id, int l)
     {
+        if(l == -1) {
+            try {
+                int size = 0;
+                String name = null;
+                String name2 = new ItemStack(id, 1, 0).getDisplayName();
+                do {
+                    name = new ItemStack(id, 1, size).getDisplayName();
+                    if((size != 0 && name.equals(name2)) || name.startsWith("tile.") || name.endsWith(".name")) {
+                        size--;
+                        break;
+                    }
+                    size++;
+                } while(size < 16);
+                if(size == 0 || size == -1 || size == 1) {
+                    addBlock(i,j,k,id,0);
+                    return;
+                }
+                addBlockWithRandomMeta(i, j, k, id, 0, size);
+                return;
+            }catch (Throwable t) {}
+        }
         if (updatingAnywhere)
         {
-            blocksToAdd.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "," + l);
+            blocksToAdd.put(toString(i, j, k), new BlockIdentity(id,l == -1 ? 0 : l));
             return;
         }
 
-        synchronized (blocks)
-        {
-            blocks.put(toString(i, j, k),Block.blockRegistry.getNameForObject(id) + "," + l);
-        }
+        blocks.put(toString(i, j, k), new BlockIdentity(id, l == -1 ? 0 : l));
     }
 
     public synchronized void addBlockAtStart(int i, int j, int k, Block id)
@@ -292,8 +317,8 @@ public class ShapeGen
 
         return returnList;
     }
-	
-	public static ArrayList<int[]> getCylinder(int X, int Y, int Z, int radius, int height)
+
+    public static ArrayList<int[]> getCylinder(int X, int Y, int Z, int radius, int height)
     {
         LinkedHashSet list = new LinkedHashSet();
 
@@ -308,7 +333,7 @@ public class ShapeGen
                     if (distance <= (double)radius)
                         list.add(new int[]
                                 {
-                                    X + i, Y + j, Z + k
+                                        X + i, Y + j, Z + k
                                 });
                 }
             }
@@ -334,7 +359,7 @@ public class ShapeGen
                     if (distance <= (double)radius && distance > (double)(radius - thickness))
                         list.add(new int[]
                                 {
-                                    X + i, Y + j, Z + k
+                                        X + i, Y + j, Z + k
                                 });
                 }
             }
@@ -366,9 +391,9 @@ public class ShapeGen
                 float f7 = f2 * f4;
                 Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
                 int a[] =
-                {
-                    (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
-                };
+                        {
+                                (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
+                        };
 
                 if (!list.contains(a))
                 {
@@ -401,9 +426,9 @@ public class ShapeGen
                 float f7 = f2 * f4;
                 Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
                 int a[] =
-                {
-                    (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
-                };
+                        {
+                                (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
+                        };
 
                 if (!list.contains(a))
                 {
@@ -436,9 +461,9 @@ public class ShapeGen
                 float f7 = f2 * f4;
                 Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
                 int a[] =
-                {
-                    (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
-                };
+                        {
+                                (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
+                        };
 
                 if (!list.contains(a))
                 {
@@ -460,9 +485,9 @@ public class ShapeGen
             int i1 = (int)((double)i + (double)radius * Math.cos(n1));
             int k1 = (int)((double)k + (double)radius * Math.sin(n1));
             int a[] =
-            {
-                i1, j, k1
-            };
+                    {
+                            i1, j, k1
+                    };
             list.add(a);
         }
 
@@ -475,7 +500,7 @@ public class ShapeGen
     }
 
     public void Level(World w, int X, int Y, int Z, float radius, Block interID, Block topsoilID,
-            EntityPlayer player)
+                      EntityPlayer player)
     {
         for (int y = world.getHeight() - Y; y > 0; y--)
         {
@@ -487,25 +512,10 @@ public class ShapeGen
 
                     if (distance <= radius)
                     {
-                        if (world.canMineBlock(player, X + x, Y + y, Z + z))
-                        {
-                            addBlockAtStart(X + x, Y + y, Z + z, Blocks.air);
-                        }
-
-                        if (world.canMineBlock(player, X + x, Y + y, Z - z))
-                        {
-                            addBlockAtStart(X + x, Y + y, Z - z, Blocks.air);
-                        }
-
-                        if (world.canMineBlock(player, X - x, Y + y, Z - z))
-                        {
-                            addBlockAtStart(X - x, Y + y, Z - z, Blocks.air);
-                        }
-
-                        if (world.canMineBlock(player, X - x, Y + y, Z + z))
-                        {
-                            addBlockAtStart(X - x, Y + y, Z + z, Blocks.air);
-                        }
+                        addBlockAtStart(X + x, Y + y, Z + z, Blocks.air);
+                        addBlockAtStart(X + x, Y + y, Z - z, Blocks.air);
+                        addBlockAtStart(X - x, Y + y, Z - z, Blocks.air);
+                        addBlockAtStart(X - x, Y + y, Z + z, Blocks.air);
                     }
                 }
             }
@@ -532,215 +542,210 @@ public class ShapeGen
                             id = interID;
                         }
 
-                        if (world.canMineBlock(player, X + x, Y + y, Z + z))
-                        {
-                            addBlockAtStart(X + x, Y + y, Z + z, id);
-                        }
-
-                        if (world.canMineBlock(player, X + x, Y + y, Z - z))
-                        {
-                            addBlockAtStart(X + x, Y + y, Z - z, id);
-                        }
-
-                        if (world.canMineBlock(player, X - x, Y + y, Z - z))
-                        {
-                            addBlockAtStart(X - x, Y + y, Z - z, id);
-                        }
-
-                        if (world.canMineBlock(player, X - x, Y + y, Z + z))
-                        {
-                            addBlockAtStart(X - x, Y + y, Z + z, id);
-                        }
+                        addBlock(X + x, Y + y, Z + z, id);
+                        addBlock(X + x, Y + y, Z - z, id);
+                        addBlock(X - x, Y + y, Z - z, id);
+                        addBlock(X - x, Y + y, Z + z, id);
                     }
                 }
             }
         }
     }
 
-    /*    public void makeLaputa(int X, int Y, int Z)
+    public void makeLaputa(int i4, int j4, int k4)
+    {
+        new RunnableGenerator(i4,j4,k4) {
+            @Override
+            public void generate() {
+                placeCylinder(X, Y, Z, 24, 3, Blocks.dirt, 0);
+                placeCylinderHollow(X, Y, Z, 25, 9, 1, false, false, Blocks.sandstone, 2, false);
+                placeDomeInverted(X, Y - 1, Z, 25F, Blocks.sandstone, false, 0, false, 2);
+                ArrayList conepoints1 = getRadialPointsDomeInverted(X, Y, Z, 21, 36);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    placeSpireInverted(pos[0], pos[1], pos[2], 4, 10, 2, Blocks.stonebrick, -1);
+                }
+
+                placeCylinderHollow(X, Y - 2, Z, 50, 6, 3, false, false, Blocks.stonebrick, -1, false);
+                placeCylinderHollow(X, Y - 2, Z, 80, 6, 10, false, false, Blocks.sandstone, 2, false);
+                placeCylinderHollow(X, Y - 2, Z, 80, 12, 1, false, false, Blocks.sandstone, 2, false);
+                placeCylinderHollow(X, Y - 2, Z, 71, 12, 1, false, false, Blocks.sandstone, 2, false);
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 75, 15);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    for(int x1 = -1; x1 <= 1; x1++)
+                    {
+                        for(int z1 = -1; z1 <= 1; z1++)
+                            placeBlockLine(new int[] {
+                                    X + x1, Y + 3, Z + z1
+                            }, new int[] {
+                                    pos[0] + x1, Y + 3, pos[2] + z1
+                            }, Blocks.sandstone, 2, false, null, null);
+                    }
+
+                    placeSpireInverted(pos[0], pos[1] + 1, pos[2], 10, 12, 4, Blocks.sandstone, 2);
+                    int l = world.rand.nextInt(5) + 3;
+                    for(int m = 0; m <= l; m++) {
+                        int x = pos[0] + world.rand.nextInt(6) - world.rand.nextInt(6);
+                        int y = pos[1] - 2 - world.rand.nextInt(2);
+                        int z = pos[2] + world.rand.nextInt(6) - world.rand.nextInt(6);
+                        placeConeInverted(x, y, z, 2, 7, Blocks.stonebrick, -1);
+                    }
+                    placeSpireHollow(pos[0], Y + 4, pos[2], 10, 19, 6, 1, Blocks.sandstone, 2, false, false);
+                    placeCylinder(pos[0], Y + 4, pos[2], 9, 6, Blocks.air, 0);
+                    placeCylinder(pos[0], Y + 3, pos[2], 9, 1, Blocks.grass, 0);
+                    generateGrass(pos[0], Y + 4, pos[2], Blocks.tallgrass, 1);
+                    generateFlowers(pos[0], Y + 4, pos[2], Blocks.red_flower);
+                    generateFlowers(pos[0], Y + 4, pos[2], Blocks.yellow_flower);
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 50, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    placeSpireInverted(pos[0], pos[1] + 1, pos[2], 15, 15, 5, Blocks.sandstone, 2);
+                    placeSpireHollow(pos[0], Y + 4, pos[2], 15, 24, 5, 1, Blocks.sandstone, 2, false, true);
+                    placeCylinder(pos[0], Y + 3, pos[2], 14, 1, Blocks.grass, 0);
+                    ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 7, 3);
+                    for(int i1 = 0; i1 < points.size(); i1++)
+                    {
+                        int pos1[] = (int[])points.get(i1);
+                        makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
+                    }
+
+                    makeLamp(pos[0], Y + 3, pos[2], Blocks.gold_block, 0);
+                    generateGrassAndFlowers(pos[0], Y + 4, pos[2], 10);
+                }
+
+                placeCylinderHollow(X, Y + 4, Z, 79, 5, 8, false, false, Blocks.air, 0, false);
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 25, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    for(int x1 = -1; x1 <= 1; x1++)
+                    {
+                        for(int z1 = -1; z1 <= 1; z1++)
+                        {
+                            for(int y1 = 1; y1 <= 3; y1++)
+                                addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, Blocks.air);
+                        }
+                    }
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 35, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    for(int x1 = -1; x1 <= 1; x1++)
+                    {
+                        for(int z1 = -1; z1 <= 1; z1++)
+                        {
+                            for(int y1 = 1; y1 <= 3; y1++)
+                                addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, Blocks.air);
+                        }
+                    }
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 65, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    for(int x1 = -1; x1 <= 1; x1++)
+                    {
+                        for(int z1 = -1; z1 <= 1; z1++)
+                        {
+                            for(int y1 = 1; y1 <= 3; y1++)
+                                addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, Blocks.air);
+                        }
+                    }
+                }
+
+                placeSphere(X, Y - 10, Z, 8F, Blocks.air, false, 0, false, false, 0);
+                placeCylinder(X, Y + 3, Z, 24, 1, Blocks.grass, 0);
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 16, 5);
+                ArrayList conepoints2 = getRegularPolyVertices(X, Y + 3, Z, 8, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    int pos2[] = (int[])conepoints2.get(i);
+                    for(int x1 = -1; x1 <= 1; x1++)
+                    {
+                        for(int z1 = -1; z1 <= 1; z1++)
+                            placeBlockLine(new int[] {
+                                    pos2[0] + x1, Y + 3, pos2[2] + z1
+                            }, new int[] {
+                                    pos[0] + x1, Y + 3, pos[2] + z1
+                            }, Blocks.water, 0, false, null, null);
+                    }
+                }
+
+                generateGrassAndFlowers(X, Y + 4, Z, 20);
+
+                ScaryGen_WorldGenElevatedMangroveTree tree2 = new ScaryGen_WorldGenElevatedMangroveTree(true);
+                tree2.useShapeGen = true;
+                tree2.setConfigOptions(Blocks.log, Blocks.leaves, 0, 1, Blocks.grass, Blocks.dirt, 69, 75, 3);
+                tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 60);
+                tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 40);
+
+                conepoints1 = getRegularPolyVertices(X, Y + 7, Z, 21, 15);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 7, Z, 8, 5);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 75, 15);
+                for(int i = 0; i < conepoints1.size(); i++)
+                {
+                    int pos[] = (int[])conepoints1.get(i);
+                    ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 5, 3);
+                    for(int i1 = 0; i1 < points.size(); i1++)
+                    {
+                        int pos1[] = (int[])points.get(i1);
+                        makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
+                    }
+
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                }
+
+                int j = 0;
+                for(int i = 0; i < 150 && j < 2500; j++) {
+                    int x = X + world.rand.nextInt(100) - world.rand.nextInt(100);
+                    int z = Z + world.rand.nextInt(100) - world.rand.nextInt(100);
+                    int y = Y + world.rand.nextInt(85) - world.rand.nextInt(40);
+                    if((!blocks.containsKey(ShapeGen.this.toString(x, y, z)) || blocks.get(ShapeGen.this.toString(x, y, z)).getBlock().getMaterial() == Material.air) && (!blocksToAdd.containsKey(ShapeGen.this.toString(x,y,z)) || blocksToAdd.get(ShapeGen.this.toString(x,y,z)).getBlock().getMaterial() == Material.air)) {
+                        addBlock(x,y,z,Blocks.vine);
+                        i++;
+                    }
+                }
+            }
+        }.run();
+    }
+
+    public void generateGrassAndFlowers(int X, int Y, int Z, int diameter)
+    {
+        for(int i = 0; i < Math.round(1 / 25 * Math.pow(diameter,2)); i++)
         {
-            if(!alive)
-                return;
-            adding = true;
-            placeCylinder(X, Y, Z, 24, 3, 3, 0);
-            placeCylinderHollow(X, Y, Z, 25, 9, 1, false, false, 24, 2, false);
-            placeDomeInverted(X, Y - 1, Z, 25F, 24, false, 0, false, 2);
-            ArrayList conepoints1 = getRadialPointsDomeInverted(X, Y, Z, 21, 36);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                placeSpireInverted(pos[0], pos[1], pos[2], 4, 10, 2, 98, 0);
-            }
-
-            placeCylinderHollow(X, Y - 2, Z, 50, 6, 3, false, false, 98, 0, false);
-            placeCylinderHollow(X, Y - 2, Z, 80, 6, 10, false, false, 24, 2, false);
-            placeCylinderHollow(X, Y - 2, Z, 80, 12, 1, false, false, 24, 2, false);
-            placeCylinderHollow(X, Y - 2, Z, 71, 12, 1, false, false, 24, 2, false);
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 75, 15);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                for(int x1 = -1; x1 <= 1; x1++)
-                {
-                    for(int z1 = -1; z1 <= 1; z1++)
-                        placeBlockLine(new int[] {
-                            X + x1, Y + 3, Z + z1
-                        }, new int[] {
-                            pos[0] + x1, Y + 3, pos[2] + z1
-                        }, 24, 2, false, null, null);
-                }
-
-                EntityLaputaSpot spot = new EntityLaputaSpot(world, pos[0], Y + 4, pos[2]);
-                spot.healthRadius = 9;
-                world.spawnEntityInWorld(spot);
-                placeSpireInverted(pos[0], pos[1] + 1, pos[2], 10, 14, 4, 24, 2);
-                placeSpireHollow(pos[0], Y + 4, pos[2], 10, 19, 6, 1, 24, 2, false, false);
-                placeCylinder(pos[0], Y + 4, pos[2], 9, 6, 0, 0);
-                placeCylinder(pos[0], Y + 3, pos[2], 9, 1, 2, 0);
-                generateGrass(pos[0], Y + 4, pos[2], Block.tallGrass.blockID, 1);
-                generateFlowers(pos[0], Y + 4, pos[2], Block.plantRed.blockID);
-                generateFlowers(pos[0], Y + 4, pos[2], Block.plantYellow.blockID);
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 50, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                placeSpireInverted(pos[0], pos[1] + 1, pos[2], 15, 15, 5, 24, 2);
-                placeSpireHollow(pos[0], Y + 4, pos[2], 15, 24, 5, 1, 24, 2, false, true);
-                placeCylinder(pos[0], Y + 3, pos[2], 14, 1, 2, 0);
-                ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 7, 3);
-                for(int i1 = 0; i1 < points.size(); i1++)
-                {
-                    int pos1[] = (int[])points.get(i1);
-                    makeLamp(pos1[0], pos1[1], pos1[2], Block.blockGold.blockID, 0);
-                }
-
-                makeLamp(pos[0], Y + 3, pos[2], Block.blockGold.blockID, 0);
-                EntityLaputaSpot spot = new EntityLaputaSpot(world, pos[0], Y + 4, pos[2]);
-                spot.healthRadius = 14;
-                world.spawnEntityInWorld(spot);
-                generateGrass(pos[0], Y + 4, pos[2], Block.tallGrass.blockID, 1);
-                generateFlowers(pos[0], Y + 4, pos[2], Block.plantRed.blockID);
-                generateFlowers(pos[0], Y + 4, pos[2], Block.plantYellow.blockID);
-            }
-
-            placeCylinderHollow(X, Y + 4, Z, 79, 5, 8, false, false, 0, 0, false);
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 25, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                for(int x1 = -1; x1 <= 1; x1++)
-                {
-                    for(int z1 = -1; z1 <= 1; z1++)
-                    {
-                        for(int y1 = 1; y1 <= 3; y1++)
-                            addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, 0);
-                    }
-                }
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 35, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                for(int x1 = -1; x1 <= 1; x1++)
-                {
-                    for(int z1 = -1; z1 <= 1; z1++)
-                    {
-                        for(int y1 = 1; y1 <= 3; y1++)
-                            addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, 0);
-                    }
-                }
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 65, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                for(int x1 = -1; x1 <= 1; x1++)
-                {
-                    for(int z1 = -1; z1 <= 1; z1++)
-                    {
-                        for(int y1 = 1; y1 <= 3; y1++)
-                            addBlock(pos[0] + x1, pos[1] + y1, pos[2] + z1, 0);
-                    }
-                }
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 7, Z, 21, 15);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                makeLamp(pos[0], pos[1], pos[2], Block.blockGold.blockID, 0);
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 7, Z, 8, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                makeLamp(pos[0], pos[1], pos[2], Block.blockGold.blockID, 0);
-                EntityLaputaSpot spot = new EntityLaputaSpot(world, pos[0], Y + 4, pos[2]);
-                spot.healthRadius = 6;
-                world.spawnEntityInWorld(spot);
-            }
-
-            placeSphere(X, Y - 10, Z, 8F, 0, false, 0, false, false, 0);
-            placeCylinder(X, Y + 3, Z, 24, 1, 2, 0);
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 16, 5);
-            ArrayList conepoints2 = getRegularPolyVertices(X, Y + 3, Z, 8, 5);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                int pos2[] = (int[])conepoints2.get(i);
-                for(int x1 = -1; x1 <= 1; x1++)
-                {
-                    for(int z1 = -1; z1 <= 1; z1++)
-                        placeBlockLine(new int[] {
-                            pos2[0] + x1, Y + 3, pos2[2] + z1
-                        }, new int[] {
-                            pos[0] + x1, Y + 3, pos[2] + z1
-                        }, 9, 0, false, null, null);
-                }
-            }
-
-            WorldGenBigTree tree1 = new WorldGenBigTree(false);
-            tree1.forced = true;
-            tree1.useShapeGen = true;
-            tree1.heightLimit = 70;
-            tree1.heightLimitLimit = 70;
-            tree1.trunkSize = 3;
-            tree1.leafDistanceLimit = 8;
-            tree1.generate(world, world.rand, X, Y + 4, Z);
-            for(int i = 0; i < 6; i++)
-            {
-                int x2 = world.rand.nextInt(20);
-                x2 -= world.rand.nextInt(20);
-                x2 += X;
-                int z2 = world.rand.nextInt(20);
-                z2 -= world.rand.nextInt(20);
-                z2 += Z;
-                generateGrass(x2, Y + 4, z2, Block.tallGrass.blockID, 1);
-                generateFlowers(x2, Y + 4, z2, Block.plantRed.blockID);
-                generateFlowers(x2, Y + 4, z2, Block.plantYellow.blockID);
-            }
-
-            conepoints1 = getRegularPolyVertices(X, Y + 3, Z, 75, 15);
-            for(int i = 0; i < conepoints1.size(); i++)
-            {
-                int pos[] = (int[])conepoints1.get(i);
-                ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 5, 3);
-                for(int i1 = 0; i1 < points.size(); i1++)
-                {
-                    int pos1[] = (int[])points.get(i1);
-                    makeLamp(pos1[0], pos1[1], pos1[2], Block.blockGold.blockID, 0);
-                }
-
-                makeLamp(pos[0], pos[1], pos[2], Block.blockGold.blockID, 0);
-            }
-
-            adding = false;
-        }*/
+            int x2 = world.rand.nextInt(diameter);
+            x2 -= world.rand.nextInt(diameter);
+            x2 += X;
+            int z2 = world.rand.nextInt(diameter);
+            z2 -= world.rand.nextInt(diameter);
+            z2 += Z;
+            generateGrass(x2, Y, z2, Blocks.tallgrass, 1);
+            generateFlowers(x2, Y, z2, Blocks.red_flower);
+            generateFlowers(x2, Y, z2, Blocks.yellow_flower);
+        }
+    }
 
     public void placeBlockLine(int par1ArrayOfInteger[], int par2ArrayOfInteger[], Block blockID, boolean drop, Block idmask[], Material mask[])
     {
@@ -753,7 +758,7 @@ public class ShapeGen
     }
 
     public void placeBlockLine(int par1ArrayOfInteger[], int par2ArrayOfInteger[], Block blockID, int meta, boolean drop, Block idmask[], Material mask[],
-            EntityPlayer player)
+                               EntityPlayer player)
     {
         int ai[] = new int[3];
         byte byte0 = 0;
@@ -831,15 +836,7 @@ public class ShapeGen
                             }
                         }
                     }
-
-                    if (!Instant)
-                    {
-                        addBlock(ai1[0], ai1[1], ai1[2], blockID, meta);
-                    }
-                    else
-                    {
-                        world.setBlock(ai1[0], ai1[1], ai1[2], blockID, meta, 3);
-                    }
+                    addBlock(ai1[0], ai1[1], ai1[2], blockID, meta);
                 }
             }
         }
@@ -847,135 +844,122 @@ public class ShapeGen
 
     public void placeCone(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta)
     {
+        Vec3 end = Vec3.createVectorHelper(X, Y + height, Z);
+        Vec3 start = Vec3.createVectorHelper(X + radius, Y, Z);
 
-        int endPoint[] =
-        {
-            X, Y + height, Z
-        };
-
-        for (int i = -radius; i <= radius; i++)
-        {
-            for (int k = -radius; k <= radius; k++)
+        for(int j = 0; j <= height; j++) {
+            Vec3 vec3 = start.getIntermediateWithYValue(end, j + Y);
+            if(vec3 == null) {
+                addBlock(X, Y + j, Z, blockID, blockMeta);
+                continue;
+            }
+            int newRadius = (int)Math.round(vec3.xCoord - X);
+            for (int i = -newRadius; i <= newRadius; i++)
             {
-                double distance = Math.sqrt(i * i + k * k);
-
-                if (distance <= (double)radius)
+                for (int k = -newRadius; k <= newRadius; k++)
                 {
-                    int start[] =
-                    {
-                        X + i, Y, Z + k
-                    };
-                    placeBlockLine(start, endPoint, blockID, blockMeta, false, null, null);
+                    double distance = Math.sqrt(i * i + k * k);
+                    if(distance <= (double)newRadius) {
+                        addBlock(X + i, Y + j, Z + k, blockID, blockMeta);
+                    }
                 }
             }
         }
     }
 
     public void placeConeHollow(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta,
-            int thickness, boolean cap, boolean fillair)
+                                int thickness, boolean cap, boolean fillair)
     {
+        Vec3 end = Vec3.createVectorHelper(X, Y + height, Z);
+        Vec3 start = Vec3.createVectorHelper(X + radius, Y, Z);
 
-        int endPoint[] =
-        {
-            X, Y + height, Z
-        };
-
-        for (int i = -radius; i <= radius; i++)
-        {
-            for (int k = -radius; k <= radius; k++)
+        int oldRadius = 0;
+        for(int j = 0; j <= height; j++) {
+            Vec3 vec3 = start.getIntermediateWithYValue(end, j + Y);
+            if(vec3 == null) {
+                addBlock(X, Y + j, Z, blockID, blockMeta);
+                continue;
+            }
+            int newRadius = (int)Math.round(vec3.xCoord - X);
+            for (int i = -newRadius; i <= newRadius; i++)
             {
-                double distance = Math.sqrt(i * i + k * k);
-
-                if (cap && distance <= (double)radius)
-                    if (!Instant)
-                    {
-                        addBlock(X + i, Y, Z + k, blockID, blockMeta);
-                    }
-                    else
-                    {
-                        world.setBlock(X + i, Y, Z + k, blockID, blockMeta, 3);
-                    }
-
-                if (distance <= (double)radius && distance > (double)(radius - thickness))
+                for (int k = -newRadius; k <= newRadius; k++)
                 {
-                    int start[] =
-                    {
-                        X + i, Y, Z + k
-                    };
-                    placeBlockLine(start, endPoint, blockID, blockMeta, false, null, null);
+                    double distance = Math.sqrt(i * i + k * k);
+                    int newThickness = thickness;
+                    if(j != 0 && oldRadius - newRadius > 1) {
+                        newThickness = thickness + (oldRadius - newRadius);
+                    }
+                    if(distance <= (double)newRadius && cap && j == 0){
+                        addBlock(X + i, Y + j, Z + k, blockID, blockMeta);
+                    } else if(distance <= (double)newRadius && distance > (double)(newRadius - newThickness)) {
+                        addBlock(X + i, Y + j, Z + k, blockID, blockMeta);
+                    } else if(distance <= (double)newRadius && fillair) {
+                        addBlock(X + i, Y + j, Z + k, Blocks.air, 0);
+                    }
                 }
             }
+            oldRadius = newRadius;
         }
     }
 
     public void placeConeHollowInverted(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta,
-            int thickness, boolean cap, boolean fillair)
+                                        int thickness, boolean cap, boolean fillair)
     {
+        Vec3 end = Vec3.createVectorHelper(X, Y - height, Z);
+        Vec3 start = Vec3.createVectorHelper(X + radius, Y, Z);
 
-        int endPoint[] =
-        {
-            X, Y - height, Z
-        };
-
-        for (int i = -radius; i <= radius; i++)
-        {
-            for (int k = -radius; k <= radius; k++)
+        int oldRadius = 0;
+        for(int j = 0; j <= height; j++) {
+            Vec3 vec3 = start.getIntermediateWithYValue(end, Y - j);
+            if(vec3 == null) {
+                addBlock(X, Y - j, Z, blockID, blockMeta);
+                continue;
+            }
+            int newRadius = (int)Math.round(vec3.xCoord - X);
+            for (int i = -newRadius; i <= newRadius; i++)
             {
-                double distance = Math.sqrt(i * i + k * k);
-
-                if (cap && distance <= (double)radius)
-                    if (!Instant)
-                    {
-                        addBlock(X + i, Y, Z + k, blockID, blockMeta);
-                    }
-                    else
-                    {
-                        world.setBlock(X + i, Y, Z + k, blockID, blockMeta, 3);
-                    }
-
-                if (fillair && distance <= (double)(radius - thickness))
-                    if (!Instant)
-                    {
-                        addBlock(X + i, Y - 1, Z + k, Blocks.air);
-                    }
-                    else
-                    {
-                        world.setBlock(X + i, Y - 1, Z + k, Blocks.air, 0, 3);
-                    }
-
-                if (distance <= (double)radius && distance > (double)(radius - thickness))
+                for (int k = -newRadius; k <= newRadius; k++)
                 {
-                    int start[] =
-                    {
-                        X + i, Y, Z + k
-                    };
-                    placeBlockLine(start, endPoint, blockID, blockMeta, false, null, null);
+                    double distance = Math.sqrt(i * i + k * k);
+                    int newThickness = thickness;
+
+                    if(j != 0 && oldRadius - newRadius > 1) {
+                        newThickness = thickness + (oldRadius - newRadius);
+                    }
+                    if(distance <= (double)newRadius && cap && j == 0){
+                        addBlock(X + i, Y - j, Z + k, blockID, blockMeta);
+                    } else if(distance <= (double)newRadius && distance > (double)(newRadius - newThickness)) {
+                        addBlock(X + i, Y - j, Z + k, blockID, blockMeta);
+                    } else if(distance <= (double)newRadius && fillair) {
+                        addBlock(X + i, Y - j, Z + k, Blocks.air, 0);
+                    }
                 }
             }
+            oldRadius = newRadius;
         }
     }
 
     public void placeConeInverted(int X, int Y, int Z, int radius, int height, Block blockID, int blockMeta)
     {
+        Vec3 end = Vec3.createVectorHelper(X, Y - height, Z);
+        Vec3 start = Vec3.createVectorHelper(X + radius, Y, Z);
 
-        int endPoint[] =
-        {
-            X, Y - height, Z
-        };
-
-        for (int i = -radius; i <= radius; i++)
-        {
-            for (int k = -radius; k <= radius; k++)
+        for(int j = 0; j <= height; j++) {
+            Vec3 vec3 = start.getIntermediateWithYValue(end, Y - j);
+            if(vec3 == null) {
+                addBlock(X, Y - j, Z, blockID, blockMeta);
+                continue;
+            }
+            int newRadius = (int)Math.round(vec3.xCoord - X);
+            for (int i = -newRadius; i <= newRadius; i++)
             {
-                double distance = Math.sqrt(i * i + k * k);
-
-                if (distance <= (double)radius)
+                for (int k = -newRadius; k <= newRadius; k++)
                 {
-                    int start[] =
-                    {
-                        X + i, Y, Z + k
-                    };
-                    placeBlockLine(start, endPoint, blockID, blockMeta, false, null, null);
+                    double distance = Math.sqrt(i * i + k * k);
+                    if(distance <= (double)newRadius) {
+                        addBlock(X + i, Y - j, Z + k, blockID, blockMeta);
+                    }
                 }
             }
         }
@@ -987,7 +971,7 @@ public class ShapeGen
     }
 
     public void placeCube(int X, int Y, int Z, int size, Block BlockID, boolean inverted, boolean hollow,
-            int thickness, boolean fillair, int metadata)
+                          int thickness, boolean fillair, int metadata)
     {
         placeRectangularPrism(X, Y, Z, size, size, size, BlockID, inverted, hollow, thickness, fillair, metadata);
     }
@@ -1004,21 +988,15 @@ public class ShapeGen
                     double distance = Math.sqrt(i * i + k * k);
 
                     if (distance <= (double)radius)
-                        if (!Instant)
-                        {
-                            addBlock(X + i, Y + j, Z + k, blockID, blockMeta);
-                        }
-                        else
-                        {
-                            world.setBlock(X + i, Y + j, Z + k, blockID, blockMeta, 3);
-                        }
+
+                        addBlock(X + i, Y + j, Z + k, blockID, blockMeta);
                 }
             }
         }
     }
 
     public void placeCylinderHollow(int X, int Y, int Z, int radius, int height, int thickness, boolean cap,
-            boolean fillair, Block blockID, int blockMeta, boolean captop)
+                                    boolean fillair, Block blockID, int blockMeta, boolean captop)
     {
 
         for (int i = -radius; i <= radius; i++)
@@ -1057,7 +1035,7 @@ public class ShapeGen
     }
 
     public void placeDome(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
-            boolean fillair, int metadata)
+                          boolean fillair, int metadata)
     {
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
@@ -1072,87 +1050,28 @@ public class ShapeGen
                     {
                         if (fillair)
                         {
-                            if (world.getBlock(X + x, Y + y, Z + z) != Blocks.air)
-                                if (!Instant)
-                                {
-                                    addBlock(X + x, Y + y, Z + z, Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock(X + x, Y + y, Z + z, Blocks.air, 0, 3);
-                                }
 
-                            if (world.getBlock(X + x, Y + y, Z - z) != Blocks.air)
-                                if (!Instant)
-                                {
-                                    addBlock(X + x, Y + y, Z - z, Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock(X + x, Y + y, Z - z, Blocks.air, 0, 3);
-                                }
-
-                            if (world.getBlock(X - x, Y + y, Z - z) != Blocks.air)
-                                if (!Instant)
-                                {
-                                    addBlock(X - x, Y + y, Z - z, Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock(X - x, Y + y, Z - z, Blocks.air, 0, 3);
-                                }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y + y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y + y, Z + z, Blocks.air, 0, 3);
-                            }
+                            addBlock(X + x, Y + y, Z + z, Blocks.air);
+                            addBlock(X + x, Y + y, Z - z, Blocks.air);
+                            addBlock(X - x, Y + y, Z - z, Blocks.air);
+                            addBlock(X - x, Y + y, Z + z, Blocks.air);
                         }
                     }
                     else if (distance <= radius)
                     {
                         if (world.getBlock(X + x, Y + y, Z + z) != BlockID && Y + y != 1)
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y + y, Z + z, BlockID, metadata);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y + y, Z + z, BlockID, metadata, 3);
-                            }
+                            addBlock(X + x, Y + y, Z + z, BlockID, metadata);
 
                         if (world.getBlock(X + x, Y + y, Z - z) != BlockID && Y + y != 1)
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y + y, Z - z, BlockID, metadata);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y + y, Z - z, BlockID, metadata, 3);
-                            }
+                            addBlock(X + x, Y + y, Z - z, BlockID, metadata);
 
                         if (world.getBlock(X - x, Y + y, Z - z) != BlockID && Y + y != 1)
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y + y, Z - z, BlockID, metadata);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y + y, Z - z, BlockID, metadata, 3);
-                            }
+
+                            addBlock(X - x, Y + y, Z - z, BlockID, metadata);
 
                         if (world.getBlock(X - x, Y + y, Z + z) != BlockID && Y + y != 1)
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y + y, Z + z, BlockID, metadata);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y + y, Z + z, BlockID, metadata, 3);
-                            }
+
+                            addBlock(X - x, Y + y, Z + z, BlockID, metadata);
                     }
                 }
             }
@@ -1160,7 +1079,7 @@ public class ShapeGen
     }
 
     public void placeDomeInverted(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
-            boolean fillair, int metadata)
+                                  boolean fillair, int metadata)
     {
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
@@ -1175,80 +1094,18 @@ public class ShapeGen
                     {
                         if (fillair)
                         {
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y - y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y - y, Z + z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y - y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y - y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y - y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y - y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y - y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y - y, Z + z, Blocks.air, 0, 3);
-                            }
+                            addBlock(X + x, Y - y, Z + z, Blocks.air);
+                            addBlock(X + x, Y - y, Z - z, Blocks.air);
+                            addBlock(X - x, Y - y, Z - z, Blocks.air);
+                            addBlock(X - x, Y - y, Z + z, Blocks.air);
                         }
                     }
                     else if (distance <= radius)
                     {
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y - y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y - y, Z + z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y - y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y - y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y - y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y - y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y - y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y - y, Z + z, BlockID, metadata, 3);
-                        }
+                        addBlock(X + x, Y - y, Z + z, BlockID, metadata);
+                        addBlock(X + x, Y - y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y - y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y - y, Z + z, BlockID, metadata);
                     }
                 }
             }
@@ -1256,14 +1113,14 @@ public class ShapeGen
     }
 
     public void placeRectangularPrism(int X, int Y, int Z, double sizeX, double sizeY,
-            double sizeZ, Block BlockID)
+                                      double sizeZ, Block BlockID)
     {
         placeRectangularPrism(X, Y, Z, sizeX, sizeY, sizeZ, BlockID, false, false, 0, false, 0);
     }
 
     public void placeRectangularPrism(int X, int Y, int Z, double sizeX, double sizeY,
-            double sizeZ, Block BlockID, boolean inverted, boolean hollow, int thickness, boolean fillair,
-            int metadata)
+                                      double sizeZ, Block BlockID, boolean inverted, boolean hollow, int thickness, boolean fillair,
+                                      int metadata)
     {
 
         if (sizeX % 2D == 0.0D && sizeZ % 2D != 0.0D)
@@ -1276,14 +1133,9 @@ public class ShapeGen
                         if (hollow && x >= -(sizeX / 2D) + (double)thickness && x < sizeX / 2D - (double)thickness && (y >= (double)(0 + thickness) && y < sizeY - (double)thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double)thickness && z < sizeZ / 2D - (double)thickness)
                         {
                             if (fillair)
-                                if (!Instant)
-                                {
-                                    addBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), Blocks.air, 0, 3);
-                                }
+
+                                addBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), Blocks.air);
+
                         }
                         else
                         {
@@ -1292,33 +1144,20 @@ public class ShapeGen
                 }
             }
         }
-        else if (sizeX % 2D != 0.0D && sizeZ % 2D == 0.0D)
-        {
-            for (double x = -(sizeX / 2D); x < sizeX / 2D; x++)
-            {
-                for (double y = 0.0D; y < sizeY; y++)
-                {
-                    for (double z = -sizeZ / 2D; z < sizeZ / 2D; z++)
-                        if (hollow && x >= -(sizeX / 2D) + (double)thickness && x < sizeX / 2D - (double)thickness && (y >= (double)(0 + thickness) && y < sizeY - (double)thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double)thickness && z < sizeZ / 2D - (double)thickness)
-                        {
-                            if (fillair)
-                                if (!Instant)
-                                {
-                                    addBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), Blocks.air, 0, 3);
-                                }
+        else if (sizeX % 2D != 0.0D && sizeZ % 2D == 0.0D) {
+            for (double x = -(sizeX / 2D); x < sizeX / 2D; x++) {
+                for (double y = 0.0D; y < sizeY; y++) {
+                    for (double z = -sizeZ / 2D; z < sizeZ / 2D; z++) {
+                        if (hollow && x >= -(sizeX / 2D) + (double) thickness && x < sizeX / 2D - (double) thickness && (y >= (double) (0 + thickness) && y < sizeY - (double) thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double) thickness && z < sizeZ / 2D - (double) thickness) {
+                            if (fillair) {
+
+                                addBlock((int) ((double) X + x + 0.5D), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z), Blocks.air);
+                            }
+
+                        } else {
+                            addBlock((int) ((double) X + x + 0.5D), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z), BlockID, metadata);
                         }
-                        else if (!Instant)
-                        {
-                            addBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), BlockID, metadata, 3);
-                        }
+                    }
                 }
             }
         }
@@ -1326,29 +1165,16 @@ public class ShapeGen
         {
             for (double x = -(sizeX / 2D); x < sizeX / 2D; x++)
             {
-                for (double y = 0.0D; y < sizeY; y++)
-                {
-                    for (double z = -(sizeZ / 2D); z < sizeZ / 2D; z++)
-                        if (hollow && x >= -(sizeX / 2D) + (double)thickness && x < sizeX / 2D - (double)thickness && (y >= (double)(0 + thickness) && y < sizeY - (double)thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double)thickness && z < sizeZ / 2D - (double)thickness)
-                        {
+                for (double y = 0.0D; y < sizeY; y++) {
+                    for (double z = -(sizeZ / 2D); z < sizeZ / 2D; z++) {
+                        if (hollow && x >= -(sizeX / 2D) + (double) thickness && x < sizeX / 2D - (double) thickness && (y >= (double) (0 + thickness) && y < sizeY - (double) thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double) thickness && z < sizeZ / 2D - (double) thickness) {
                             if (fillair)
-                                if (!Instant)
-                                {
-                                    addBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), Blocks.air);
-                                }
-                                else
-                                {
-                                    world.setBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), Blocks.air, 0, 3);
-                                }
+
+                                addBlock((int) ((double) X + x + 0.5D), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z + 0.5D), Blocks.air);
+                        } else {
+                            addBlock((int) ((double) X + x + 0.5D), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z + 0.5D), BlockID, metadata);
                         }
-                        else if (!Instant)
-                        {
-                            addBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock((int)((double)X + x + 0.5D), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z + 0.5D), BlockID, metadata, 3);
-                        }
+                    }
                 }
             }
         }
@@ -1356,31 +1182,23 @@ public class ShapeGen
         {
             for (double x = -(sizeX / 2D); x < sizeX / 2D; x++)
             {
-                for (double y = 0.0D; y < sizeY; y++)
-                {
-                    for (double z = -(sizeZ / 2D); z < sizeZ / 2D; z++)
-                        if (hollow && x >= -(sizeX / 2D) + (double)thickness && x < sizeX / 2D - (double)thickness && (y >= (double)(0 + thickness) && y < sizeY - (double)thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double)thickness && z < sizeZ / 2D - (double)thickness)
-                        {
-                            if (fillair)
-                            {
-                                addBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), Blocks.air);
+                for (double y = 0.0D; y < sizeY; y++) {
+                    for (double z = -(sizeZ / 2D); z < sizeZ / 2D; z++) {
+                        if (hollow && x >= -(sizeX / 2D) + (double) thickness && x < sizeX / 2D - (double) thickness && (y >= (double) (0 + thickness) && y < sizeY - (double) thickness || sizeY == 1.0D || sizeY == 2D || sizeY == 3D) && z >= -(sizeZ / 2D) + (double) thickness && z < sizeZ / 2D - (double) thickness) {
+                            if (fillair) {
+                                addBlock((int) ((double) X + x), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z), Blocks.air);
                             }
+                        } else {
+                            addBlock((int) ((double) X + x), (int) ((double) Y + (inverted ? -y : y)), (int) ((double) Z + z), BlockID, metadata);
                         }
-                        else if (!Instant)
-                        {
-                            addBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock((int)((double)X + x), (int)((double)Y + (inverted ? -y : y)), (int)((double)Z + z), BlockID, metadata, 3);
-                        }
+                    }
                 }
             }
         }
     }
 
     public void placeSphere(int X, int Y, int Z, float radius, Block BlockID, boolean hollow, int thickness,
-            boolean fillair, boolean noisy, int metadata)
+                            boolean fillair, boolean noisy, int metadata)
     {
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
@@ -1395,152 +1213,26 @@ public class ShapeGen
                     {
                         if (fillair)
                         {
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y + y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y + y, Z + z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y + y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y + y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y + y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y + y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y + y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y + y, Z + z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y - y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y - y, Z + z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X + x, Y - y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X + x, Y - y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y - y, Z - z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y - y, Z - z, Blocks.air, 0, 3);
-                            }
-
-                            if (!Instant)
-                            {
-                                addBlock(X - x, Y - y, Z + z, Blocks.air);
-                            }
-                            else
-                            {
-                                world.setBlock(X - x, Y - y, Z + z, Blocks.air, 0, 3);
-                            }
+                            addBlock(X + x, Y + y, Z + z, Blocks.air);
+                            addBlock(X + x, Y + y, Z - z, Blocks.air);
+                            addBlock(X - x, Y + y, Z - z, Blocks.air);
+                            addBlock(X - x, Y + y, Z + z, Blocks.air);
+                            addBlock(X + x, Y - y, Z + z, Blocks.air);
+                            addBlock(X + x, Y - y, Z - z, Blocks.air);
+                            addBlock(X - x, Y - y, Z - z, Blocks.air);
+                            addBlock(X - x, Y - y, Z + z, Blocks.air);
                         }
                     }
                     else if (distance <= radius && (!noisy || distance >= radius + 1.0F || distance <= radius - 2.0F || world.rand.nextInt(12) <= 6))
                     {
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y + y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y + y, Z + z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y + y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y + y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y + y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y + y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y + y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y + y, Z + z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y - y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y - y, Z + z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X + x, Y - y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X + x, Y - y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y - y, Z - z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y - y, Z - z, BlockID, metadata, 3);
-                        }
-
-                        if (!Instant)
-                        {
-                            addBlock(X - x, Y - y, Z + z, BlockID, metadata);
-                        }
-                        else
-                        {
-                            world.setBlock(X - x, Y - y, Z + z, BlockID, metadata, 3);
-                        }
+                        addBlock(X + x, Y + y, Z + z, BlockID, metadata);
+                        addBlock(X + x, Y + y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y + y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y + y, Z + z, BlockID, metadata);
+                        addBlock(X + x, Y - y, Z + z, BlockID, metadata);
+                        addBlock(X + x, Y - y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y - y, Z - z, BlockID, metadata);
+                        addBlock(X - x, Y - y, Z + z, BlockID, metadata);
                     }
                 }
             }
@@ -1553,7 +1245,7 @@ public class ShapeGen
     }
 
     public void placeSphereTopsoil(int X, int Y, int Z, float radius, Block BlockID, Block interID, Block topsoilID,
-            int blockmetadata, int intermetadata, int topmetadata)
+                                   int blockmetadata, int intermetadata, int topmetadata)
     {
 
         for (int y = 0; y <= (int)Math.ceil(radius); y++)
@@ -1666,36 +1358,36 @@ public class ShapeGen
     }
 
     public void placeTopsoil(int X, int Y, int Z, int radius, Block interID, Block topsoilID, int intermetadata,
-            int topmetadata)
+                             int topmetadata)
     {
         placeTopsoil(X, Y, Z, radius, interID, topsoilID, intermetadata, topmetadata, null, false);
     }
 
     public void placeTopsoil(int X, int Y, int Z, int radius, Block interID, Block topsoilID, int intermetadata,
-            int topmetadata, EntityPlayer player, boolean fromBiome)
+                             int topmetadata, EntityPlayer player, boolean fromBiome)
     {
-        
+
         for (int i = X - radius; i <= X + radius; i++)
         {
             for (int k = Z - radius; k <= Z + radius; k++)
             {
-            	if(fromBiome)
-            	{
-            		BiomeGenBase a = world.getBiomeGenForCoords(i, k);
-            		topsoilID = a.topBlock;
-            		interID = a.fillerBlock;
-            	}
+                if(fromBiome)
+                {
+                    BiomeGenBase a = world.getBiomeGenForCoords(i, k);
+                    topsoilID = a.topBlock;
+                    interID = a.fillerBlock;
+                }
                 int j = getTopHeight(i, k, Y, radius);
 
                 if (j != 0)
                 {
-                	if(interID == Blocks.sand && topsoilID == Blocks.sand)
+                    if(interID == Blocks.sand && topsoilID == Blocks.sand)
                     {
-                    	Block id = world.getBlock(i, j - 3, k);
-                    	if(id.getMaterial() == Material.air || BlockUtils.isFluid(id) || id == Blocks.sand || id == Blocks.gravel)
-                    	{
-                    		addBlock(i, j - 3, k, Blocks.sandstone);
-                    	}
+                        Block id = world.getBlock(i, j - 3, k);
+                        if(id.getMaterial() == Material.air || BlockUtils.isFluid(id) || id == Blocks.sand || id == Blocks.gravel)
+                        {
+                            addBlock(i, j - 3, k, Blocks.sandstone);
+                        }
                     }
                     addBlock(i, j, k, topsoilID, topmetadata);
                     addBlock(i, j - 1, k, interID, intermetadata);
@@ -1742,168 +1434,168 @@ public class ShapeGen
     }
 
     public void placeSpire(int X, int Y, int Z, int radius, int height, int startheight, Block blockID,
-            int blockMeta)
+                           int blockMeta)
     {
         placeCylinder(X, Y, Z, radius, startheight, blockID, blockMeta);
         placeCone(X, Y + startheight, Z, radius, height - startheight, blockID, blockMeta);
     }
 
     public void placeSpireHollow(int X, int Y, int Z, int radius, int height, int startheight, int thickness,
-            Block blockID, int blockMeta, boolean cap, boolean fillair)
+                                 Block blockID, int blockMeta, boolean cap, boolean fillair)
     {
         placeCylinderHollow(X, Y, Z, radius, startheight, thickness, cap, fillair, blockID, blockMeta, false);
         placeConeHollow(X, Y + startheight, Z, radius, height - startheight, blockID, blockMeta, thickness, false, fillair);
     }
 
     public void placeSpireHollowInverted(int X, int Y, int Z, int radius, int height, int startheight, int thickness,
-            Block blockID, int blockMeta, boolean cap, boolean fillair)
+                                         Block blockID, int blockMeta, boolean cap, boolean fillair)
     {
         placeCylinderHollow(X, Y - startheight, Z, radius, startheight, thickness, cap, fillair, blockID, blockMeta, false);
         placeConeHollowInverted(X, Y - startheight, Z, radius, height - startheight, blockID, blockMeta, thickness, false, fillair);
     }
 
     public void placeSpireInverted(int X, int Y, int Z, int radius, int height, int startheight, Block blockID,
-            int blockMeta)
+                                   int blockMeta)
     {
         placeCylinder(X, Y - startheight, Z, radius, startheight, blockID, blockMeta);
         placeConeInverted(X, Y - startheight, Z, radius, height - startheight, blockID, blockMeta);
     }
-    
-    
+
+
     public void placeDoubleHelix(int x, int y, int z, float size, float startAngle)
     {
-    	int i1 = 0;
-		int k1 = 0;
-		int i2 = 0;
-		int k2 = 0;
-    	for(int Y = 0; Y < 720; Y++)
-    	{
-    		
-    		i1 = (int)Math.floor(x + Math.cos(Math.toRadians(Y + startAngle)) * size);
-    		k1 = (int)Math.floor(z + Math.sin(Math.toRadians(Y + startAngle)) * size);
-    		
-    		i2 = (int)Math.floor(x - Math.cos(Math.toRadians(Y + startAngle)) * size);
-    		k2 = (int)Math.floor(z - Math.sin(Math.toRadians(Y + startAngle)) * size);
-    		addBlock(i1, (int)(Y / 30 + y), k1, Blocks.glass);
-    		addBlock(i2, (int)(Y / 30 + y), k2, Blocks.glass);
-    	}
+        int i1 = 0;
+        int k1 = 0;
+        int i2 = 0;
+        int k2 = 0;
+        for(int Y = 0; Y < 720; Y++)
+        {
+
+            i1 = (int)Math.floor(x + Math.cos(Math.toRadians(Y + startAngle)) * size);
+            k1 = (int)Math.floor(z + Math.sin(Math.toRadians(Y + startAngle)) * size);
+
+            i2 = (int)Math.floor(x - Math.cos(Math.toRadians(Y + startAngle)) * size);
+            k2 = (int)Math.floor(z - Math.sin(Math.toRadians(Y + startAngle)) * size);
+            addBlock(i1, (int)(Y / 30 + y), k1, Blocks.glass);
+            addBlock(i2, (int)(Y / 30 + y), k2, Blocks.glass);
+        }
     }
-    
+
     public void placeLightningSpire(int x, int y, int z, float size)
     {
-    	int i1 = 0;
-		int k1 = 0;
-		int i2 = 0;
-		int k2 = 0;
-		for(int Y = 0; Y < 17; Y++)
-		{
-			addBlock(x, (int)(Y + y), z, Blocks.glass);
-		}
-    	for(int Y = 0; Y < 720; Y++)
-    	{
-    		if(Y / 45 < 4)
-    		{
-    			i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size * Y / 180));
-    			k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size * Y / 180));
-    		
-    			i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size * Y / 180));
-    			k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size * Y / 180));
-    		}else if(Y / 45 < 12)
-    		{
-    			i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size));
-    			k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size));
-    		
-    			i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size));
-    			k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size));
-    		}else
-    		{
-    			i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size * (720 - Y) / 180));
-    			k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size * (720 - Y) / 180));
-    		
-    			i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size * (720 - Y) / 180));
-    			k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size * (720 - Y) / 180));
-    		}
-    		addBlock(i1, (int)(Y / 45 + y), k1, Blocks.glass);
-    		addBlock(i2, (int)(Y / 45 + y), k2, Blocks.glass);
-    	}
+        int i1 = 0;
+        int k1 = 0;
+        int i2 = 0;
+        int k2 = 0;
+        for(int Y = 0; Y < 17; Y++)
+        {
+            addBlock(x, (int)(Y + y), z, Blocks.glass);
+        }
+        for(int Y = 0; Y < 720; Y++)
+        {
+            if(Y / 45 < 4)
+            {
+                i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size * Y / 180));
+                k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size * Y / 180));
+
+                i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size * Y / 180));
+                k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size * Y / 180));
+            }else if(Y / 45 < 12)
+            {
+                i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size));
+                k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size));
+
+                i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size));
+                k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size));
+            }else
+            {
+                i1 = (int)Math.round(x + Math.cos(Math.toRadians(Y)) * (size * (720 - Y) / 180));
+                k1 = (int)Math.round(z + Math.sin(Math.toRadians(Y)) * (size * (720 - Y) / 180));
+
+                i2 = (int)Math.round(x - Math.cos(Math.toRadians(Y)) * (size * (720 - Y) / 180));
+                k2 = (int)Math.round(z - Math.sin(Math.toRadians(Y)) * (size * (720 - Y) / 180));
+            }
+            addBlock(i1, (int)(Y / 45 + y), k1, Blocks.glass);
+            addBlock(i2, (int)(Y / 45 + y), k2, Blocks.glass);
+        }
     }
-    
+
     public void shuffle(int x, int y, int z, int range, int randomness, boolean excludeAir, boolean excludeLiquids, boolean excludeBedrock)
     {
-    	shuffle(x - range, y - range, z - range, x + range, y + range, z + range, randomness, excludeAir, excludeLiquids, excludeBedrock);
+        shuffle(x - range, y - range, z - range, x + range, y + range, z + range, randomness, excludeAir, excludeLiquids, excludeBedrock);
     }
-    
+
     public void shuffle(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int randomness, boolean excludeAir, boolean excludeLiquids, boolean excludeBedrock)
     {
-    	int length = (maxX - minX);
-    	int width = (maxY - minY);
-    	int depth = (maxZ - minZ);
-    	String[] blocks = new String[length * width * depth];
-    	if(randomness == -1)
-    	{
-    		randomness = blocks.length - 1;
-    	}
-    	if(randomness >= blocks.length)
-		{
-			randomness -= blocks.length;
-		}
-    	int i = 0;
-    	Block j;
-    	for(int x = 0; x < length; x++)
-    	{
-    		for(int y = 0; y < width; y++)
-    		{
-    			for(int z = 0; z < depth; z++)
-    			{
-    				j = world.getBlock(x + minX, y + minY, z + minZ);
-    				if(excludeAir && j.isAir(world,x + minX,y + minY,z + minZ)) continue;
-    				if(excludeLiquids && (BlockUtils.isFluid(j))) continue;
-    				if(excludeBedrock && j == Blocks.bedrock) continue;
-    				blocks[i] = Block.blockRegistry.getNameForObject(j) + "," + world.getBlockMetadata(x + minX, y + minY, z + minZ);
-    				i++;
-    			}
-    		}
-    	}
-    	blocks = cloneTrim(blocks, i);
-    	int index = 0;
-    	for(int x = 0; x < length; x++)
-    	{
-    		for(int y = 0; y < width; y++)
-    		{
-    			for(int z = 0; z < depth; z++)
-    			{
-    				if(excludeAir)
-    				{
-    					if(world.isAirBlock(x + minX, y + minY, z + minZ))
-    					{
-    						continue;
-    					}
-    				}
-    				if(excludeLiquids)
-    				{
-    					if(BlockUtils.isFluid(world.getBlock(x + minX, y + minY, z + minZ)))
-    					{
-    						continue;
-    					}
-    				}
-    				if(excludeBedrock)
-    				{
-    					if(world.getBlock(x + minX, y + minY, z + minZ) == Blocks.bedrock) continue;
-    				}
-    				
-    				index = x + y * width + z * width * depth + world.rand.nextInt(randomness);
-    				do
-    				{
-    					if(index < blocks.length) break;
-    					index -= blocks.length;
-    				}while(true);
-    				String[] id = blocks[index].split(",");
-					Block block2 = (Block) Block.blockRegistry.getObject(id[0]);
-					int meta2 = Integer.parseInt(id[1]);
-    				addBlock(x + minX, y + minY, z + minZ, block2, meta2);
-    			}
-    		}
-    	}
+        int length = (maxX - minX);
+        int width = (maxY - minY);
+        int depth = (maxZ - minZ);
+        String[] blocks = new String[length * width * depth];
+        if(randomness == -1)
+        {
+            randomness = blocks.length - 1;
+        }
+        if(randomness >= blocks.length)
+        {
+            randomness -= blocks.length;
+        }
+        int i = 0;
+        Block j;
+        for(int x = 0; x < length; x++)
+        {
+            for(int y = 0; y < width; y++)
+            {
+                for(int z = 0; z < depth; z++)
+                {
+                    j = world.getBlock(x + minX, y + minY, z + minZ);
+                    if(excludeAir && j.isAir(world,x + minX,y + minY,z + minZ)) continue;
+                    if(excludeLiquids && (BlockUtils.isFluid(j))) continue;
+                    if(excludeBedrock && j == Blocks.bedrock) continue;
+                    blocks[i] = Block.blockRegistry.getNameForObject(j) + "," + world.getBlockMetadata(x + minX, y + minY, z + minZ);
+                    i++;
+                }
+            }
+        }
+        blocks = cloneTrim(blocks, i);
+        int index = 0;
+        for(int x = 0; x < length; x++)
+        {
+            for(int y = 0; y < width; y++)
+            {
+                for(int z = 0; z < depth; z++)
+                {
+                    if(excludeAir)
+                    {
+                        if(world.isAirBlock(x + minX, y + minY, z + minZ))
+                        {
+                            continue;
+                        }
+                    }
+                    if(excludeLiquids)
+                    {
+                        if(BlockUtils.isFluid(world.getBlock(x + minX, y + minY, z + minZ)))
+                        {
+                            continue;
+                        }
+                    }
+                    if(excludeBedrock)
+                    {
+                        if(world.getBlock(x + minX, y + minY, z + minZ) == Blocks.bedrock) continue;
+                    }
+
+                    index = x + y * width + z * width * depth + world.rand.nextInt(randomness);
+                    do
+                    {
+                        if(index < blocks.length) break;
+                        index -= blocks.length;
+                    }while(true);
+                    String[] id = blocks[index].split(",");
+                    Block block2 = (Block) Block.blockRegistry.getObject(id[0]);
+                    int meta2 = Integer.parseInt(id[1]);
+                    addBlock(x + minX, y + minY, z + minZ, block2, meta2);
+                }
+            }
+        }
     }
 
     /*
@@ -1921,7 +1613,7 @@ public class ShapeGen
     public void blend(World world, int i, int j, int k, int radius, boolean allowAir, boolean allowFluids) {
         blend(world, i - radius, j - radius, k - radius, i + radius, j + radius, k + radius, 1, allowAir, allowFluids, true);
     }
-    
+
     public void blend(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int falloff, boolean allowAir, boolean allowFluids, boolean rounded) {
         if(minX == maxX || minY == maxY || minZ == maxZ) return;
         int temp1 = 0;
@@ -2034,6 +1726,7 @@ public class ShapeGen
                     yIndex = y - minY;
                     zIndex = z - minZ;
 
+                    if(newBlocks[xIndex][yIndex][zIndex] == null || newBlocks[xIndex][yIndex][zIndex].getBlock() == null) continue;
                     addBlock(x,y,z,newBlocks[xIndex][yIndex][zIndex].getBlock(), newBlocks[xIndex][yIndex][zIndex].getMeta());
                 }
             }
@@ -2145,27 +1838,26 @@ public class ShapeGen
             }
         }
     }
-    
+
     private String[] cloneTrim(String[] array, int newSize)
     {
-    	String[] newDouble = new String[newSize];
-    	for(int i = 0; i < newSize; i++)
-    	{
-    		if(i >= array.length)
-    		{
-    			newDouble[i] = "";
-    			continue;
-    		}
-    		newDouble[i] = array[i];
-    	}
-    	return newDouble;
+        String[] newDouble = new String[newSize];
+        for(int i = 0; i < newSize; i++)
+        {
+            if(i >= array.length)
+            {
+                newDouble[i] = "";
+                continue;
+            }
+            newDouble[i] = array[i];
+        }
+        return newDouble;
     }
 
     public void readFromNBT()
     {
-        File minedir = new File(".");
-        File levelsdir = new File(minedir, world.getWorldInfo().getWorldName());
-        File shapeGenFile = new File(levelsdir, (new StringBuilder("ShapeGen_BlocksList")).append(shapeGenID).append(".dat").toString());
+        File leveldir = ABO.getWorldDir();
+        File shapeGenFile = new File(leveldir, (new StringBuilder("ShapeGen_BlocksList")).append(shapeGenID).append(".dat").toString());
 
         if (!shapeGenFile.exists())
         {
@@ -2195,7 +1887,7 @@ public class ShapeGen
                     int k = Integer.parseInt(as1[2]);
                     int meta = Integer.parseInt(as1[4]);
                     String id = as1[3];
-					Block block = (Block)Block.blockRegistry.getObject(id);
+                    Block block = (Block)Block.blockRegistry.getObject(id);
                     addBlock(i, j, k, block, meta);
                 }
             }
@@ -2209,13 +1901,12 @@ public class ShapeGen
 
     public void writeToNBT()
     {
-        stopping = true;
-        File minedir = new File(".");
-        File levelsdir = new File(minedir, world.getWorldInfo().getWorldName());
-        File shapeGenFile = new File(levelsdir, (new StringBuilder("ShapeGen_BlocksList")).append(shapeGenID).append(".dat").toString());
+        File leveldir = ABO.getWorldDir();
+        File shapeGenFile = new File(leveldir, (new StringBuilder("ShapeGen_BlocksList")).append(shapeGenID).append(".dat").toString());
 
         try
         {
+            shapeGenFile.delete();
             FileOutputStream in = new FileOutputStream(shapeGenFile);
             PrintWriter write = new PrintWriter(in);
 
@@ -2225,16 +1916,16 @@ public class ShapeGen
 
                 for (Iterator it = blocks.entrySet().iterator(); it.hasNext(); write.print(s))
                 {
-                    java.util.Map.Entry block = (java.util.Map.Entry)it.next();
+                    java.util.Map.Entry<String,BlockIdentity> block = (java.util.Map.Entry)it.next();
                     String sep = System.getProperty("line.separator");
-                    s = (String)block.getKey() + "," + (String)block.getValue() + sep;
+                    s = (String)block.getKey() + "," + block.getValue().toString() + sep;
                 }
             }
 
             in.close();
             write.close();
         }
-        catch (Exception exception) { }
+        catch (Exception exception) { ABO.aboLog.warn("Unable to write blocks to file"); ABO.aboLog.catching(exception);}
     }
 
     private boolean generateFlowers(int par3, int par4, int par5, Block id)
@@ -2247,7 +1938,7 @@ public class ShapeGen
             int l = par4;
             int i1 = (par5 + par2Random.nextInt(8)) - par2Random.nextInt(8);
 
-            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split(",")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
+            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.dirt || (blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.grass)) || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
             {
                 addBlock(k, l, i1, id);
             }
@@ -2266,9 +1957,12 @@ public class ShapeGen
             int l = par4;
             int i1 = (par5 + par2Random.nextInt(8)) - par2Random.nextInt(8);
 
-            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.containsKey(toString(k, l, i1)) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])).getMaterial() == Material.air || !blocks.containsKey(toString(k, l, i1))) && ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l - 1, i1))).split(",")[0])) == Blocks.dirt || ((Block)Block.blockRegistry.getObject(((String)blocks.get(toString(k, l, i1))).split(",")[0])) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
+            if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.dirt || blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.grass))
             {
-                addBlock(k, l, i1, tallGrassID, tallGrassMetadata);
+                if (!blocks.containsKey(toString(k, l, i1)) || blocks.get(toString(k, l, i1)).getBlock().getMaterial() == Material.air)
+                {
+                    addBlock(k, l, i1, tallGrassID, tallGrassMetadata);
+                }
             }
         }
 
@@ -2292,17 +1986,17 @@ public class ShapeGen
         return "" + i + "," + j + "," + k;
     }
 
-    public static boolean Instant = false;
-    public static boolean Notify = true;
     private static MinecraftServer server;
-    public boolean updatingAnywhere;
-    private Map<String,String> blocks;
-    private Map<String, String> blocksToAdd;
+    private boolean updatingAnywhere = false;
+    private Map<String,BlockIdentity> blocks;
+    private Map<String, BlockIdentity> blocksToAdd;
     private final byte otherCoordPairs[] =
-    {
-        2, 0, 0, 1, 2, 1
-    };
+            {
+                    2, 0, 0, 1, 2, 1
+            };
     private int shapeGenID;
     private World world;
     public static boolean stopping = false;
+    private boolean saved = false;
+    private long msSinceLastTick = 0;
 }
