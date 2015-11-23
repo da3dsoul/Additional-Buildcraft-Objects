@@ -3,6 +3,7 @@ package da3dsoul.scaryGen.items;
 import java.util.ArrayList;
 import java.util.List;
 
+import abo.ABO;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -30,6 +31,7 @@ public class ItemBottle extends ItemGlassBottle {
 	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
+        if(!ABO.useMoBottle) return itemstack;
 
 		MovingObjectPosition movingobjectposition = getMovingObjectPositionFromPlayer(world, entityplayer, false);
 
@@ -45,11 +47,13 @@ public class ItemBottle extends ItemGlassBottle {
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer par2EntityPlayer, World world, int i, int j, int k,
 			int l, float par8, float par9, float par10) {
+        if(!ABO.useMoBottle) return false;
 		return tryPlace(itemstack, world, i, j, k, l);
 	}
 
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+        if(!ABO.useMoBottle) return false;
         try {
             ItemStack item;
             if (stack.stackSize > 1) {

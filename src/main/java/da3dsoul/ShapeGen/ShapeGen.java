@@ -13,11 +13,13 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.logging.Logger;
 
 import abo.ABO;
 import cpw.mods.fml.common.FMLCommonHandler;
 import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenBigTree;
 import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenElevatedMangroveTree;
+import io.netty.util.internal.logging.Log4JLoggerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -30,6 +32,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import org.apache.commons.logging.impl.Log4JLogger;
 
 public class ShapeGen
 {
@@ -153,7 +156,7 @@ public class ShapeGen
         addBlock(i, j, k, id, 0);
     }
 
-    public synchronized void addBlock(int a[], Block blockID)
+    public void addBlock(int a[], Block blockID)
     {
         if (a.length < 3)
         {
@@ -165,6 +168,7 @@ public class ShapeGen
             return;
         }
     }
+
     public void addBlockWithRandomMeta(int i, int j, int k, Block id, int startMeta, int endMeta) {
         if(startMeta == 0 && endMeta == 0) {
             addBlock(i,j,k,id,0);
@@ -174,9 +178,27 @@ public class ShapeGen
         addBlock(i,j,k,id,meta);
     }
 
+    public boolean addBlockIfNotExist(int i, int j, int k, Block id, int l) {
+        if(blocks.containsKey(toString(i,j,k)) && blocks.get(toString(i,j,k)).getBlock().getMaterial() != Material.air) return false;
+        addBlock(i, j, k, id, l);
+        return true;
+    }
+
+    public boolean addBlockIfNotExist(int i, int j, int k, Block id) {
+        return addBlockIfNotExist(i, j, k, id, 0);
+    }
+
     public void addBlock(int i, int j, int k, Block id, int l)
     {
-        if(l == -1) {
+        if(l >= 0) {
+            if (updatingAnywhere)
+            {
+                blocksToAdd.put(toString(i, j, k), new BlockIdentity(id,l));
+                return;
+            }
+
+            blocks.put(toString(i, j, k), new BlockIdentity(id, l));
+        } else {
             try {
                 int size = 0;
                 String name = null;
@@ -195,15 +217,10 @@ public class ShapeGen
                 }
                 addBlockWithRandomMeta(i, j, k, id, 0, size);
                 return;
-            }catch (Throwable t) {}
-        }
-        if (updatingAnywhere)
-        {
-            blocksToAdd.put(toString(i, j, k), new BlockIdentity(id,l == -1 ? 0 : l));
-            return;
+            }catch (Throwable t) { }
+            l = 0;
         }
 
-        blocks.put(toString(i, j, k), new BlockIdentity(id, l == -1 ? 0 : l));
     }
 
     public synchronized void addBlockAtStart(int i, int j, int k, Block id)
@@ -1910,8 +1927,7 @@ public class ShapeGen
             FileOutputStream in = new FileOutputStream(shapeGenFile);
             PrintWriter write = new PrintWriter(in);
 
-            synchronized (blocks)
-            {
+
                 String s;
 
                 for (Iterator it = blocks.entrySet().iterator(); it.hasNext(); write.print(s))
@@ -1920,7 +1936,7 @@ public class ShapeGen
                     String sep = System.getProperty("line.separator");
                     s = (String)block.getKey() + "," + block.getValue().toString() + sep;
                 }
-            }
+
 
             in.close();
             write.close();
@@ -1940,7 +1956,7 @@ public class ShapeGen
 
             if (blocks.containsKey(toString(k, l - 1, i1)) && (blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.dirt || (blocks.get(toString(k, l - 1, i1)).getBlock() == Blocks.grass)) || world.getBlock(k, l - 1, i1) == Blocks.grass || world.getBlock(k, l - 1, i1) == Blocks.dirt)
             {
-                addBlock(k, l, i1, id);
+                addBlockIfNotExist(k, l, i1, id);
             }
         }
 

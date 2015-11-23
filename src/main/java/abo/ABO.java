@@ -128,6 +128,8 @@ public class ABO {
     public static Item bottle = null;
     public static Item goldenstaff = null;
     public static HashMap<Integer, ShapeGen> shapeGens = new HashMap<Integer, ShapeGen>();
+    public static boolean useMoBottle;
+    public static boolean useYellowDye;
 
     public static boolean geostrataInstalled = false;
     public static boolean cofhInstalled = false;
@@ -193,6 +195,9 @@ public class ABO {
             initFluidCapacities();
 
             aboConfiguration.load();
+
+            useMoBottle = aboConfiguration.get("Misc", "AllowMobBottles", true).getBoolean(true);
+            useYellowDye = aboConfiguration.get("Misc", "AllowYellowDye", true).getBoolean(true);
 
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
@@ -311,39 +316,43 @@ public class ABO {
 
             bottle = new ItemBottle();
             GameRegistry.registerItem(bottle, "MobBottle");
-            addFullRecipe(new ItemStack(bottle, 3, 0),
-                    new Object[]{" B ", "A A", " A ", 'A', Blocks.glass, 'B', Blocks.planks});
+            if(useMoBottle ) {
+                addFullRecipe(new ItemStack(bottle, 3, 0),
+                        new Object[]{" B ", "A A", " A ", 'A', Blocks.glass, 'B', Blocks.planks});
 
-            PipeManager.registerStripesHandler(new StripesHandlerRightClick() {
-                @Override
-                public boolean shouldHandle(ItemStack stack) {
-                    return stack.getItem() == ABO.bottle;
-                }
-            });
-            BlockDispenser.dispenseBehaviorRegistry.putObject(ABO.bottle, new BehaviorProjectileDispense() {
+                PipeManager.registerStripesHandler(new StripesHandlerRightClick() {
+                    @Override
+                    public boolean shouldHandle(ItemStack stack) {
+                        return stack.getItem() == ABO.bottle;
+                    }
+                });
+                BlockDispenser.dispenseBehaviorRegistry.putObject(ABO.bottle, new BehaviorProjectileDispense() {
 
-                @Override
-                public ItemStack dispenseStack(IBlockSource p_82487_1_, ItemStack p_82487_2_) {
-                    World world = p_82487_1_.getWorld();
-                    IPosition iposition = BlockDispenser.func_149939_a(p_82487_1_);
-                    EnumFacing enumfacing = BlockDispenser.func_149937_b(p_82487_1_.getBlockMetadata());
-                    IProjectile iprojectile = new EntityThrownBottle(world, iposition.getX(), iposition.getY(), iposition.getZ(), p_82487_2_.splitStack(1));
-                    iprojectile.setThrowableHeading((double) enumfacing.getFrontOffsetX(), (double) ((float) enumfacing.getFrontOffsetY() + 0.1F), (double) enumfacing.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
-                    world.spawnEntityInWorld((Entity) iprojectile);
-                    return p_82487_2_;
-                }
+                    @Override
+                    public ItemStack dispenseStack(IBlockSource p_82487_1_, ItemStack p_82487_2_) {
+                        World world = p_82487_1_.getWorld();
+                        IPosition iposition = BlockDispenser.func_149939_a(p_82487_1_);
+                        EnumFacing enumfacing = BlockDispenser.func_149937_b(p_82487_1_.getBlockMetadata());
+                        IProjectile iprojectile = new EntityThrownBottle(world, iposition.getX(), iposition.getY(), iposition.getZ(), p_82487_2_.splitStack(1));
+                        iprojectile.setThrowableHeading((double) enumfacing.getFrontOffsetX(), (double) ((float) enumfacing.getFrontOffsetY() + 0.1F), (double) enumfacing.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
+                        world.spawnEntityInWorld((Entity) iprojectile);
+                        return p_82487_2_;
+                    }
 
-                @Override
-                protected IProjectile getProjectileEntity(World p_82499_1_, IPosition p_82499_2_) {
-                    return null;
-                }
-            });
+                    @Override
+                    protected IProjectile getProjectileEntity(World p_82499_1_, IPosition p_82499_2_) {
+                        return null;
+                    }
+                });
+            }
 
             goldenstaff = new ItemGoldenStaff();
             GameRegistry.registerItem(goldenstaff, "GoldenStaff");
-            addFullRecipe(new ItemStack(goldenstaff, 1, 0),
-                    new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
-                            new ItemStack(Items.dye, 1, 11)});
+            if(useYellowDye) {
+                addFullRecipe(new ItemStack(goldenstaff, 1, 0),
+                        new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
+                                new ItemStack(Items.dye, 1, 11)});
+            }
 
             blockLargeButtonWood = new BlockLargeButton(true).setBlockName("largebuttonwood");
             blockLargeButtonStone = new BlockLargeButton(false).setBlockName("largebuttonstone");
@@ -418,6 +427,10 @@ public class ABO {
     @EventHandler
     public void stop(FMLServerStoppingEvent event) {
         ShapeGen.stopping = true;
+        Integer[] dims = DimensionManager.getIDs();
+        for(int world : dims) {
+                ShapeGen.getShapeGen(world).writeToNBT();
+        }
     }
 
     @SubscribeEvent

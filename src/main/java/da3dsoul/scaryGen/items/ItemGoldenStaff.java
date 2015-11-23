@@ -3,6 +3,7 @@ package da3dsoul.scaryGen.items;
 import java.util.List;
 import java.util.ListIterator;
 
+import abo.ABO;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
@@ -37,6 +38,7 @@ public class ItemGoldenStaff extends Item {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
+        if(!ABO.useYellowDye) return itemstack;
 		List list = world.getEntitiesWithinAABB(net.minecraft.entity.item.EntityItem.class, AxisAlignedBB.getBoundingBox(entityplayer.posX - 0.5D, entityplayer.posY - 0.5D, entityplayer.posZ - 0.5D, entityplayer.posX + 0.5D, entityplayer.posY + 0.5D, entityplayer.posZ + 0.5D).expand(60D, 64D, 60D));
 		list.addAll(world.getEntitiesWithinAABB(net.minecraft.entity.item.EntityXPOrb.class, AxisAlignedBB.getBoundingBox(entityplayer.posX - 0.5D, entityplayer.posY - 0.5D, entityplayer.posZ - 0.5D, entityplayer.posX + 0.5D, entityplayer.posY + 0.5D, entityplayer.posZ + 0.5D).expand(60D, 64D, 60D)));
 		ListIterator it = list.listIterator();
