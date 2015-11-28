@@ -13,13 +13,10 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.*;
-import java.util.logging.Logger;
 
 import abo.ABO;
 import cpw.mods.fml.common.FMLCommonHandler;
-import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenBigTree;
 import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenElevatedMangroveTree;
-import io.netty.util.internal.logging.Log4JLoggerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -28,11 +25,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import org.apache.commons.logging.impl.Log4JLogger;
 
 public class ShapeGen
 {
@@ -323,9 +318,9 @@ public class ShapeGen
 
         for (int k = ai[i] + byte3; j != k; j += byte3)
         {
-            ai1[i] = MathHelper.floor_double((double) (arrayStart[i] + j) + 0.5D);
-            ai1[byte1] = MathHelper.floor_double((double)arrayStart[byte1] + (double)j * d + 0.5D);
-            ai1[byte2] = MathHelper.floor_double((double) arrayStart[byte2] + (double) j * d1 + 0.5D);
+            ai1[i] = (int)Math.floor((double) (arrayStart[i] + j) + 0.5D);
+            ai1[byte1] = (int)Math.floor((double)arrayStart[byte1] + (double)j * d + 0.5D);
+            ai1[byte2] = (int)Math.floor((double) arrayStart[byte2] + (double) j * d1 + 0.5D);
             Block id = world.getBlock(ai1[0], ai1[1], ai1[2]);
             int meta = world.getBlockMetadata(ai1[0], ai1[1], ai1[2]);
             String returnVal = ai1[0]+ "," + ai1[1] + "," + ai1[2] + "," + Block.blockRegistry.getNameForObject(id) + "," + meta;
@@ -400,13 +395,13 @@ public class ShapeGen
         {
             for (float f1 = 0.0F; f1 < 360F; f1 += 360 / steps)
             {
-                float f2 = MathHelper.cos(-f1 * 0.01745329F - (float)Math.PI);
-                float f3 = MathHelper.sin(-f1 * 0.01745329F - (float)Math.PI);
-                float f4 = -MathHelper.cos(-f * 0.01745329F);
-                float f5 = MathHelper.sin(-f * 0.01745329F);
-                float f6 = f3 * f4;
-                float f7 = f2 * f4;
-                Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+                double f2 = Math.cos(-f1 * 0.01745329F - (float)Math.PI);
+                double f3 = Math.sin(-f1 * 0.01745329F - (float)Math.PI);
+                double f4 = -Math.cos(-f * 0.01745329F);
+                double f5 = Math.sin(-f * 0.01745329F);
+                double f6 = f3 * f4;
+                double f7 = f2 * f4;
+                Vec3 vec3d1 = vec3d.addVector(f6 * d3, f5 * d3, f7 * d3);
                 int a[] =
                         {
                                 (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
@@ -435,13 +430,13 @@ public class ShapeGen
         {
             for (float f1 = 0.0F; f1 < 360F; f1 += 360 / steps)
             {
-                float f2 = MathHelper.cos(-f1 * 0.01745329F - (float)Math.PI);
-                float f3 = MathHelper.sin(-f1 * 0.01745329F - (float)Math.PI);
-                float f4 = -MathHelper.cos(-f * 0.01745329F);
-                float f5 = MathHelper.sin(-f * 0.01745329F);
-                float f6 = f3 * f4;
-                float f7 = f2 * f4;
-                Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+                double f2 = Math.cos(-f1 * 0.01745329F - (float)Math.PI);
+                double f3 = Math.sin(-f1 * 0.01745329F - (float)Math.PI);
+                double f4 = -Math.cos(-f * 0.01745329F);
+                double f5 = Math.sin(-f * 0.01745329F);
+                double f6 = f3 * f4;
+                double f7 = f2 * f4;
+                Vec3 vec3d1 = vec3d.addVector(f6 * d3, f5 * d3, f7 * d3);
                 int a[] =
                         {
                                 (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
@@ -470,13 +465,13 @@ public class ShapeGen
         {
             for (float f1 = 0.0F; f1 < 360F; f1 += 360 / steps)
             {
-                float f2 = MathHelper.cos(-f1 * 0.01745329F - (float)Math.PI);
-                float f3 = MathHelper.sin(-f1 * 0.01745329F - (float)Math.PI);
-                float f4 = -MathHelper.cos(-f * 0.01745329F);
-                float f5 = MathHelper.sin(-f * 0.01745329F);
-                float f6 = f3 * f4;
-                float f7 = f2 * f4;
-                Vec3 vec3d1 = vec3d.addVector((double)f6 * d3, (double)f5 * d3, (double)f7 * d3);
+                double f2 = Math.cos(-f1 * 0.01745329F - (float)Math.PI);
+                double f3 = Math.sin(-f1 * 0.01745329F - (float)Math.PI);
+                double f4 = -Math.cos(-f * 0.01745329F);
+                double f5 = Math.sin(-f * 0.01745329F);
+                double f6 = f3 * f4;
+                double f7 = f2 * f4;
+                Vec3 vec3d1 = vec3d.addVector(f6 * d3, f5 * d3, f7 * d3);
                 int a[] =
                         {
                                 (int)vec3d1.xCoord, (int)vec3d1.yCoord, (int)vec3d1.zCoord
@@ -525,7 +520,7 @@ public class ShapeGen
             {
                 for (int x = 0; (double)x < Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z);
+                    double distance = Math.sqrt(x * x + z * z);
 
                     if (distance <= radius)
                     {
@@ -544,7 +539,7 @@ public class ShapeGen
             {
                 for (int x = 0; (float)x <= radius; x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z);
+                    double distance = Math.sqrt(x * x + z * z);
 
                     if (distance <= radius)
                     {
@@ -816,9 +811,9 @@ public class ShapeGen
 
         for (int k = ai[i] + byte3; j != k; j += byte3)
         {
-            ai1[i] = MathHelper.floor_double((double)(par1ArrayOfInteger[i] + j) + 0.5D);
-            ai1[byte1] = MathHelper.floor_double((double)par1ArrayOfInteger[byte1] + (double)j * d + 0.5D);
-            ai1[byte2] = MathHelper.floor_double((double) par1ArrayOfInteger[byte2] + (double) j * d1 + 0.5D);
+            ai1[i] = (int)Math.floor((double)(par1ArrayOfInteger[i] + j) + 0.5D);
+            ai1[byte1] = (int)Math.floor((double)par1ArrayOfInteger[byte1] + (double)j * d + 0.5D);
+            ai1[byte2] = (int)Math.floor((double) par1ArrayOfInteger[byte2] + (double) j * d1 + 0.5D);
             Block id = world.getBlock(ai1[0], ai1[1], ai1[2]);
 
             if (id != blockID)
@@ -1061,7 +1056,7 @@ public class ShapeGen
             {
                 for (int x = 0; x <= (int)Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
+                    double distance = Math.sqrt(x * x + z * z + y * y);
 
                     if (hollow && distance < radius - (float)thickness)
                     {
@@ -1105,7 +1100,7 @@ public class ShapeGen
             {
                 for (int x = 0; x <= (int)Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
+                    double distance = Math.sqrt(x * x + z * z + y * y);
 
                     if (hollow && distance < radius - (float)thickness)
                     {
@@ -1224,7 +1219,7 @@ public class ShapeGen
             {
                 for (int x = 0; x <= (int)Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
+                    double distance = Math.sqrt(x * x + z * z + y * y);
 
                     if (hollow && distance < radius - (float)thickness)
                     {
@@ -1271,7 +1266,7 @@ public class ShapeGen
             {
                 for (int x = 0; x <= (int)Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
+                    double distance = Math.sqrt(x * x + z * z + y * y);
 
                     if (distance <= radius)
                     {
@@ -1325,7 +1320,7 @@ public class ShapeGen
             {
                 for (int x = 0; x < (int)Math.ceil(radius); x++)
                 {
-                    float distance = MathHelper.sqrt_double(x * x + z * z + y * y);
+                    double distance = Math.sqrt(x * x + z * z + y * y);
 
                     if (distance <= radius)
                     {
@@ -1890,7 +1885,7 @@ public class ShapeGen
             {
                 String s = read.readLine();
 
-                if (MathHelper.stringNullOrLengthZero(s))
+                if (s == null || s.isEmpty())
                 {
                     break;
                 }
