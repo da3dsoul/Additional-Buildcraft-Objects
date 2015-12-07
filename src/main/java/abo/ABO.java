@@ -186,11 +186,6 @@ public class ABO {
         geostrataInstalled = Loader.isModLoaded("GeoStrata");
         cofhInstalled = Loader.isModLoaded("CoFHCore");
 
-        if (ABO.cofhInstalled) {
-            ABO.aboLog.info("COFH is Loaded");
-            COFHOverride.overrideCOFHWordGen();
-        }
-
         try {
             initFluidCapacities();
 

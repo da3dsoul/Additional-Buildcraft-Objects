@@ -37,5 +37,6 @@ item.GoldenStaff.name=Yellow Dye on a Stick
 tile.blockLiquidXP.name=Liquid Experience
 
 generator.scaryGen=ScaryGen
+generator.candycraft=Candy Craft
 
 death.attack.experience=%1$s十分な経験を持っていない。たぶん、彼奴が学んでいる？

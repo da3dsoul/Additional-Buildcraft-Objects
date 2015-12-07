@@ -6,6 +6,7 @@ import java.util.*;
 import abo.ABO;
 import cpw.mods.fml.common.IWorldGenerator;
 import cpw.mods.fml.common.registry.GameRegistry;
+import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.Galacticraft.GalactiCraftHandler;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.ProjectRed.ProjectRedHandler;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.Reika.ReactorCraft.ReactorOreGeneratorOverride;
@@ -174,6 +175,9 @@ public class ChunkProviderScary implements IChunkProvider {
                         ProjectRedHandler.override(gen);
                     }
                 } while (true);
+
+                ABO.aboLog.info("COFH is Loaded");
+                COFHOverride.overrideCOFHWordGen();
 
                 ABO.aboLog.info("Unregistered " + j + " ore " + (j > 1 ? "generators" : "generator") + " from World Generation");
 
