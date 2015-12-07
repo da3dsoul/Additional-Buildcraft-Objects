@@ -176,8 +176,10 @@ public class ChunkProviderScary implements IChunkProvider {
                     }
                 } while (true);
 
-                ABO.aboLog.info("COFH is Loaded");
-                COFHOverride.overrideCOFHWordGen();
+                if(ABO.geostrataInstalled && ABO.cofhInstalled) {
+                    ABO.aboLog.info("COFH is Loaded");
+                    COFHOverride.overrideCOFHWordGen();
+                }
 
                 ABO.aboLog.info("Unregistered " + j + " ore " + (j > 1 ? "generators" : "generator") + " from World Generation");
 
