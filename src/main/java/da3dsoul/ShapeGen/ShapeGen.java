@@ -9,6 +9,7 @@ import abo.ABO;
 import cpw.mods.fml.common.FMLCommonHandler;
 import da3dsoul.scaryGen.generate.feature.ScaryGen_WorldGenElevatedMangroveTree;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockIce;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -49,6 +50,8 @@ public class ShapeGen {
         return world;
     }
 
+    public static int numberOfBlocksToUpdate = 64;
+
     public ShapeGen(World world) {
         server = FMLCommonHandler.instance().getMinecraftServerInstance();
         blocks = Collections.synchronizedMap(new LinkedHashMap());
@@ -86,7 +89,7 @@ public class ShapeGen {
             return;
         }
 
-        if (msSinceLastTick >= 100) return;
+        if (msSinceLastTick >= 55) return;
 
         int c = 0;
 
@@ -95,7 +98,9 @@ public class ShapeGen {
         }
 
         updatingAnywhere = true;
-        for (Iterator<Map.Entry<String, BlockIdentity>> it = blocks.entrySet().iterator(); c <= (512) && it.hasNext(); it.remove()) {
+        long time = System.currentTimeMillis();
+        for (Iterator<Map.Entry<String, BlockIdentity>> it = blocks.entrySet().iterator(); c <= (numberOfBlocksToUpdate) && it.hasNext(); it.remove()) {
+            if(System.currentTimeMillis() - time > 5) break;
             java.util.Map.Entry<String, BlockIdentity> block = (java.util.Map.Entry) it.next();
             String a[] = ((String) block.getKey()).split(",");
             int i = Integer.parseInt(a[0]);
@@ -116,6 +121,11 @@ public class ShapeGen {
 
             c++;
         }
+        /*if(!blocks.isEmpty() && c < numberOfBlocksToUpdate) {
+            ABO.aboLog.info("ShapeGen is not completing it's tasks as scheduled. It updated " + c + " blocks out of " + numberOfBlocksToUpdate + ".");
+            ABO.aboLog.info("This could be due to a large structure being generated (daylight shadows take a long time calculate), or the computer could just be too slow to handle all of the tasks effectively.");
+            ABO.aboLog.info("This message is just a warning to indicate that generation will take longer. ShapeGen will stop its tasks if they are taking longer than 25ms (half a tick) and will not run if the game is lagging.");
+        }*/
         updatingAnywhere = false;
 
         blocks.putAll(blocksToAdd);
@@ -502,297 +512,294 @@ public class ShapeGen {
         int X = i4;
         int Y = j4;
         int Z = k4;
-        /*new RunnableGenerator(i4, j4, k4) {
+        new RunnableGenerator(i4, j4, k4) {
             @Override
-            public void generate() {*/
-        int center = 55;
-        int innerRing = 80;
-        int outerRing = 115;
+            public void generate() {
+                int center = 55;
+                int innerRing = 80;
+                int outerRing = 115;
 
-        // center dome
-        placeDomeInverted(X, Y - 1, Z, center, Blocks.sandstone, false, 0, false, 2);
-        ArrayList conepoints1 = getRadialPointsDomeInverted(X, Y, Z, center - 4, 36);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            placeSpireInverted(pos[0], pos[1], pos[2], 4, 10, 2, Blocks.stonebrick, -1);
-        }
-
-        // bridges
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            int s = 1;
-            int q = 2;
-            int r = -1;
-
-            double[] P = new double[]{pos[2] - Z, -pos[0] + X};
-            double VLength = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
-            P[0] /= VLength;
-            P[1] /= VLength;
-            int[] p1;
-            int[] p2;
-            int[] p3;
-            int[] p4;
-            if (i == 0 || i % 3 == 0) {
-                s = 2;
-                q = 3;
-                r = 0;
-                p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
-                p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
-                p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
-                p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
-
-                placeBlockLine(new int[]{
-                        p1[0], Y + 4, p1[1]
-                }, new int[]{
-                        p4[0], Y + 4, p4[1]
-                }, Blocks.nether_brick_fence, 0, false, null, null);
-
-                placeBlockLine(new int[]{
-                        p2[0], Y + 4, p2[1]
-                }, new int[]{
-                        p3[0], Y + 4, p3[1]
-                }, Blocks.nether_brick_fence, 0, false, null, null);
-
-            }
-
-            p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
-            p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
-            p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
-            p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
-
-            for (int y1 = Y + q + r; y1 >= Y + q + r - s; y1--) {
-                placeQuad(new int[]{
-                        p1[0], y1, p1[1]
-                }, new int[]{
-                        p2[0], y1, p2[1]
-                }, new int[]{
-                        p3[0], y1, p3[1]
-                }, new int[]{
-                        p4[0], y1, p4[1]
-                }, Blocks.sandstone, 2);
-            }
-        }
-
-        // inner ring
-        placeCylinderHollow(X, Y - 2, Z, innerRing, 6, 4, false, false, Blocks.stonebrick, -1, false);
-
-        // outer ring
-        placeCylinderHollow(X, Y - 2, Z, outerRing, 6, 10, false, false, Blocks.sandstone, 2, false);
-        // outer ring walls
-        placeCylinderHollow(X, Y - 2, Z, outerRing, 12, 1, false, false, Blocks.sandstone, 2, false);
-        placeCylinderHollow(X, Y - 2, Z, outerRing - 9, 12, 1, false, false, Blocks.sandstone, 2, false);
-
-        // outer ring glass ceiling
-        placeCylinderHollow(X, Y + 10, Z, outerRing - 1, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 11, Z, outerRing - 2, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 12, Z, outerRing - 3, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 13, Z, outerRing - 4, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 13, Z, outerRing - 5, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 12, Z, outerRing - 6, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 11, Z, outerRing - 7, 1, 1, false, false, Blocks.stained_glass, 15, false);
-        placeCylinderHollow(X, Y + 10, Z, outerRing - 8, 1, 1, false, false, Blocks.stained_glass, 15, false);
-
-
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, innerRing, 5);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            placeSpireInverted(pos[0], pos[1] + 1, pos[2], 15, 15, 5, Blocks.sandstone, 2);
-            int l = world.rand.nextInt(5) + 3;
-            for (int m = 0; m <= l; m++) {
-                int x = pos[0] + world.rand.nextInt(10) - world.rand.nextInt(10);
-                int y = pos[1] - 3 - world.rand.nextInt(2);
-                int z = pos[2] + world.rand.nextInt(10) - world.rand.nextInt(10);
-                placeConeInverted(x, y, z, 2, 9, Blocks.stonebrick, -1);
-            }
-            placeSpireHollow(pos[0], Y + 4, pos[2], 15, 24, 5, 1, Blocks.sandstone, 2, false, true);
-            placeCylinder(pos[0], Y + 3, pos[2], 14, 1, Blocks.grass, 0);
-            placeCylinderHollow(pos[0], Y + 7, pos[2], 14, 1, 1, false, false, Blocks.glowstone, 0, false);
-
-        }
-
-
-        // center wall
-        placeCylinderHollow(X, Y, Z, center, 9, 1, false, true, Blocks.sandstone, 2, false);
-
-        // center top layer
-        placeCylinder(X, Y, Z, center - 1, 3, Blocks.dirt, 0);
-        placeCylinder(X, Y + 3, Z, center - 1, 1, Blocks.grass, 0);
-
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-
-            placeSpireInverted(pos[0], pos[1] + 1, pos[2], 10, 12, 4, Blocks.sandstone, 2);
-            int l = world.rand.nextInt(5) + 3;
-            for (int m = 0; m <= l; m++) {
-                int x = pos[0] + world.rand.nextInt(6) - world.rand.nextInt(6);
-                int y = pos[1] - 2 - world.rand.nextInt(2);
-                int z = pos[2] + world.rand.nextInt(6) - world.rand.nextInt(6);
-                placeConeInverted(x, y, z, 2, 7, Blocks.stonebrick, -1);
-            }
-            placeSpireHollow(pos[0], Y + 4, pos[2], 10, 19, 6, 1, Blocks.sandstone, 2, false, true);
-            placeCylinder(pos[0], Y + 3, pos[2], 9, 1, Blocks.grass, 0);
-            placeCylinderHollow(pos[0], Y + 7, pos[2], 9, 1, 1, false, false, Blocks.glowstone, 0, false);
-        }
-
-
-        // cut center of outer ring for doors
-        placeCylinderHollow(X, Y + 4, Z, outerRing - 1, 5, 8, false, false, Blocks.air, 0, false);
-
-        // outer ring lights
-        placeCylinderHollow(X, Y + 7, Z, outerRing - 1, 1, 1, false, false, Blocks.glowstone, 0, false);
-        placeCylinderHollow(X, Y + 7, Z, outerRing - 8, 1, 1, false, false, Blocks.glowstone, 0, false);
-
-
-        placeSphere(X, Y - 10, Z, 8F, Blocks.air, false, 0, false, false, 0);
-
-        // center water
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, center - 10, 5);
-        ArrayList conepoints2 = getRegularPolyVertices(X, Y + 3, Z, center - 20, 5);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            int pos2[] = (int[]) conepoints2.get(i);
-            for (int x1 = -1; x1 <= 1; x1++) {
-                for (int z1 = -1; z1 <= 1; z1++)
-                    placeBlockLine(new int[]{
-                            pos2[0] + x1, Y + 3, pos2[2] + z1
-                    }, new int[]{
-                            pos[0] + x1, Y + 3, pos[2] + z1
-                    }, Blocks.water, 0, false, null, null);
-            }
-        }
-
-        // outer ring post
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-
-            if(i == 0 || i % 3 == 0) {
-                double[] V = new double[]{pos[0] - X, pos[2] - Z};
-                double[] P = new double[]{V[1], -V[0]};
-                double VLength = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
-                P[0] /= VLength;
-                P[1] /= VLength;
-                int s = 1;
-                int[] p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
-                int[] p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
-                int[] p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
-                int[] p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
-                for (int y1 = Y + 4; y1 < Y + 7; y1++) {
-                    placeQuad(new int[]{
-                            p1[0], y1, p1[1]
-                    }, new int[]{
-                            p2[0], y1, p2[1]
-                    }, new int[]{
-                            p3[0], y1, p3[1]
-                    }, new int[]{
-                            p4[0], y1, p4[1]
-                    }, Blocks.air, 0);
+                // center dome
+                placeDomeInverted(X, Y - 1, Z, center, ABO.sandStone, false, 0, false, -1);
+                ArrayList conepoints1 = getRadialPointsDomeInverted(X, Y, Z, center - 4, 36);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    placeSpireInverted(pos[0], pos[1], pos[2], 4, 10, 2, Blocks.stonebrick, -1);
                 }
-            }
 
-            placeCylinder(pos[0], Y + 4, pos[2], 8, 6, Blocks.air, 0);
+                // bridges
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    int s = 1;
+                    int q = 2;
+                    int r = -1;
 
-            ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 5, 3);
-            for (int i1 = 0; i1 < points.size(); i1++) {
-                int pos1[] = (int[]) points.get(i1);
-                makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
-            }
+                    double[] P = new double[]{pos[2] - Z, -pos[0] + X};
+                    double VLength = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
+                    P[0] /= VLength;
+                    P[1] /= VLength;
+                    int[] p1;
+                    int[] p2;
+                    int[] p3;
+                    int[] p4;
+                    if (i == 0 || i % 3 == 0) {
+                        s = 2;
+                        q = 3;
+                        r = 0;
+                        p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
+                        p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
+                        p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
+                        p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
 
-            makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
-            generateGrassAndFlowers(pos[0], Y + 4, pos[2], 8);
-        }
+                        placeBlockLine(new int[]{
+                                p1[0], Y + 4, p1[1]
+                        }, new int[]{
+                                p4[0], Y + 4, p4[1]
+                        }, Blocks.nether_brick_fence, 0, false, null, null);
 
-        // inner ring post
-        conepoints1 = getRegularPolyVertices(X, Y + 3, Z, innerRing, 5);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
+                        placeBlockLine(new int[]{
+                                p2[0], Y + 4, p2[1]
+                        }, new int[]{
+                                p3[0], Y + 4, p3[1]
+                        }, Blocks.nether_brick_fence, 0, false, null, null);
 
-            placeCylinder(pos[0], Y + 4, pos[2], 14, 5, Blocks.air, 0);
+                    }
 
-            ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 7, 3);
-            for (int i1 = 0; i1 < points.size(); i1++) {
-                int pos1[] = (int[]) points.get(i1);
-                makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
-            }
+                    p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
+                    p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
+                    p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
+                    p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
 
-            makeLamp(pos[0], Y + 3, pos[2], Blocks.gold_block, 0);
-
-            generateGrassAndFlowers(pos[0], Y + 4, pos[2], 12);
-        }
-
-        // inner ring stone decorations
-        conepoints1 = getRandomRadialVertices(X, Y - 3, Z, innerRing - 1, innerRing - 40 + world.rand.nextInt(15));
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            placeConeInverted(pos[0], pos[1], pos[2], 2, 6, Blocks.stonebrick, -1);
-        }
-
-        // inner ring lapis decorations
-        conepoints1 = getRandomRadialVertices(X, Y - 3, Z, innerRing - 2, innerRing - 60 + world.rand.nextInt(12));
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            int x = pos[0] + world.rand.nextInt(1) - world.rand.nextInt(1);
-            int z = pos[2] + world.rand.nextInt(1) - world.rand.nextInt(1);
-            placeConeInverted(x, pos[1], z, 1, 3, Blocks.lapis_block, 0);
-        }
-
-        // outer ring stone decorations
-        conepoints1 = getRandomRadialVertices(X, Y - 3, Z, outerRing - 5, outerRing - 40 + world.rand.nextInt(15));
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            int x = pos[0] + world.rand.nextInt(3) - world.rand.nextInt(3);
-            int z = pos[2] + world.rand.nextInt(3) - world.rand.nextInt(3);
-            placeConeInverted(x, pos[1], z, 2, 6, Blocks.stonebrick, -1);
-        }
-
-        // outer ring lapis decorations
-        conepoints1 = getRandomRadialVertices(X, Y - 3, Z, outerRing - 5, innerRing - 60 + world.rand.nextInt(12));
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            int x = pos[0] + world.rand.nextInt(4) - world.rand.nextInt(4);
-            int z = pos[2] + world.rand.nextInt(4) - world.rand.nextInt(4);
-            placeConeInverted(x, pos[1], z, 1, 4, Blocks.lapis_block, 0);
-        }
-
-        ScaryGen_WorldGenElevatedMangroveTree tree2 = new ScaryGen_WorldGenElevatedMangroveTree(true);
-        tree2.useShapeGen = true;
-        tree2.setConfigOptions(Blocks.log, Blocks.leaves, 0, 1, Blocks.grass, Blocks.dirt, 69, 75, 3);
-        tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 90);
-        tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 70);
-
-        // center grass
-        generateGrassAndFlowers(X, Y + 4, Z, center - 5);
-
-        // center lamps
-        conepoints1 = getRegularPolyVertices(X, Y + 7, Z, center - 4, 15);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
-        }
-
-        conepoints1 = getRegularPolyVertices(X, Y + 7, Z, center - 12, 5);
-        for (int i = 0; i < conepoints1.size(); i++) {
-            int pos[] = (int[]) conepoints1.get(i);
-            makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
-        }
-
-        int j = 0;
-        for (int i = 0; i < outerRing + 50 && j < 2500; j++) {
-            int x = X + world.rand.nextInt(outerRing + 10) - world.rand.nextInt(outerRing + 10);
-            int z = Z + world.rand.nextInt(outerRing + 10) - world.rand.nextInt(outerRing + 10);
-            int y = Y + world.rand.nextInt(center * 2) - world.rand.nextInt(center + 10);
-            for(int x12 = -1; x12 <= 1; x12++) {
-                for(int y12 = -1; y12 <= 1; y12++) {
-                    for(int z12 = -1; z12 <= 1; z12++) {
-                        addBlockIfNotExist(x + x12, y + y12, z + z12, Blocks.vine);
+                    for (int y1 = Y + q + r; y1 >= Y + q + r - s; y1--) {
+                        placeQuad(new int[]{
+                                p1[0], y1, p1[1]
+                        }, new int[]{
+                                p2[0], y1, p2[1]
+                        }, new int[]{
+                                p3[0], y1, p3[1]
+                        }, new int[]{
+                                p4[0], y1, p4[1]
+                        }, ABO.sandStone, -1);
                     }
                 }
+
+                // inner ring
+                placeCylinderHollow(X, Y - 2, Z, innerRing, 6, 4, false, false, Blocks.stonebrick, -1, false);
+
+                // outer ring
+                placeCylinderHollow(X, Y - 2, Z, outerRing, 6, 10, false, false, ABO.sandStone, -1, false);
+                // outer ring walls
+                placeCylinderHollow(X, Y - 2, Z, outerRing, 12, 1, false, false, ABO.sandStone, -1, false);
+                placeCylinderHollow(X, Y - 2, Z, outerRing - 9, 12, 1, false, false, ABO.sandStone, -1, false);
+
+                // outer ring glass ceiling
+                placeCylinderHollow(X, Y + 10, Z, outerRing - 1, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 11, Z, outerRing - 2, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 12, Z, outerRing - 3, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 13, Z, outerRing - 4, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 12, Z, outerRing - 5, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 11, Z, outerRing - 6, 1, 2, false, false, Blocks.stained_glass, 15, false);
+                placeCylinderHollow(X, Y + 10, Z, outerRing - 7, 1, 2, false, false, Blocks.stained_glass, 15, false);
+
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, innerRing, 5);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    placeSpireInverted(pos[0], pos[1] + 1, pos[2], 15, 15, 5, ABO.sandStone, -1);
+                    int l = world.rand.nextInt(5) + 3;
+                    for (int m = 0; m <= l; m++) {
+                        int x = pos[0] + world.rand.nextInt(10) - world.rand.nextInt(10);
+                        int y = pos[1] - 3 - world.rand.nextInt(2);
+                        int z = pos[2] + world.rand.nextInt(10) - world.rand.nextInt(10);
+                        placeConeInverted(x, y, z, 2, 9, Blocks.stonebrick, -1);
+                    }
+                    //placeSpireHollow(pos[0], Y + 4, pos[2], 15, 24, 5, 1, ABO.sandStone, -1, false, true);
+                    placeCylinderHollow(pos[0], Y + 4, pos[2], 15, 5, 1, false, true, ABO.sandStone, -1, false);
+                    placeConeHollow(pos[0], Y + 9, pos[2], 15, 19, ABO.sandStone, -1, 2, false, true);
+                    placeCylinder(pos[0], Y + 3, pos[2], 14, 1, Blocks.grass, 0);
+                    placeCylinderHollow(pos[0], Y + 7, pos[2], 14, 1, 1, false, false, Blocks.glowstone, 0, false);
+
+                }
+
+
+                // center wall
+                placeCylinderHollow(X, Y, Z, center, 9, 1, false, true, ABO.sandStone, -1, false);
+
+                // center top layer
+                placeCylinder(X, Y, Z, center - 1, 3, Blocks.dirt, 0);
+                placeCylinder(X, Y + 3, Z, center - 1, 1, Blocks.grass, 0);
+
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+
+                    placeSpireInverted(pos[0], pos[1] + 1, pos[2], 10, 12, 4, ABO.sandStone, -1);
+                    int l = world.rand.nextInt(5) + 3;
+                    for (int m = 0; m <= l; m++) {
+                        int x = pos[0] + world.rand.nextInt(6) - world.rand.nextInt(6);
+                        int y = pos[1] - 2 - world.rand.nextInt(2);
+                        int z = pos[2] + world.rand.nextInt(6) - world.rand.nextInt(6);
+                        placeConeInverted(x, y, z, 2, 7, Blocks.stonebrick, -1);
+                    }
+                    //placeSpireHollow(pos[0], Y + 4, pos[2], 10, 19, 6, 1, ABO.sandStone, -1, false, true);
+                    placeCylinderHollow(pos[0], Y + 4, pos[2], 10, 6, 1, false, true, ABO.sandStone, -1, false);
+                    placeConeHollow(pos[0], Y + 10, pos[2], 10, 13, ABO.sandStone, -1, 2, false, true);
+                    placeCylinder(pos[0], Y + 3, pos[2], 9, 1, Blocks.grass, 0);
+                    placeCylinderHollow(pos[0], Y + 7, pos[2], 9, 1, 1, false, false, Blocks.glowstone, 0, false);
+                }
+
+
+                // cut center of outer ring for doors
+                placeCylinderHollow(X, Y + 4, Z, outerRing - 1, 5, 8, false, false, Blocks.air, 0, false);
+
+                // outer ring lights
+                placeCylinderHollow(X, Y + 7, Z, outerRing - 1, 1, 1, false, false, Blocks.glowstone, 0, false);
+                placeCylinderHollow(X, Y + 7, Z, outerRing - 8, 1, 1, false, false, Blocks.glowstone, 0, false);
+
+
+                placeSphere(X, Y - 10, Z, 8F, Blocks.air, false, 0, false, false, 0);
+
+                // center water
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, center - 10, 5);
+                ArrayList conepoints2 = getRegularPolyVertices(X, Y + 3, Z, center - 20, 5);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    int pos2[] = (int[]) conepoints2.get(i);
+                    for (int x1 = -1; x1 <= 1; x1++) {
+                        for (int z1 = -1; z1 <= 1; z1++)
+                            placeBlockLine(new int[]{
+                                    pos2[0] + x1, Y + 3, pos2[2] + z1
+                            }, new int[]{
+                                    pos[0] + x1, Y + 3, pos[2] + z1
+                            }, Blocks.water, 0, false, null, null);
+                    }
+                }
+
+                // outer ring post
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, outerRing - 5, 15);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+
+                    if(i == 0 || i % 3 == 0) {
+                        double[] V = new double[]{pos[0] - X, pos[2] - Z};
+                        double[] P = new double[]{V[1], -V[0]};
+                        double VLength = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
+                        P[0] /= VLength;
+                        P[1] /= VLength;
+                        int s = 1;
+                        int[] p1 = new int[]{(int) Math.round(X + P[0] * s), (int) Math.round(Z + P[1] * s)};
+                        int[] p2 = new int[]{(int) Math.round(X - P[0] * s), (int) Math.round(Z - P[1] * s)};
+                        int[] p3 = new int[]{(int) Math.round(pos[0] - P[0] * s), (int) Math.round(pos[2] - P[1] * s)};
+                        int[] p4 = new int[]{(int) Math.round(pos[0] + P[0] * s), (int) Math.round(pos[2] + P[1] * s)};
+                        for (int y1 = Y + 4; y1 < Y + 7; y1++) {
+                            placeQuad(new int[]{
+                                    p1[0], y1, p1[1]
+                            }, new int[]{
+                                    p2[0], y1, p2[1]
+                            }, new int[]{
+                                    p3[0], y1, p3[1]
+                            }, new int[]{
+                                    p4[0], y1, p4[1]
+                            }, Blocks.air, 0);
+                        }
+                    }
+
+                    placeCylinder(pos[0], Y + 4, pos[2], 8, 6, Blocks.air, 0);
+
+                    ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 5, 3);
+                    for (int i1 = 0; i1 < points.size(); i1++) {
+                        int pos1[] = (int[]) points.get(i1);
+                        makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
+                    }
+
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                    generateGrassAndFlowers(pos[0], Y + 4, pos[2], 8);
+                }
+
+                // inner ring post
+                conepoints1 = getRegularPolyVertices(X, Y + 3, Z, innerRing, 5);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+
+                    placeCylinder(pos[0], Y + 4, pos[2], 14, 5, Blocks.air, 0);
+
+                    ArrayList points = getRegularPolyVertices(pos[0], Y + 3, pos[2], 7, 3);
+                    for (int i1 = 0; i1 < points.size(); i1++) {
+                        int pos1[] = (int[]) points.get(i1);
+                        makeLamp(pos1[0], pos1[1], pos1[2], Blocks.gold_block, 0);
+                    }
+
+                    makeLamp(pos[0], Y + 3, pos[2], Blocks.gold_block, 0);
+
+                    generateGrassAndFlowers(pos[0], Y + 4, pos[2], 12);
+                }
+
+                // inner ring stone decorations
+                conepoints1 = getRandomRadialVertices(X, Y - 3, Z, innerRing - 1, innerRing - 40 + world.rand.nextInt(15));
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    placeConeInverted(pos[0], pos[1], pos[2], 2, 6, Blocks.stonebrick, -1);
+                }
+
+                // inner ring lapis decorations
+                conepoints1 = getRandomRadialVertices(X, Y - 3, Z, innerRing - 2, innerRing - 60 + world.rand.nextInt(12));
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    int x = pos[0] + world.rand.nextInt(1) - world.rand.nextInt(1);
+                    int z = pos[2] + world.rand.nextInt(1) - world.rand.nextInt(1);
+                    placeConeInverted(x, pos[1], z, 1, 3, Blocks.lapis_block, 0);
+                }
+
+                // outer ring stone decorations
+                conepoints1 = getRandomRadialVertices(X, Y - 3, Z, outerRing - 5, outerRing - 40 + world.rand.nextInt(15));
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    int x = pos[0] + world.rand.nextInt(3) - world.rand.nextInt(3);
+                    int z = pos[2] + world.rand.nextInt(3) - world.rand.nextInt(3);
+                    placeConeInverted(x, pos[1], z, 2, 6, Blocks.stonebrick, -1);
+                }
+
+                // outer ring lapis decorations
+                conepoints1 = getRandomRadialVertices(X, Y - 3, Z, outerRing - 5, innerRing - 60 + world.rand.nextInt(12));
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    int x = pos[0] + world.rand.nextInt(4) - world.rand.nextInt(4);
+                    int z = pos[2] + world.rand.nextInt(4) - world.rand.nextInt(4);
+                    placeConeInverted(x, pos[1], z, 1, 4, Blocks.lapis_block, 0);
+                }
+
+                ScaryGen_WorldGenElevatedMangroveTree tree2 = new ScaryGen_WorldGenElevatedMangroveTree(true);
+                tree2.useShapeGen = true;
+                tree2.setConfigOptions(Blocks.log, Blocks.leaves, 0, 1, Blocks.grass, Blocks.dirt, 69, 75, 3);
+                tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 90);
+                tree2.generateCustom(world, world.rand, X, Y + 4, Z, 7, 70);
+
+                // center grass
+                generateGrassAndFlowers(X, Y + 4, Z, center - 5);
+
+                // center lamps
+                conepoints1 = getRegularPolyVertices(X, Y + 7, Z, center - 4, 15);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                }
+
+                conepoints1 = getRegularPolyVertices(X, Y + 7, Z, center - 12, 5);
+                for (int i = 0; i < conepoints1.size(); i++) {
+                    int pos[] = (int[]) conepoints1.get(i);
+                    makeLamp(pos[0], pos[1], pos[2], Blocks.gold_block, 0);
+                }
+
+                int j = 0;
+                for (int i = 0; i < outerRing + 50 && j < 2500; j++) {
+                    int x = X + world.rand.nextInt(outerRing + 10) - world.rand.nextInt(outerRing + 10);
+                    int z = Z + world.rand.nextInt(outerRing + 10) - world.rand.nextInt(outerRing + 10);
+                    int y = Y + world.rand.nextInt(center * 2) - world.rand.nextInt(center + 10);
+                    generateVines(x,y,z);
+                }
             }
-        }
-        //   }
-        //}.run();
+        }.run();
     }
 
     public void generateGrassAndFlowers(int X, int Y, int Z, int diameter) {
@@ -1543,6 +1550,105 @@ public class ShapeGen {
         blend(world, i - radius, j - radius, k - radius, i + radius, j + radius, k + radius, 1, allowAir, allowFluids, true);
     }
 
+    public void blendNewOld(World world, int i, int j, int k, int size, boolean excludeAir, boolean excludeWater)
+    {
+        int _bSize = size;
+        int _twoBrushSize = 2 * _bSize;
+        BlockIdentity oldBlocks[][][] = new BlockIdentity[2 * (_bSize + 1) + 1][2 * (_bSize + 1) + 1][2 * (_bSize + 1) + 1];
+        BlockIdentity newBlocks[][][] = new BlockIdentity[_twoBrushSize + 1][_twoBrushSize + 1][_twoBrushSize + 1];
+
+        for (int _x = 0; _x <= 2 * (_bSize + 1); _x++)
+        {
+            for (int _y = 0; _y <= 2 * (_bSize + 1); _y++)
+            {
+                for (int _z = 0; _z <= 2 * (_bSize + 1); _z++)
+                {
+                    oldBlocks[_x][_y][_z] = new BlockIdentity(world.getBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z), world.getBlockMetadata((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z));
+                }
+            }
+        }
+
+        for (int _x = 0; _x <= _twoBrushSize; _x++)
+        {
+            for (int _y = 0; _y <= _twoBrushSize; _y++)
+            {
+                for (int _z = 0; _z <= _twoBrushSize; _z++)
+                {
+                    newBlocks[_x][_y][_z] = oldBlocks[_x + 1][_y + 1][_z + 1];
+                }
+            }
+        }
+
+        for (int x1 = 0; x1 <= _twoBrushSize; x1++)
+        {
+            for (int y1 = 0; y1 <= _twoBrushSize; y1++)
+            {
+                for (int z1 = 0; z1 <= _twoBrushSize; z1++)
+                {
+                    HashMap<BlockIdentity, Integer> blockCount = new HashMap<BlockIdentity, Integer>();
+                    int _modeMatCount = 0;
+                    BlockIdentity _modeMatId = null;
+                    boolean _tiecheck = true;
+
+                    for (int x3 = -1; x3 <= 1; x3++)
+                    {
+                        for (int y3 = -1; y3 <= 1; y3++)
+                        {
+                            for (int z3 = -1; z3 <= 1; z3++) {
+                                if (x3 != 0 || y3 != 0 || z3 != 0) {
+                                    Integer count = blockCount.get(oldBlocks[x1 + 1 + x3][y1 + 1 + y3][z1 + 1 + z3]);
+                                    if(count == null) count = 0;
+                                    blockCount.put(oldBlocks[x1 + 1 + x3][y1 + 1 + y3][z1 + 1 + z3], count+1);
+                                }
+                            }
+                        }
+                    }
+
+                    for (BlockIdentity id2 : blockCount.keySet()) {
+                        if (blockCount.get(id2) > _modeMatCount && (!excludeAir || id2.getBlock().getMaterial() != Material.air) && (!excludeWater || !BlockUtils.isFluid(id2.getBlock())) && (id2.getBlock() != Blocks.bedrock)) {
+                            _modeMatCount = blockCount.get(id2);
+                            _modeMatId = id2;
+                        }
+                    }
+
+                    for (BlockIdentity id2 : blockCount.keySet()) {
+                        if (blockCount.get(id2) == _modeMatCount && !id2.equals(_modeMatId)) {
+                            _tiecheck = false;
+                        }
+                    }
+
+                    if (_tiecheck)
+                    {
+                        newBlocks[x1][y1][z1] = _modeMatId;
+                    }
+                }
+            }
+        }
+
+        for (int _x = _twoBrushSize; _x >= 0; _x--)
+        {
+            for (int _y = 0; _y <= _twoBrushSize; _y++)
+            {
+                for (int _z = _twoBrushSize; _z >= 0; _z--)
+                {
+                    double x4 = (double)_x - (double)_bSize - 1D;
+                    double y4 = (double)_y - (double)_bSize - 1D;
+                    double z4 = (double)_z - (double)_bSize - 1D;
+                    if (Math.sqrt(x4*x4+y4*y4+z4*z4) > (double)size)
+                    {
+                        continue;
+                    }
+                    if(newBlocks[_x][_y][_z] == null || newBlocks[_x][_y][_z].getBlock() == null) continue;
+
+                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != newBlocks[_x][_y][_z].getBlock())
+                    {
+                        addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, newBlocks[_x][_y][_z].getBlock(), newBlocks[_x][_y][_z].getMeta());
+                    }
+                }
+            }
+        }
+    }
+
     public void blend(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int falloff, boolean allowAir, boolean allowFluids, boolean rounded) {
         if (minX == maxX || minY == maxY || minZ == maxZ) return;
         int temp1 = 0;
@@ -1750,6 +1856,23 @@ public class ShapeGen {
                     if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getBlock() || world.getBlockMetadata((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != _newMaterials[_x][_y][_z].getMeta()) {
                         addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, _newMaterials[_x][_y][_z].getBlock(), _newMaterials[_x][_y][_z].getMeta());
                     }
+                }
+            }
+        }
+    }
+
+    public void blendNew(World world, int i, int j, int k, int size, boolean excludeAir, boolean excludeFluids) {
+        int twoSize = 2 * size;
+        int x = i - size;
+        int y = j - size;
+        int z = k - size;
+        BlockIdentity _oldMaterials[][][] = new BlockIdentity[2 * (size + 1) + 1][2 * (size + 1) + 1][2 * (size + 1) + 1];
+        BlockIdentity _newMaterials[][][] = new BlockIdentity[twoSize + 1][twoSize + 1][twoSize + 1];
+
+        for(int x1 = 0; x1 <= twoSize; x1++) {
+            for(int y1 = 0; y1 <= twoSize; y1++) {
+                for(int z1 = 0; z1 <= twoSize; z1++) {
+
                 }
             }
         }

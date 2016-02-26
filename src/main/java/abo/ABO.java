@@ -6,6 +6,7 @@ import abo.actions.ActionToggleOffPipe;
 import abo.actions.ActionToggleOnPipe;
 import abo.energy.*;
 import abo.gui.ABOGuiHandler;
+import abo.machines.BlockAccelerator;
 import abo.pipes.fluids.*;
 import abo.pipes.items.*;
 import abo.pipes.power.PipePowerDirected;
@@ -24,9 +25,8 @@ import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
+import com.google.common.eventbus.EventBus;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.*;
@@ -36,12 +36,16 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.IFMLCallHook;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.ShapeGen.ShapeGen;
+import da3dsoul.reference.Metadata;
 import da3dsoul.scaryGen.SaveHandler.EnderInventorySaveHandler;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
-import da3dsoul.scaryGen.entity.EntityItemBat;
+import da3dsoul.scaryGen.blocks.BlockSandStone;
+import da3dsoul.scaryGen.blocks.ItemSandStone;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
@@ -49,7 +53,6 @@ import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
-import da3dsoul.scaryGen.pathfinding_astar.FollowableEntity;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
@@ -63,9 +66,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryEnderChest;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -90,13 +91,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 @Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion")
-public class ABO {
+public class ABO{
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
             .getLogger("Additional-Buildcraft-Objects");
@@ -122,9 +120,11 @@ public class ABO {
     public static BlockWaterwheel waterwheelBlock;
     public static Block blockNull = null;
     public static Block blockNullCollide = null;
+    public static Block acceleratorBlock = null;
 
     public static Block blockLargeButtonStone = null;
     public static Block blockLargeButtonWood = null;
+    public static Block sandStone;
     public static Item bottle = null;
     public static Item goldenstaff = null;
     public static HashMap<Integer, ShapeGen> shapeGens = new HashMap<Integer, ShapeGen>();
@@ -186,6 +186,11 @@ public class ABO {
         geostrataInstalled = Loader.isModLoaded("GeoStrata");
         cofhInstalled = Loader.isModLoaded("CoFHCore");
 
+        if(ABO.geostrataInstalled && ABO.cofhInstalled) {
+            ABO.aboLog.info("COFH is Loaded");
+            COFHOverride.overrideCOFHWordGen(0);
+        }
+
         try {
             initFluidCapacities();
 
@@ -197,12 +202,12 @@ public class ABO {
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
 
-            spawnLakes = aboConfiguration.get("LiquidXP", "SpawnExperieneLakes", spawnLakes).getBoolean();
-            respawnLakes = aboConfiguration.get("LiquidXP", "RespawnExperieneLakes", respawnLakes).getBoolean();
-            spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperieneOrbs", spawnOrbs).getBoolean();
-            orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperieneOrbSpawnChance", orbSpawnChance).getInt();
-            orbLifetime = aboConfiguration.get("LiquidXP", "ExperieneOrbLifetime", orbLifetime).getInt();
-            orbSize = aboConfiguration.get("LiquidXP", "ExperieneOrbSize", orbSize).getInt();
+            spawnLakes = aboConfiguration.get("LiquidXP", "SpawnExperienceLakes", spawnLakes).getBoolean();
+            respawnLakes = aboConfiguration.get("LiquidXP", "RespawnExperienceLakes", respawnLakes).getBoolean();
+            spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperienceOrbs", spawnOrbs).getBoolean();
+            orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperienceOrbSpawnChance", orbSpawnChance).getInt();
+            orbLifetime = aboConfiguration.get("LiquidXP", "ExperienceOrbLifetime", orbLifetime).getInt();
+            orbSize = aboConfiguration.get("LiquidXP", "ExperienceOrbSize", orbSize).getInt();
 
             windmillScalar = aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble();
             waterwheelScalar = aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble();
@@ -235,13 +240,6 @@ public class ABO {
 
             pipeItemsBounce = buildPipe(PipeItemsBounce.class);
 
-            ArrayList<ItemStack> list = OreDictionary.getOres("cobblestone");
-            if (list.size() >= 1) {
-                for (ItemStack item : list) {
-                    addRecipe(pipeItemsBounce, 1, BuildCraftTransport.pipeItemsStone, item);
-                }
-            }
-
             pipeItemsDivide = buildPipe(PipeItemsDivide.class);
 
             addRecipe(pipeItemsDivide, 1, BuildCraftTransport.pipeItemsStone, Items.wooden_sword);
@@ -260,12 +258,6 @@ public class ABO {
                     new ItemStack(Items.dye, 1, 2));
 
             pipeItemsExtraction = buildPipe(PipeItemsExtraction.class);
-            list = OreDictionary.getOres("plankWood");
-            if (list.size() >= 1) {
-                for (ItemStack item : list) {
-                    addRecipe(pipeItemsExtraction, 1, BuildCraftTransport.pipeItemsWood, item);
-                }
-            }
 
             pipeItemsEnderExtraction = buildPipe(PipeItemsEnderExtraction.class, 1, ABO.pipeItemsExtraction,
                     Items.ender_pearl);
@@ -286,12 +278,19 @@ public class ABO {
             waterwheelBlock = new BlockWaterwheel(waterwheelScalar);
             waterwheelItem = new ItemWaterwheel();
 
+            acceleratorBlock = new BlockAccelerator().setBlockName("blockAccelerator");
+
             if (Loader.isModLoaded("LiquidXP")) {
                 BlockLiquidXP.preinit();
                 GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
             } else {
                 blockLiquidXP = null;
             }
+
+            sandStone = (new BlockSandStone()).setStepSound(Block.soundTypePiston).setHardness(0.8F).setBlockName("sandStone").setBlockTextureName("sandstone");
+
+            ItemBlock sandStoneItem = (new ItemMultiTexture(sandStone, sandStone, BlockSandStone.iconNames)).setUnlocalizedName("sandStone");
+            GameRegistry.registerBlock(sandStone, ItemSandStone.class, "sandStone");
 
             GameRegistry.registerItem(waterwheelItem, "waterwheelItem");
 
@@ -301,6 +300,11 @@ public class ABO {
 
             GameRegistry.registerBlock(windmillBlock, "windmillBlock");
             GameRegistry.registerBlock(waterwheelBlock, "waterwheelBlock");
+            GameRegistry.registerBlock(acceleratorBlock, "acceleratorBlock");
+            addFullRecipe(new ItemStack(acceleratorBlock),
+                    new Object[]{"ABA", "ACA", "DED", 'A', BuildCraftCore.ironGearItem,
+                            'B', BuildCraftCore.diamondGearItem, 'C', Items.clock, 'D', Blocks.stone, 'E', Items.redstone});
+
             GameRegistry.registerBlock(blockNull, "null");
             GameRegistry.registerBlock(blockNullCollide, "nullCollide");
             addFullRecipe(new ItemStack(windmillBlock),
@@ -360,11 +364,6 @@ public class ABO {
             addFullRecipe(new ItemStack(blockLargeButtonStone, 1, 0),
                     new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.stone_button});
 
-            int id = 0;
-
-            addEntity(FollowableEntity.class, "FollowableItem", ++id, false);
-            addEntity(EntityItemBat.class, "ItemBat", ++id, true);
-
             LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name",
                     "Item Bat");
 
@@ -388,6 +387,20 @@ public class ABO {
     @EventHandler
     public void init(FMLInitializationEvent evt) {
 
+        ArrayList<ItemStack> list = OreDictionary.getOres("cobblestone");
+        if (list.size() >= 1) {
+            for (ItemStack item : list) {
+                addRecipe(pipeItemsBounce, 1, BuildCraftTransport.pipeItemsStone, item);
+            }
+        }
+
+        list = OreDictionary.getOres("plankWood");
+        if (list.size() >= 1) {
+            for (ItemStack item : list) {
+                addRecipe(pipeItemsExtraction, 1, BuildCraftTransport.pipeItemsWood, item);
+            }
+        }
+
         loadRecipes();
 
         if (blockLiquidXP != null) {
@@ -410,7 +423,7 @@ public class ABO {
 
     @EventHandler
     public void aboutToStart(FMLServerAboutToStartEvent event) {
-        this.shapeGens.clear();
+        shapeGens.clear();
         ShapeGen.stopping = false;
     }
 
@@ -424,12 +437,17 @@ public class ABO {
         ShapeGen.stopping = true;
         Integer[] dims = DimensionManager.getIDs();
         for(int world : dims) {
-                ShapeGen.getShapeGen(world).writeToNBT();
+            ShapeGen.getShapeGen(world).writeToNBT();
         }
     }
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
+
+    }
+
+    @SubscribeEvent
+    public void tickWorld(TickEvent.WorldTickEvent event) {
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
         if (server != null) {
             if (event.phase == TickEvent.Phase.START) {
@@ -442,19 +460,13 @@ public class ABO {
                     }
                 }
 
-                World[] dims = DimensionManager.getWorlds();
-                for(World world : dims) {
-                    if(world != null) {
-                        ShapeGen.getShapeGen(world).tick();
-                    }
+                if(event.world != null && !event.world.isRemote) {
+                    ShapeGen.getShapeGen(event.world).tick();
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    public void tickWorld(TickEvent.WorldTickEvent event) {
-    }
 
     @SubscribeEvent
     public void populate(PopulateChunkEvent.Pre event) {
@@ -500,8 +512,8 @@ public class ABO {
                 int y = (int) Math.floor(player.posY);
                 int z = (int) Math.floor(player.posZ);
                 if (y < 256 && y > 0) {
-                    if (((BlockLiquidXP) blockLiquidXP).isInXP(player)) {
-                        int quanta = ((BlockLiquidXP) blockLiquidXP).getGreatestQuantaValue(player);
+                    if (blockLiquidXP.isInXP(player)) {
+                        int quanta = blockLiquidXP.getGreatestQuantaValue(player);
                         if (player.ticksExisted % 20 == 0) {
                             if (!player.capabilities.isCreativeMode) {
                                 int targetLevel = blockLiquidXP.getLevelTarget(player.worldObj, x, y, z, quanta);
@@ -513,7 +525,7 @@ public class ABO {
                         }
                         if (player.isDead) return;
                         if (player.worldObj.rand.nextInt(100) == 0) {
-                            if (((BlockLiquidXP) blockLiquidXP).useXP(player.worldObj, x, y, z)) {
+                            if (blockLiquidXP.useXP(player.worldObj, x, y, z)) {
                                 player.addExperience(1000);
                                 if (!player.worldObj.isRemote)
                                     player.worldObj.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 1.8F));
@@ -559,7 +571,7 @@ public class ABO {
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            /*if (event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+            if (event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
                 ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
 
                 int range = 150;
@@ -596,7 +608,7 @@ public class ABO {
                     if (!world.canMineBlock(entityplayer, i, j, k)) {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 5, 2, true, false, false);
+                    ShapeGen.getShapeGen(world).blendNewOld(world, i, j, k, 5, false, true);
                 } else if (itemstack.getItemDamage() == 10) {
                     ChunkCoordinates chuck = getLooking(world, entityplayer, range);
 
@@ -611,7 +623,7 @@ public class ABO {
                     if (!world.canMineBlock(entityplayer, i, j, k)) {
                         return;
                     }
-                    ShapeGen.getShapeGen(world).blend(world, i, j, k, 4, 2, false, false, true);
+                    ShapeGen.getShapeGen(world).blendNewOld(world, i, j, k, 4, true, true);
                 } else if (itemstack.getItemDamage() == 12) {
                     ChunkCoordinates chuck = getLookingOffset(world, entityplayer, range, 1);
 
@@ -628,7 +640,7 @@ public class ABO {
                     }
                     ShapeGen.getShapeGen(world).makeLaputa(i, 160, k);
                 }
-            }*/
+            }
 
             if (blockLiquidXP != null) {
                 if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
@@ -833,11 +845,8 @@ public class ABO {
             return false;
         }
 
-        if (world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2) {
-            return false;
-        }
+        return !(world.getBlockLightValue(i, j + 1, k) < 4 && world.getBlockLightOpacity(i, j + 1, k) > 2);
 
-        return true;
     }
 
     public static File getWorldDir() {
@@ -945,5 +954,7 @@ public class ABO {
     }
 
     // End
+
+
 
 }

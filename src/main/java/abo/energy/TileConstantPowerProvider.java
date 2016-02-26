@@ -84,7 +84,6 @@ public abstract class TileConstantPowerProvider extends TileEngineBase {
 
     protected double calculateChainedOutput(){ return 0; }
 
-    @Override
     public int calculateCurrentOutput() {
         updateTargetOutput();
         realCurrentOutput = realCurrentOutput + (TARGET_OUTPUT - realCurrentOutput) / 200D;

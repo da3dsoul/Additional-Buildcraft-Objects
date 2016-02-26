@@ -20,11 +20,22 @@ item.PipeItemsEnderExtraction.name=Ender Extraction Pipe
 item.waterwheelItem.name=Waterwheel
 tile.windmillBlock.name=Windmill
 tile.waterwheelBlock.name=Waterwheel
+tile.blockAccelerator.name=Accelerator
 
 # da3dsoul, might eventually be moved
 
 tile.largebuttonstone.name=Large Stone Button
 tile.largebuttonwood.name=Large Wooden Button
+
+
+tile.sandStone.name=Sandstone
+tile.sandStone.bricks.name=Sandstone Bricks
+tile.sandStone.cracked_bricks.name=Cracked Sandstone Bricks
+tile.sandStone.mossy_bricks.name=Mossy Sandstone Bricks
+tile.sandStone.smooth.name=Smooth Sandstone
+tile.sandStone.cracked_smooth.name=Cracked Smooth Sandstone
+tile.sandStone.mossy_smooth.name=Mossy Smooth Sandstone
+
 
 item.MobBottleFull.name=Mob Bottle (Full)
 item.MobBottleEmpty.name=Mob Bottle
@@ -37,6 +48,7 @@ item.GoldenStaff.name=Yellow Dye on a Stick
 tile.blockLiquidXP.name=Liquid Experience
 
 generator.scaryGen=ScaryGen
-generator.candycraft=Candy Craft
+# Because it pissed me off...
+generator.CandyCraft=Candy Craft
 
 death.attack.experience=%1$s十分な経験を持っていない。たぶん、彼奴が学んでいる？

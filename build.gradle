@@ -31,7 +31,7 @@ minecraft {
 
 jar {
     manifest {
-        attributes 'FMLAT': 'ABO_at.cfg'
+        attributes 'FMLAT': 'ABO_at.cfg' , 'FMLCorePlugin' : 'da3dsoul.asm.LoadingPlugin', 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
 

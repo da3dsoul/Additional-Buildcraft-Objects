@@ -106,8 +106,8 @@ public class PipeItemsDivide extends ABOPipe<PipeTransportItems> {
 	}
 
 	public void readjustSpeed(TravelingItem item, int errorMargin) {
-		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f,
-				TransportConstants.PIPE_NORMAL_SPEED * 20F)
+		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_DEFAULT_SPEED, item.getSpeed()) * 2f,
+				TransportConstants.PIPE_DEFAULT_SPEED * 20F)
 				+ (new Random().nextInt(errorMargin) / 1000)
 				- (new Random().nextInt(errorMargin) / 1000));
 	}

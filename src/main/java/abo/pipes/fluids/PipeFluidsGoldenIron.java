@@ -55,7 +55,7 @@ public class PipeFluidsGoldenIron extends ABOPipe<PipeTransportFluids> {
 
 	@Override
 	public boolean blockActivated(EntityPlayer entityplayer, ForgeDirection side) {
-		return logic.blockActivated(entityplayer);
+		return logic.blockActivated(entityplayer,side);
 	}
 
 	@Override

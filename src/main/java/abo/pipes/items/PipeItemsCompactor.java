@@ -254,8 +254,8 @@ public class PipeItemsCompactor extends ABOPipe<PipeTransportItems> implements I
 	}
 
 	public void readjustSpeed(TravelingItem item) {
-		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_NORMAL_SPEED, item.getSpeed()) * 2f,
-				TransportConstants.PIPE_NORMAL_SPEED * 20F));
+		item.setSpeed(Math.min(Math.max(TransportConstants.PIPE_DEFAULT_SPEED, item.getSpeed()) * 2f,
+				TransportConstants.PIPE_DEFAULT_SPEED * 20F));
 	}
 
 	@Override
