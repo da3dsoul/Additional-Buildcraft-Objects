@@ -26,6 +26,7 @@ tile.blockAccelerator.name=Accelerator
 
 tile.largebuttonstone.name=Large Stone Button
 tile.largebuttonwood.name=Large Wooden Button
+tile.brickNoCrossing.name=§oThe Line§r
 
 
 tile.sandStone.name=Sandstone

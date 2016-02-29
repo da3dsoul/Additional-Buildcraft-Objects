@@ -16,7 +16,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
     // Start CoreMod
 
     public String[] getASMTransformerClass() {
-        return new String[] { "da3dsoul.asm.iChunDoorsTransformer" };
+        return new String[] { "da3dsoul.asm.da3dsoulClassTransformer" };
     }
 
     public String getModContainerClass() {

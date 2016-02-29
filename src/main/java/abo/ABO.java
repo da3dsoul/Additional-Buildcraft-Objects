@@ -44,6 +44,7 @@ import da3dsoul.ShapeGen.ShapeGen;
 import da3dsoul.reference.Metadata;
 import da3dsoul.scaryGen.SaveHandler.EnderInventorySaveHandler;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
+import da3dsoul.scaryGen.blocks.BlockNoCrossing;
 import da3dsoul.scaryGen.blocks.BlockSandStone;
 import da3dsoul.scaryGen.blocks.ItemSandStone;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
@@ -54,13 +55,17 @@ import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
+import mods.railcraft.common.util.misc.Game;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
+import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorProjectileDispense;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.IPosition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -169,6 +174,7 @@ public class ABO{
     // Mod Init Handling
     private boolean bucketEventCanceled = false;
     private EnderInventorySaveHandler enderInventorySaveHandler = null;
+    public static Block brickNoCrossing;
 
     // Start
 
@@ -305,6 +311,10 @@ public class ABO{
                     new Object[]{"ABA", "ACA", "DED", 'A', BuildCraftCore.ironGearItem,
                             'B', BuildCraftCore.diamondGearItem, 'C', Items.clock, 'D', Blocks.stone, 'E', Items.redstone});
 
+            brickNoCrossing = (new BlockNoCrossing(Material.rock)).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundTypePiston).setBlockName("brickNoCrossing").setCreativeTab(CreativeTabs.tabBlock).setBlockTextureName("brick");
+            addShapelessRecipe(new ItemStack(brickNoCrossing), new Object[] { Blocks.brick_block });
+            addShapelessRecipe(new ItemStack(Blocks.brick_block), new Object[] { brickNoCrossing });
+            GameRegistry.registerBlock(brickNoCrossing, "brickNoCrossing");
             GameRegistry.registerBlock(blockNull, "null");
             GameRegistry.registerBlock(blockNullCollide, "nullCollide");
             addFullRecipe(new ItemStack(windmillBlock),
@@ -350,6 +360,9 @@ public class ABO{
             if(useYellowDye) {
                 addFullRecipe(new ItemStack(goldenstaff, 1, 0),
                         new Object[]{"B", "A", "A", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
+                                new ItemStack(Items.dye, 1, 11)});
+                addFullRecipe(new ItemStack(goldenstaff, 1, 0),
+                        new Object[]{"  B", " A ", "A  ", Character.valueOf('A'), Items.stick, Character.valueOf('B'),
                                 new ItemStack(Items.dye, 1, 11)});
             }
 
@@ -532,6 +545,43 @@ public class ABO{
                             }
                         }
                     }
+                }
+            }
+        }
+        if(!event.entity.worldObj.isRemote) {
+            if (!(event.entityLiving instanceof EntityPlayer)) {
+                EntityLivingBase entity = event.entityLiving;
+                World world = entity.worldObj;
+                int x = MathHelper.floor_double(entity.posX);
+                int y = MathHelper.floor_double(entity.boundingBox.minY);
+                int z = MathHelper.floor_double(entity.posZ);
+                for(int i =0; i < 3;i++) {
+                    if (world.getBlock(x, y, z) == brickNoCrossing) {
+                        for (int f = 2; f < 6; f++) {
+                            int y1 = 0;
+                            boolean nextBrick = false;
+                            for(int j = -3; j < 3; j++) {
+                                Block block = world.getBlock(x + Facing.offsetsXForSide[f], y + j, z + Facing.offsetsZForSide[f]);
+                                if(block == brickNoCrossing) {
+                                    nextBrick = true;
+                                    y1 = j;
+                                    break;
+                                }
+                            }
+                            if (!nextBrick) {
+                                for(int j = y1; j < 3; j++) {
+                                    if (!world.getBlock(x + Facing.offsetsXForSide[f], y + j, z + Facing.offsetsZForSide[f]).getMaterial().blocksMovement()) {
+                                        double blockX = x + Facing.offsetsXForSide[f] + 0.5D + Facing.offsetsXForSide[f] * (entity.boundingBox.maxX - entity.boundingBox.minX) / 2;
+                                        double blockY = y + j;
+                                        double blockZ = z + Facing.offsetsZForSide[f] + 0.5D + Facing.offsetsZForSide[f] * (entity.boundingBox.maxZ - entity.boundingBox.minZ) / 2;
+                                        entity.setPosition(blockX, blockY + entity.yOffset, blockZ);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    y--;
                 }
             }
         }
@@ -918,6 +968,16 @@ public class ABO{
                 aboRecipes.add(recipe);
             }
         }
+    }
+
+    private void addShapelessRecipe(ItemStack stack, Object... ingredients) {
+        ABORecipe recipe = new ABORecipe();
+
+        recipe.isShapeless = true;
+        recipe.result = stack;
+        recipe.input = ingredients;
+
+        aboRecipes.add(recipe);
     }
 
     private static void addFullRecipe(ItemStack stack, Object[] ingredients) {
