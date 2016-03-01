@@ -621,7 +621,7 @@ public class ABO{
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (event.entityPlayer != null && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+            if (event.entityPlayer != null && (event.entityPlayer.getCommandSenderName().equalsIgnoreCase("da3dsoul") || event.entityPlayer.getCommandSenderName().equalsIgnoreCase("balmung42")) && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
                 ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
 
                 int range = 150;

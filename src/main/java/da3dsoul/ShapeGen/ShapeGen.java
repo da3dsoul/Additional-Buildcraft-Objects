@@ -1640,9 +1640,9 @@ public class ShapeGen {
                     }
                     if(newBlocks[_x][_y][_z] == null || newBlocks[_x][_y][_z].getBlock() == null) continue;
 
-                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != newBlocks[_x][_y][_z].getBlock())
+                    if (world.getBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z) != newBlocks[_x][_y][_z].getBlock())
                     {
-                        addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, newBlocks[_x][_y][_z].getBlock(), newBlocks[_x][_y][_z].getMeta());
+                        addBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z, newBlocks[_x][_y][_z].getBlock(), newBlocks[_x][_y][_z].getMeta());
                     }
                 }
             }
