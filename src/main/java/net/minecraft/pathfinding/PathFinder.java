@@ -1,5 +1,6 @@
 package net.minecraft.pathfinding;
 
+import abo.ABO;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -358,7 +359,7 @@ public class PathFinder
                                 return -2;
                             }
                         }
-                    } else if(p_82565_0_.worldObj.getBlock(l, i1 - 1, j1) == Blocks.brick_block || p_82565_0_.worldObj.getBlock(l, i1 - 2, j1) == Blocks.brick_block || p_82565_0_.worldObj.getBlock(l, i1 - 3, j1) == Blocks.brick_block) return 0;
+                    } else if(p_82565_0_.worldObj.getBlock(l, i1 - 1, j1) == ABO.brickNoCrossing || p_82565_0_.worldObj.getBlock(l, i1 - 2, j1) == ABO.brickNoCrossing || p_82565_0_.worldObj.getBlock(l, i1 - 3, j1) == ABO.brickNoCrossing) return 0;
                 }
             }
         }

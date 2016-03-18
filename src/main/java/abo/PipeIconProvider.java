@@ -1,6 +1,7 @@
 package abo;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import buildcraft.api.core.IIconProvider;
 import cpw.mods.fml.relauncher.Side;
@@ -14,7 +15,13 @@ public class PipeIconProvider implements IIconProvider {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int iconIndex) {
-		return _icons[iconIndex];
+        try {
+            return _icons[iconIndex];
+        } catch (Throwable t) {
+            ABO.aboLog.error("Exception in getting pipe icon: " + iconIndex + " in Icon Provider");
+            ABO.aboLog.catching(t);
+            return Blocks.planks.getIcon(0,0);
+        }
 	}
 
 	@Override

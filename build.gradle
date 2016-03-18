@@ -1,8 +1,8 @@
 buildscript {
     repositories {
-    flatDir {
-       dirs 'libs'
-   }
+        flatDir {
+            dirs 'libs'
+        }
         mavenCentral()
         maven {
             name = "forge"
@@ -35,17 +35,29 @@ jar {
     }
 }
 
+repositories {
+    maven {
+        name = "buildcraft"
+        url = "http://mod-buildcraft.com"
+    }
+    ivy {
+        name "BuildCraft"
+        artifactPattern "http://www.mod-buildcraft.com/releases/BuildCraft/[revision]/[module]-[revision]-[classifier].[ext]"
+    }
+}
+
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
-      
+
     // real examples
     //if buildcraft maven is not updated again, replace this with buildcraft-version-dev and uncomment it
-    //compile name: 'buildcraft-6.1.4-dev'
+    //compile name: 'buildcraft-7.1.15-dev'
     //if buildcraft maven is not updated, comment out this line
-    //compile 'com.mod-buildcraft:buildcraft:6.4.0:dev'  // adds buildcraft to the dev env
+    //compile name: 'buildcraft', version: '7.1.15', classifier: "dev", ext: 'jar'
+    //compile "com.mod-buildcraft:buildcraft:7.1.15:dev"
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
     // for more info...
@@ -55,21 +67,21 @@ dependencies {
 }
 
 processResources
-{
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        {
+            // this will ensure that this task is redone when the versions change.
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
+            // replace stuff in mcmod.info, nothing else
+            from(sourceSets.main.resources.srcDirs) {
+                include 'mcmod.info'
+
+                // replace version and mcversion
+                expand 'version':project.version, 'mcversion':project.minecraft.version
+            }
+
+            // copy everything else, thats not the mcmod.info
+            from(sourceSets.main.resources.srcDirs) {
+                exclude 'mcmod.info'
+            }
+        }

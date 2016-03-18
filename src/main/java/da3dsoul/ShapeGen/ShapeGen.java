@@ -1631,18 +1631,18 @@ public class ShapeGen {
             {
                 for (int _z = _twoBrushSize; _z >= 0; _z--)
                 {
-                    double x4 = (double)_x - (double)_bSize - 1D;
-                    double y4 = (double)_y - (double)_bSize - 1D;
-                    double z4 = (double)_z - (double)_bSize - 1D;
+                    double x4 = (double)_x - (double)_bSize;
+                    double y4 = (double)_y - (double)_bSize;
+                    double z4 = (double)_z - (double)_bSize;
                     if (Math.sqrt(x4*x4+y4*y4+z4*z4) > (double)size)
                     {
                         continue;
                     }
                     if(newBlocks[_x][_y][_z] == null || newBlocks[_x][_y][_z].getBlock() == null) continue;
 
-                    if (world.getBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z) != newBlocks[_x][_y][_z].getBlock())
+                    if (world.getBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z) != newBlocks[_x][_y][_z].getBlock())
                     {
-                        addBlock((i - _bSize - 1) + _x, (j - _bSize - 1) + _y, (k - _bSize - 1) + _z, newBlocks[_x][_y][_z].getBlock(), newBlocks[_x][_y][_z].getMeta());
+                        addBlock((i - _bSize) + _x, (j - _bSize) + _y, (k - _bSize) + _z, newBlocks[_x][_y][_z].getBlock(), newBlocks[_x][_y][_z].getMeta());
                     }
                 }
             }
