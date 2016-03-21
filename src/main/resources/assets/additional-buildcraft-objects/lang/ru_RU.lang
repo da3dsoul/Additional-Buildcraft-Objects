@@ -13,13 +13,14 @@ item.PipeItemsDivide.name=Разделяющая транспортная тру
 item.PipeItemsExtraction.name=Извлекающая транспортная труба
 item.PipeItemsCrossover.name=Перекрёстная транспортная труба
 item.PipeItemsCompactor.name=Уплотняющая транспортная труба
-item.PipeItemsBounce=Упругая транспортная труба
+item.PipeItemsBounce.name=Упругая транспортная труба
 item.PipePowerSwitch.name=Переключаемая энергетическая труба
 item.PipePowerDirected.name=Диодная энергетическая труба
 item.PipeItemsEnderExtraction.name=Извлекающая труба Края
 item.waterwheelItem.name=Гидрогенератор
 tile.windmillBlock.name=Ветрогенератор
 tile.waterwheelBlock.name=Гидрогенератор
+tile.blockAccelerator.name=Акселератор
 
 # da3dsoul, might eventually be moved
 

@@ -34,6 +34,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.IFMLCallHook;
@@ -392,6 +393,7 @@ public class ABO{
 
             FMLCommonHandler.instance().bus().register(this);
             MinecraftForge.EVENT_BUS.register(this);
+
         } finally {
             if (aboConfiguration.hasChanged()) aboConfiguration.save();
         }
@@ -427,6 +429,15 @@ public class ABO{
 
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ABOGuiHandler());
 
+        for(Object o : GameData.getBlockRegistry().getKeys()) {
+            String s = (String)o;
+            if(s.split(":")[0].equals("Additional_Buildcraft-Objects")) {
+                Block b = GameData.getBlockRegistry().get(s);
+                if(b == null) continue;
+                if(s.contains("sandStone") || s.contains("accelerator")) continue;
+                FMLInterModComms.sendMessage("BuildCraft|Transport", "blacklist-facade", new ItemStack(b));
+            }
+        }
     }
 
     @EventHandler
