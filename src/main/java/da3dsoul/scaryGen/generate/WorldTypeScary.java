@@ -19,6 +19,7 @@ public class WorldTypeScary extends WorldType {
 	public Block oceanReplacement;
 	public int cloudLevel;
     public boolean geostrataGen;
+    public boolean genSurfaceFeatures;
 	
 	public WorldTypeScary() {
 		super("scaryGen");
@@ -28,12 +29,13 @@ public class WorldTypeScary extends WorldType {
 		oceanReplacement = Blocks.water;
 		cloudLevel = 128;
 		geostrataGen = false;
+        genSurfaceFeatures = true;
 	}
 
 	@Override
 	public IChunkProvider getChunkGenerator(World world, String generatorOptions) {
 		setOptionsFromString(generatorOptions);
-		return new ChunkProviderScary(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), index, heightLevel, oceanLevel, oceanReplacement, geostrataGen);
+		return new ChunkProviderScary(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), index, heightLevel, oceanLevel, oceanReplacement, geostrataGen, genSurfaceFeatures);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -74,6 +76,9 @@ public class WorldTypeScary extends WorldType {
     			cloudLevel = Integer.parseInt(option[4]);
                 if(option.length > 4) {
                     geostrataGen = Integer.parseInt(option[5]) != 0;
+                    if(option.length > 5) {
+                        genSurfaceFeatures = Integer.parseInt(option[6]) != 0;
+                    }
                 }
     		}
     	}catch(Throwable t){}
@@ -89,7 +94,8 @@ public class WorldTypeScary extends WorldType {
     	b.append(getOceanReplacement()).append("\n");
     	
     	b.append(cloudLevel).append("\n");
-        b.append(geostrataGen ? 1 : 0);
+        b.append(geostrataGen ? 1 : 0).append("\n");
+        b.append(genSurfaceFeatures ? 1 : 0);
     	return b.toString();
     }
     
@@ -110,6 +116,9 @@ public class WorldTypeScary extends WorldType {
     	} else if(option == "geostrataGen")
         {
             return geostrataGen ? 1 : 0;
+        } else if(option == "genSurfaceFeatures")
+        {
+            return genSurfaceFeatures ? 1 : 0;
         }
     	return -1;
     }
@@ -135,6 +144,8 @@ public class WorldTypeScary extends WorldType {
     		cloudLevel = value;
     	} else if(option == "geostrataGen") {
             geostrataGen = value != 0;
+        } else if(option == "genSurfaceFeatures") {
+            genSurfaceFeatures = value != 0;
         }
     }
     

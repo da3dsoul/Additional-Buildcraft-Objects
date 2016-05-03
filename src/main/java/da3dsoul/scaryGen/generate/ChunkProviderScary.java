@@ -5,6 +5,7 @@ import java.util.*;
 
 import abo.ABO;
 import cpw.mods.fml.common.IWorldGenerator;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.Galacticraft.GalactiCraftHandler;
@@ -85,6 +86,7 @@ public class ChunkProviderScary implements IChunkProvider {
     public int oceanLevel;
     public Block oceanReplacement;
     public boolean geostrataGen;
+    public static boolean genSurfaceFeatures = true;
     private boolean initBiomeGenDecorators = false;
 
     {
@@ -97,7 +99,7 @@ public class ChunkProviderScary implements IChunkProvider {
         ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, InitMapGenEvent.EventType.RAVINE);
     }
 
-    public ChunkProviderScary(World world, long seed, boolean mapFeatures, byte i, int hLevel, int oLevel, Block oReplace, boolean geostrataGen) {
+    public ChunkProviderScary(World world, long seed, boolean mapFeatures, byte i, int hLevel, int oLevel, Block oReplace, boolean geostrataGen, boolean genSurfaceFeatures) {
         this.worldObj = world;
         this.mapFeaturesEnabled = mapFeatures;
         this.field_147435_p = world.getWorldInfo().getTerrainType();
@@ -135,6 +137,7 @@ public class ChunkProviderScary implements IChunkProvider {
         oceanLevel = oLevel;
         oceanReplacement = oReplace;
         this.geostrataGen = geostrataGen;
+        this.genSurfaceFeatures = genSurfaceFeatures;
         if(geostrataGen) {
             try {
                 Class gameRegistry = GameRegistry.class;
@@ -464,11 +467,11 @@ public class ChunkProviderScary implements IChunkProvider {
             worldObj.theProfiler.startSection("Mineshaft");
             this.mineshaftGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
             worldObj.theProfiler.endStartSection("Village");
-            this.villageGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
+            if(genSurfaceFeatures) this.villageGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
             worldObj.theProfiler.endStartSection("Stronghold");
             this.strongholdGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
             worldObj.theProfiler.endStartSection("ScatteredFeature");
-            this.scatteredFeatureGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
+            if(genSurfaceFeatures) this.scatteredFeatureGenerator.func_151539_a(this, this.worldObj, p_73154_1_, p_73154_2_, ablock);
             worldObj.theProfiler.endSection();
             worldObj.theProfiler.endSection();
         }
@@ -669,15 +672,14 @@ public class ChunkProviderScary implements IChunkProvider {
 
         if (this.mapFeaturesEnabled) {
             this.mineshaftGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
-            flag = this.villageGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
+            if(genSurfaceFeatures) flag = this.villageGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
             this.strongholdGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
-            this.scatteredFeatureGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
+            if(genSurfaceFeatures) this.scatteredFeatureGenerator.generateStructuresInChunk(this.worldObj, this.rand, p_73153_2_, p_73153_3_);
         }
 
         int k1;
         int l1;
         int i2;
-
         if (biomegenbase != BiomeGenBase.desert && biomegenbase != BiomeGenBase.desertHills && !flag
                 && this.rand.nextInt(4) == 0
                 && TerrainGen.populate(p_73153_1_, worldObj, rand, p_73153_2_, p_73153_3_, flag, PopulateChunkEvent.Populate.EventType.LAKE)) {
@@ -697,6 +699,7 @@ public class ChunkProviderScary implements IChunkProvider {
                 (new WorldGenLakes(Blocks.lava)).generate(this.worldObj, this.rand, k1, l1, i2);
             }
         }
+
 
         boolean doGen = TerrainGen.populate(p_73153_1_, worldObj, rand, p_73153_2_, p_73153_3_, flag, PopulateChunkEvent.Populate.EventType.DUNGEON);
         for (k1 = 0; doGen && k1 < 8; ++k1) {

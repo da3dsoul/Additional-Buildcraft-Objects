@@ -30,6 +30,8 @@ import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -49,6 +51,7 @@ import da3dsoul.scaryGen.blocks.BlockNoCrossing;
 import da3dsoul.scaryGen.blocks.BlockSandStone;
 import da3dsoul.scaryGen.blocks.ItemSandStone;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
+import da3dsoul.scaryGen.generate.ChunkProviderScary;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
 import da3dsoul.scaryGen.items.ItemBottle;
@@ -313,9 +316,10 @@ public class ABO{
                             'B', BuildCraftCore.diamondGearItem, 'C', Items.clock, 'D', Blocks.stone, 'E', Items.redstone});
 
             brickNoCrossing = (new BlockNoCrossing(Material.rock)).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundTypePiston).setBlockName("brickNoCrossing").setCreativeTab(CreativeTabs.tabBlock).setBlockTextureName("brick");
-            addShapelessRecipe(new ItemStack(brickNoCrossing), new Object[] { Blocks.brick_block });
-            addShapelessRecipe(new ItemStack(Blocks.brick_block), new Object[] { brickNoCrossing });
+
             GameRegistry.registerBlock(brickNoCrossing, "brickNoCrossing");
+            addFullRecipe(new ItemStack(ABO.brickNoCrossing), new Object[] { "#", '#', new ItemStack(Blocks.brick_block) });
+            addFullRecipe(new ItemStack(Blocks.brick_block), new Object[] { "#", '#', new ItemStack(ABO.brickNoCrossing) });
             GameRegistry.registerBlock(blockNull, "null");
             GameRegistry.registerBlock(blockNullCollide, "nullCollide");
             addFullRecipe(new ItemStack(windmillBlock),
@@ -393,6 +397,7 @@ public class ABO{
 
             FMLCommonHandler.instance().bus().register(this);
             MinecraftForge.EVENT_BUS.register(this);
+            MinecraftForge.TERRAIN_GEN_BUS.register(this);
 
         } finally {
             if (aboConfiguration.hasChanged()) aboConfiguration.save();
@@ -431,10 +436,15 @@ public class ABO{
 
         for(Object o : GameData.getBlockRegistry().getKeys()) {
             String s = (String)o;
-            if(s.split(":")[0].equals("Additional_Buildcraft-Objects")) {
+            if(s.split(":")[0].equals("Additional-Buildcraft-Objects")) {
                 Block b = GameData.getBlockRegistry().get(s);
                 if(b == null) continue;
                 if(s.contains("sandStone") || s.contains("accelerator")) continue;
+                FMLInterModComms.sendMessage("BuildCraft|Transport", "blacklist-facade", new ItemStack(b));
+            } else if(s.split(":")[0].equals("GalaxySpace")) {
+                Block b = GameData.getBlockRegistry().get(s);
+                if(b == null) continue;
+                if(b.isOpaqueCube()) continue;
                 FMLInterModComms.sendMessage("BuildCraft|Transport", "blacklist-facade", new ItemStack(b));
             }
         }
@@ -470,6 +480,38 @@ public class ABO{
 
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void decorateBiome(DecorateBiomeEvent.Decorate event) {
+        if(!ChunkProviderScary.genSurfaceFeatures) {
+            switch (event.type) {
+                case BIG_SHROOM: event.setResult(Event.Result.DENY); break;
+                case CACTUS: event.setResult(Event.Result.DENY); break;
+                case DEAD_BUSH: event.setResult(Event.Result.DENY); break;
+                case FLOWERS: event.setResult(Event.Result.DENY); break;
+                case GRASS: event.setResult(Event.Result.DENY); break;
+                case LAKE: event.setResult(Event.Result.DENY); break;
+                case LILYPAD: event.setResult(Event.Result.DENY); break;
+                case PUMPKIN: event.setResult(Event.Result.DENY); break;
+                case REED: event.setResult(Event.Result.DENY); break;
+                case SHROOM: event.setResult(Event.Result.DENY); break;
+                case TREE: event.setResult(Event.Result.DENY); break;
+                case CUSTOM: event.setResult(Event.Result.DENY); break;
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void populateBiome(PopulateChunkEvent.Populate event) {
+        if(!ChunkProviderScary.genSurfaceFeatures) {
+            switch (event.type) {
+                case ICE: event.setResult(Event.Result.DENY); break;
+                case LAKE: event.setResult(Event.Result.DENY); break;
+                case LAVA: event.setResult(Event.Result.DENY); break;
+                case CUSTOM: event.setResult(Event.Result.DENY); break;
+            }
+        }
+    }
+
     @SubscribeEvent
     public void tickWorld(TickEvent.WorldTickEvent event) {
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
@@ -493,8 +535,10 @@ public class ABO{
 
 
     @SubscribeEvent
-    public void populate(PopulateChunkEvent.Pre event) {
+    public void populate(PopulateChunkEvent.Populate event) {
         if (ABO.blockLiquidXP == null) return;
+        if(event.hasVillageGenerated) return;
+        if(event.type != PopulateChunkEvent.Populate.EventType.LAKE) return;
         if (!spawnLakes) return;
         if (!respawnLakes) return;
         if (event.rand.nextInt(16) == 0

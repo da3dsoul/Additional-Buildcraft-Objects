@@ -27,7 +27,11 @@ public class GuiScaryGenCustomize extends GuiScreen {
 	public GuiScaryGenCustomize(GuiCreateWorld parentScreen, WorldTypeScary worldType) {
 		this.parentScreen = parentScreen;
 		this.worldType = worldType;
-		origOptions = worldType.optionsToString();
+        origOptions = worldType.optionsToString();
+        if(!parentScreen.field_146334_a.isEmpty() && !parentScreen.field_146334_a.equals(worldType.optionsToString())){
+            origOptions = parentScreen.field_146334_a;
+            worldType.setOptionsFromString(parentScreen.field_146334_a);
+        }
 	}
 
 	public void updateScreen() {
@@ -80,6 +84,7 @@ public class GuiScaryGenCustomize extends GuiScreen {
 		this.buttonList.add(new GuiIntSlider(this, 5, col2.startX, y, "cloudLevel", 4, 300));
 		y += 32;
         this.buttonList.add(new GuiIntSlider(this, 6, col1.startX, y, "geostrataGen", 0, 1));
+        this.buttonList.add(new GuiIntSlider(this, 8, col2.startX, y, "genSurfaceFeatures", 0, 1));
         //this.buttonList.add(new GuiIntSlider(this, 7, col2.startX, y, "colorTolerance", 20, 255));
         y += 32;
 		this.textField = new GuiTextField(this.fontRendererObj, col1.startX, y, 375, 20);
