@@ -90,11 +90,12 @@ public class WorldGenMinableOverride extends WorldGenMinable{
                                 Block target = p_76484_1_.getBlock(k2, l2, i3);
                                 if (d12 * d12 + d13 * d13 + d14 * d14 < 1.0D && target.isReplaceableOreGen(p_76484_1_, k2, l2, i3, field_150518_c))
                                 {
+                                    // field_150519_a is the ore block we're setting, assuming normal stone
+                                    RockTypes rockType = RockTypes.getTypeFromID(target);
                                     if(target == Blocks.stone) {
                                         p_76484_1_.setBlock(k2, l2, i3, field_150519_a, mineableBlockMeta, 2);
-                                    } else {
-                                        RockTypes rockType = RockTypes.getTypeFromID(target);
-                                        if(ReikaOreHelper.isVanillaOre(field_150519_a)) {
+                                    } else if(rockType != null) { // target == Geostrata rock generated in ChunkProvider
+                                        if(oreHelper != null && ReikaOreHelper.isVanillaOre(field_150519_a)) {
                                             int oreMeta = BlockOreTile.getMetadataByTypes(rockType, oreHelper);
                                             p_76484_1_.setBlock(k2, l2, i3, oreBlock, oreMeta, 2);
                                         } else {

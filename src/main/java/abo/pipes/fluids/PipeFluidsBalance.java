@@ -24,7 +24,7 @@ class Neighbor {
 		if (tank == null) return 0;
 
 		FluidStack fluid = tank.fluid;
-		return fluid != null ? fluid.fluidID : 0;
+		return fluid != null ? fluid.getFluidID() : 0;
 	}
 
 	public int getFluidCapacity() {
@@ -130,7 +130,7 @@ public class PipeFluidsBalance extends ABOPipe<PipeTransportFluids> {
 
 		if (tank != null) fluid = tank.fluid;
 
-		if (fluid != null && fluid.amount > 0) fluidID = fluid.fluidID;
+		if (fluid != null && fluid.amount > 0) fluidID = fluid.getFluidID();
 
 		if (fluidID == 0) {
 			for (Neighbor neighbor : neighbors) {

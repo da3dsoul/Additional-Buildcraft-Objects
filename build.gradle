@@ -25,7 +25,7 @@ group= "abo" // http://maven.apache.org/guides/mini/guide-naming-conventions.htm
 archivesBaseName = "ABO"
 
 minecraft {
-    version = "1.7.10-10.13.2.1277"
+    version = "1.7.10-10.13.4.1614-1.7.10"
     replace '${version}', project.version
 }
 
