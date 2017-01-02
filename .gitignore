@@ -16,11 +16,15 @@ out
 
 #gradle
 build
-.gradle
+/.gradle/*
+/gradle/*
 
 #runtime
 run
-.gradle/*
-gradle
 eclipse
 libs/*
+src/blockAccelerator.png
+src/blockAccelerator.png.mcmeta
+src/blockAccelerator.psd
+src/main/java/da3dsoul/scaryGen/mod_ScaryGen/
+

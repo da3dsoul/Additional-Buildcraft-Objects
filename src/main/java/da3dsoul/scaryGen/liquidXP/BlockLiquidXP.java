@@ -76,7 +76,9 @@ public class BlockLiquidXP extends BlockFluidClassic {
 
     @Override
     public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        return LiquidXPMod.fluid.getIcon((World) world, x, y, z);
+        if (world instanceof World)
+            return LiquidXPMod.fluid.getIcon((World)world, x, y, z);
+        return getIcon(side, world.getBlockMetadata(x,y,z));
     }
 
     public int getGreatestQuantaValue(Entity entity) {
