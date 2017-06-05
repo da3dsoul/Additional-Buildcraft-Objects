@@ -20,22 +20,36 @@ item.PipeItemsEnderExtraction.name=末影提取管道
 item.waterwheelItem.name=水车
 tile.windmillBlock.name=风车
 tile.waterwheelBlock.name=水车
+tile.blockAccelerator.name=加速器
 
 # da3dsoul, might eventually be moved
 
 tile.largebuttonstone.name=大型石质按钮
 tile.largebuttonwood.name=大型木质按钮
+tile.brickNoCrossing.name=§o管线§r
 
-item.MobBottleFull.name=生物瓶 (满)
+
+tile.sandStone.name=沙石
+tile.sandStone.bricks.name=沙石砖
+tile.sandStone.cracked_bricks.name=裂砂沙石
+tile.sandStone.mossy_bricks.name=苔沙石砖
+tile.sandStone.smooth.name=平滑沙石
+tile.sandStone.cracked_smooth.name=裂平滑沙石
+tile.sandStone.mossy_smooth.name=苔平滑沙石
+
+
+item.MobBottleFull.name=生物瓶(满)
 item.MobBottleEmpty.name=生物瓶
 item.MobBottleNoEntityName0.name=实体没有本地化名称.
 item.MobBottleNoEntityName1.name=与开发者联系,他们'或许'会修复它.
-item.MobBottleNoEntityName2.name=实体的本地化名称是:
-item.MobBottlePressShift.name=按下潜行键查看更多信息.
-item.GoldenStaff.name=黄色木棍
+item.MobBottleNoEntityName2.name=未本地化的实体名称是:
+item.MobBottlePressShift.name=按下Shift查看更多信息.
+item.GoldenStaff.name=带黄色染料的木棍
 
 tile.blockLiquidXP.name=液态经验
 
 generator.scaryGen=恐怖生成
+# Because it pissed me off...
+generator.CandyCraft=糖果工艺
 
-death.attack.experience=%1$s没有丰富的经验。那个家伙大概还在学习吧？
+death.attack.experience=%1$s没有丰富的经验. 那个家伙大概还在学习吧?
