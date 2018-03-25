@@ -161,6 +161,12 @@ public class ChunkProviderScary implements IChunkProvider {
                         it.remove();
                         continue;
                     }
+                    if (gen.getClass().getSimpleName().equalsIgnoreCase("VentGenerator")) {
+                        j++;
+                        iWorldGeneratorIntegerMap.remove(gen);
+                        it.remove();
+                        continue;
+                    }
                     if (gen.getClass().getSimpleName().equalsIgnoreCase("ReactorOreGenerator")) {
                         j++;
                         toAdd.put(ReactorOreGeneratorOverride.instance, iWorldGeneratorIntegerMap.get(gen));
@@ -216,6 +222,31 @@ public class ChunkProviderScary implements IChunkProvider {
                     e.printStackTrace();
                 }
 
+            }
+        } else {
+            try {
+                Class gameRegistry = GameRegistry.class;
+                Field worldGeneratorIndex = gameRegistry.getDeclaredField("worldGeneratorIndex");
+                worldGeneratorIndex.setAccessible(true);
+                Field worldGenerators = gameRegistry.getDeclaredField("worldGenerators");
+                worldGenerators.setAccessible(true);
+                Set<IWorldGenerator> iWorldGenerators = (Set<IWorldGenerator>) worldGenerators.get(null);
+                Map<IWorldGenerator, Integer> iWorldGeneratorIntegerMap = (Map<IWorldGenerator, Integer>) worldGeneratorIndex.get(null);
+                Iterator<IWorldGenerator> it = iWorldGenerators.iterator();
+                do {
+                    if (!ABO.geostrataInstalled) break;
+                    if (!it.hasNext()) break;
+                    IWorldGenerator gen = it.next();
+                    if (gen.getClass().getSimpleName().equalsIgnoreCase("VentGenerator")) {
+                        iWorldGeneratorIntegerMap.remove(gen);
+                        it.remove();
+                        continue;
+                    }
+                } while (true);
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }

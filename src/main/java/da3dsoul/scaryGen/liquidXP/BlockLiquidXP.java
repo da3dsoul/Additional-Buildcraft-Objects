@@ -76,8 +76,11 @@ public class BlockLiquidXP extends BlockFluidClassic {
 
     @Override
     public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        if (world instanceof World)
-            return LiquidXPMod.fluid.getIcon((World)world, x, y, z);
+        try {
+            if (world instanceof World) return LiquidXPMod.fluid.getIcon((World) world, x, y, z);
+        } catch (ClassCastException ex) {
+        }
+
         return getIcon(side, world.getBlockMetadata(x,y,z));
     }
 
@@ -139,6 +142,7 @@ public class BlockLiquidXP extends BlockFluidClassic {
      */
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand) {
+        super.updateTick(world, x, y, z, rand);
         if(!ABO.spawnOrbs) return;
 
         if (world.getBlock(x, y + 1, z).getMaterial() == Material.air && !world.getBlock(x, y + 1, z).isOpaqueCube()) {
@@ -154,7 +158,6 @@ public class BlockLiquidXP extends BlockFluidClassic {
             }
             world.scheduleBlockUpdateWithPriority(x, y, z, this, 200, 2);
         }
-        super.updateTick(world, x, y, z, rand);
     }
 
     public int getXPforOneBlock() {

@@ -12,14 +12,21 @@ import abo.pipes.items.*;
 import abo.pipes.power.PipePowerDirected;
 import abo.pipes.power.PipePowerSwitch;
 import abo.proxy.ABOProxy;
+import abo.robots.ABOBoardNBT;
+import abo.robots.BoardRobotStoner;
+import abo.robots.BoardRobotWoody;
 import buildcraft.BuildCraftCore;
 import buildcraft.BuildCraftTransport;
+import buildcraft.api.boards.RedstoneBoardRegistry;
 import buildcraft.api.core.IIconProvider;
+import buildcraft.api.robots.RobotManager;
 import buildcraft.api.statements.IActionInternal;
 import buildcraft.api.statements.StatementManager;
 import buildcraft.api.transport.PipeManager;
 import buildcraft.core.BCCreativeTab;
 import buildcraft.core.InterModComms;
+import buildcraft.robotics.boards.BCBoardNBT;
+import buildcraft.robotics.boards.BoardRobotMiner;
 import buildcraft.transport.BlockGenericPipe;
 import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
@@ -54,12 +61,13 @@ import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.generate.ChunkProviderScary;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
+import da3dsoul.scaryGen.generate.WorldTypeScaryBOP;
 import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
+import da3dsoul.scaryGen.items.ItemThermalImplication;
 import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
 import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
-import mods.railcraft.common.util.misc.Game;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.material.Material;
@@ -102,7 +110,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:BuildCraft|Robotics;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion;after:BiomesOPlenty")
 public class ABO{
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
@@ -154,6 +162,10 @@ public class ABO{
     public static int orbSize = 5;
     public static DamageSource experience = (new DamageSource("experience")).setDamageBypassesArmor().setMagicDamage().setDamageIsAbsolute();
     // LiquidXP
+
+    // Thermal Foundation
+    public static Item thermalImplication;
+    // Thermal Foundation
 
     public static int actionSwitchOnPipeID = 128;
     public static IActionInternal actionSwitchOnPipe = null;
@@ -297,6 +309,13 @@ public class ABO{
                 blockLiquidXP = null;
             }
 
+            if (Loader.isModLoaded("ThermalFoundation")) {
+                thermalImplication = new ItemThermalImplication().init();
+                ImplicationEventHandler.initialize();
+            } else {
+                thermalImplication = null;
+            }
+
             sandStone = (new BlockSandStone()).setStepSound(Block.soundTypePiston).setHardness(0.8F).setBlockName("sandStone").setBlockTextureName("sandstone");
 
             ItemBlock sandStoneItem = (new ItemMultiTexture(sandStone, sandStone, BlockSandStone.iconNames)).setUnlocalizedName("sandStone");
@@ -387,6 +406,8 @@ public class ABO{
 
             new WorldTypeScary();
 
+            if (Loader.isModLoaded("BiomesOPlenty")) new WorldTypeScaryBOP();
+
             // end scaryGen
 
             actionSwitchOnPipe = new ActionSwitchOnPipe(actionSwitchOnPipeID);
@@ -398,6 +419,13 @@ public class ABO{
             FMLCommonHandler.instance().bus().register(this);
             MinecraftForge.EVENT_BUS.register(this);
             MinecraftForge.TERRAIN_GEN_BUS.register(this);
+
+            if (Loader.isModLoaded("BuildCraft|Robotics")) {
+                RedstoneBoardRegistry.instance.registerBoardType(new ABOBoardNBT("additional-buildcraft-objects:stoner",
+                        "stoner", BoardRobotStoner.class, "blue"), 32000);
+                RedstoneBoardRegistry.instance.registerBoardType(new ABOBoardNBT("additional-buildcraft-objects:woody",
+                        "woody", BoardRobotWoody.class, "blue"), 32000);
+            }
 
         } finally {
             if (aboConfiguration.hasChanged()) aboConfiguration.save();
@@ -447,6 +475,10 @@ public class ABO{
                 if(b.isOpaqueCube()) continue;
                 FMLInterModComms.sendMessage("BuildCraft|Transport", "blacklist-facade", new ItemStack(b));
             }
+        }
+        if (Loader.isModLoaded("BuildCraft|Robotics")) {
+            RobotManager.registerAIRobot(BoardRobotStoner.class, "boardRobotStoner", "abo.robots.BoardRobotStoner");
+            RobotManager.registerAIRobot(BoardRobotWoody.class, "boardRobotWoody", "abo.robots.BoardRobotWoody");
         }
     }
 
@@ -569,7 +601,7 @@ public class ABO{
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerUpdate(LivingEvent.LivingUpdateEvent event) {
         if (ABO.blockLiquidXP != null) {
             if (event.entityLiving instanceof EntityPlayer) {
@@ -600,43 +632,6 @@ public class ABO{
                             }
                         }
                     }
-                }
-            }
-        }
-        if(!event.entity.worldObj.isRemote) {
-            if (!(event.entityLiving instanceof EntityPlayer)) {
-                EntityLivingBase entity = event.entityLiving;
-                World world = entity.worldObj;
-                int x = MathHelper.floor_double(entity.posX);
-                int y = MathHelper.floor_double(entity.boundingBox.minY);
-                int z = MathHelper.floor_double(entity.posZ);
-                for(int i =0; i < 3;i++) {
-                    if (world.getBlock(x, y, z) == brickNoCrossing) {
-                        for (int f = 2; f < 6; f++) {
-                            int y1 = 0;
-                            boolean nextBrick = false;
-                            for(int j = -3; j < 3; j++) {
-                                Block block = world.getBlock(x + Facing.offsetsXForSide[f], y + j, z + Facing.offsetsZForSide[f]);
-                                if(block == brickNoCrossing) {
-                                    nextBrick = true;
-                                    y1 = j;
-                                    break;
-                                }
-                            }
-                            if (!nextBrick) {
-                                for(int j = y1; j < 3; j++) {
-                                    if (!world.getBlock(x + Facing.offsetsXForSide[f], y + j, z + Facing.offsetsZForSide[f]).getMaterial().blocksMovement()) {
-                                        double blockX = x + Facing.offsetsXForSide[f] + 0.5D + Facing.offsetsXForSide[f] * (entity.boundingBox.maxX - entity.boundingBox.minX) / 2;
-                                        double blockY = y + j;
-                                        double blockZ = z + Facing.offsetsZForSide[f] + 0.5D + Facing.offsetsZForSide[f] * (entity.boundingBox.maxZ - entity.boundingBox.minZ) / 2;
-                                        entity.setPosition(blockX, blockY + entity.yOffset, blockZ);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    y--;
                 }
             }
         }
@@ -676,7 +671,7 @@ public class ABO{
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (event.entityPlayer != null && (event.entityPlayer.getCommandSenderName().equalsIgnoreCase("da3dsoul") || event.entityPlayer.getCommandSenderName().equalsIgnoreCase("balmung42")) && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+            if (event.entityPlayer instanceof EntityPlayer && (event.entityPlayer.getCommandSenderName().equalsIgnoreCase("da3dsoul") || event.entityPlayer.getCommandSenderName().equalsIgnoreCase("balmung42")) && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
                 ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
 
                 int range = 150;
@@ -819,7 +814,6 @@ public class ABO{
 
         }
     }
-
 
     private static class ABORecipe {
         boolean isShapeless = false;
@@ -986,7 +980,7 @@ public class ABO{
         return res;
     }
 
-    private static void addRecipe(Item item, int count, Object... ingredients) {
+    public static void addRecipe(Item item, int count, Object... ingredients) {
 
         if (ingredients.length == 3) {
             for (int i = 0; i < 17; i++) {
@@ -1025,7 +1019,7 @@ public class ABO{
         }
     }
 
-    private void addShapelessRecipe(ItemStack stack, Object... ingredients) {
+    public static void addShapelessRecipe(ItemStack stack, Object... ingredients) {
         ABORecipe recipe = new ABORecipe();
 
         recipe.isShapeless = true;
@@ -1035,7 +1029,7 @@ public class ABO{
         aboRecipes.add(recipe);
     }
 
-    private static void addFullRecipe(ItemStack stack, Object[] ingredients) {
+    public static void addFullRecipe(ItemStack stack, Object[] ingredients) {
         ABORecipe recipe = new ABORecipe();
         recipe.result = stack;
         recipe.input = ingredients;
@@ -1069,7 +1063,4 @@ public class ABO{
     }
 
     // End
-
-
-
 }

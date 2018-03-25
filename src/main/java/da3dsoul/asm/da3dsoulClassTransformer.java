@@ -14,6 +14,9 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
     private static Transformer.MethodTransformer isBoundingBoxInFrustrumFullyTransformer;
     private static Transformer.MethodTransformer pathfinderTransformerAdd;
     private static Transformer.MethodTransformer pathfinderTransformerDelete;
+
+    private static Transformer.ClassTransformer MorphPlayerHandTransformer;
+
     private static Map<String, Transformer.ClassTransformer> classMap;
 
     public byte[] transform(final String className, final String className2, byte[] bytes) {
@@ -27,8 +30,372 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
 
     static {
         da3dsoulClassTransformer.Frustrum = new ASMString("us.ichun.mods.doors.client.render.culling.Frustrum");
-        da3dsoulClassTransformer.PathFinding = new ASMString.ASMObfString("net/minecraft/pathfinding/PathFinder","ayg");
+        da3dsoulClassTransformer.PathFinding = new ASMString.ASMObfString("net/minecraft/pathfinding/PathFinder", "ayg");
 
+        da3dsoulClassTransformer.MorphPlayerHandTransformer = new Transformer.ClassTransformer("morph/client/render/RenderPlayerHand") {
+            @Override
+            public byte[] transform(final byte[] bytes) {
+                if (find() == null) return bytes;
+
+                ClassWriter cw = new ClassWriter(0);
+                FieldVisitor fv;
+                MethodVisitor mv;
+                AnnotationVisitor av0;
+
+                String superName = new ASMString.ASMObfString("net/minecraft/client/renderer/entity/RenderPlayerOF", "RenderPlayerOF").getText(); // bop
+                String modelBiped = new ASMString.ASMObfString("net/minecraft/client/model/ModelBiped", "bhm").getText();
+                String modelRenderer = new ASMString.ASMObfString("net/minecraft/client/model/ModelRenderer", "bix").getText();
+                String resourceLocaltion = new ASMString.ASMObfString("net/minecraft/util/ResourceLocation", "bqx").getText();
+                String entityPlayer = new ASMString.ASMObfString("net/minecraft/entity/player/EntityPlayer", "yz").getText();
+                String minecraft = new ASMString.ASMObfString("net/minecraft/client/Minecraft", "bao").getText();
+                String textureManager = new ASMString.ASMObfString("net/minecraft/client/renderer/texture/TextureManager", "bqf").getText();
+                String entity = new ASMString.ASMObfString("net/minecraft/entity/Entity", "sa").getText();
+
+                String super_func_82441_a = new ASMString.ASMObfString("renderFirstPersonArm", "a").getText();
+                String super_field_77109_a = new ASMString.ASMObfString("modelBipedMain", "f").getText();
+
+                String minecraft_func_71410_x = new ASMString.ASMObfString("getMinecraft", "B").getText();
+                String minecraft_func_110434_k = new ASMString.ASMObfString("getTextureManager", "P").getText();
+
+                String texturemanager_func_110577_a = new ASMString.ASMObfString("bindTexture", "a").getText();
+
+                String modelBiped_field_78112_f = new ASMString.ASMObfString("bipedRightArm", "f").getText();
+                String modelBiped_field_78095_p = new ASMString.ASMObfString("onGround", "p").getText();
+                String modelBiped_func_78087_a = new ASMString.ASMObfString("setRotationAngles", "a").getText();
+
+                String modelRenderer_func_78785_a = new ASMString.ASMObfString("render", "a").getText();
+                String modelRenderer_field_78800_c = new ASMString.ASMObfString("rotationPointX", "c").getText();
+                String modelRenderer_field_78797_d = new ASMString.ASMObfString("rotationPointY", "d").getText();
+                String modelRenderer_field_78798_e = new ASMString.ASMObfString("rotationPointZ", "e").getText();
+                String modelRenderer_field_78795_f = new ASMString.ASMObfString("rotateAngleX", "f").getText();
+                String modelRenderer_field_78796_g = new ASMString.ASMObfString("rotateAngleY", "g").getText();
+                String modelRenderer_field_78808_h = new ASMString.ASMObfString("rotateAngleZ", "h").getText();
+
+                cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, "morph/client/render/RenderPlayerHand", null, superName, null);
+
+                cw.visitSource("RenderPlayerHand.java", null);
+
+                {
+                    fv = cw.visitField(Opcodes.ACC_PUBLIC, "progress", "F", null, null);
+                    fv.visitEnd();
+                }
+                {
+                    fv = cw.visitField(Opcodes.ACC_PUBLIC, "parent", "L" + superName + ";", null, null);
+                    fv.visitEnd();
+                }
+
+                {
+                    fv = cw.visitField(Opcodes.ACC_PUBLIC, "biped", "L" + modelBiped + ";", null, null);
+                    fv.visitEnd();
+                }
+                {
+                    fv = cw.visitField(Opcodes.ACC_PUBLIC, "replacement", "L" + modelRenderer + ";", null, null);
+                    fv.visitEnd();
+                }
+                {
+                    fv = cw.visitField(Opcodes.ACC_PUBLIC, "resourceLoc", "L" + resourceLocaltion + ";", null, null);
+                    fv.visitEnd();
+                }
+                {
+                    mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
+                    mv.visitCode();
+                    Label l0 = new Label();
+                    mv.visitLabel(l0);
+                    mv.visitLineNumber(15, l0);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitMethodInsn(Opcodes.INVOKESPECIAL, superName, "<init>", "()V", false);
+                    mv.visitInsn(Opcodes.RETURN);
+                    Label l1 = new Label();
+                    mv.visitLabel(l1);
+                    mv.visitLocalVariable("this", "Lmorph/client/render/RenderPlayerHand;", null, l0, l1, 0);
+                    mv.visitMaxs(1, 1);
+                    mv.visitEnd();
+                }
+                {
+                    mv = cw.visitMethod(Opcodes.ACC_PUBLIC, super_func_82441_a, "(L" + entityPlayer + ";)V", null, null);
+                    mv.visitCode();
+                    Label l0 = new Label();
+                    mv.visitLabel(l0);
+                    mv.visitLineNumber(30, l0);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    Label l1 = new Label();
+                    mv.visitJumpInsn(Opcodes.IFNULL, l1);
+                    Label l2 = new Label();
+                    mv.visitLabel(l2);
+                    mv.visitLineNumber(32, l2);
+                    mv.visitInsn(Opcodes.FCONST_1);
+                    mv.visitVarInsn(Opcodes.FSTORE, 2);
+                    Label l3 = new Label();
+                    mv.visitLabel(l3);
+                    mv.visitLineNumber(34, l3);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, minecraft, minecraft_func_71410_x, "()L" + minecraft + ";", false);
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, minecraft, minecraft_func_110434_k, "()L" + textureManager + ";", false);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "resourceLoc", "L" + resourceLocaltion + ";");
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, textureManager, texturemanager_func_110577_a, "(L" + resourceLocaltion + ";)V", false);
+                    Label l4 = new Label();
+                    mv.visitLabel(l4);
+                    mv.visitLineNumber(36, l4);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "progress", "F");
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glColor4f", "(FFFF)V", false);
+                    Label l5 = new Label();
+                    mv.visitLabel(l5);
+                    mv.visitLineNumber(37, l5);
+                    mv.visitIntInsn(Opcodes.SIPUSH, 3042);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glEnable", "(I)V", false);
+                    Label l6 = new Label();
+                    mv.visitLabel(l6);
+                    mv.visitLineNumber(38, l6);
+                    mv.visitIntInsn(Opcodes.SIPUSH, 770);
+                    mv.visitIntInsn(Opcodes.SIPUSH, 771);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glBlendFunc", "(II)V", false);
+                    Label l7 = new Label();
+                    mv.visitLabel(l7);
+                    mv.visitLineNumber(40, l7);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelBiped, modelBiped_field_78112_f, "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.ASTORE, 3);
+                    Label l8 = new Label();
+                    mv.visitLabel(l8);
+                    mv.visitLineNumber(41, l8);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelBiped, modelBiped_field_78112_f, "L" + modelRenderer + ";");
+                    Label l9 = new Label();
+                    mv.visitLabel(l9);
+                    mv.visitLineNumber(44, l9);
+                    mv.visitIntInsn(Opcodes.BIPUSH, 12);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "morph/client/model/ModelHelper", "getModelHeight", "(L" + modelRenderer + ";)I", false);
+                    mv.visitInsn(Opcodes.ISUB);
+                    mv.visitVarInsn(Opcodes.ISTORE, 4);
+                    Label l10 = new Label();
+                    mv.visitLabel(l10);
+                    mv.visitLineNumber(45, l10);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78800_c, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 5);
+                    Label l11 = new Label();
+                    mv.visitLabel(l11);
+                    mv.visitLineNumber(46, l11);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78797_d, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 6);
+                    Label l12 = new Label();
+                    mv.visitLabel(l12);
+                    mv.visitLineNumber(47, l12);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78798_e, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 7);
+                    Label l13 = new Label();
+                    mv.visitLabel(l13);
+                    mv.visitLineNumber(49, l13);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78795_f, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 8);
+                    Label l14 = new Label();
+                    mv.visitLabel(l14);
+                    mv.visitLineNumber(50, l14);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78796_g, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 9);
+                    Label l15 = new Label();
+                    mv.visitLabel(l15);
+                    mv.visitLineNumber(51, l15);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78808_h, "F");
+                    mv.visitVarInsn(Opcodes.FSTORE, 10);
+                    Label l16 = new Label();
+                    mv.visitLabel(l16);
+                    mv.visitLineNumber(53, l16);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 3);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78800_c, "F");
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78800_c, "F");
+                    Label l17 = new Label();
+                    mv.visitLabel(l17);
+                    mv.visitLineNumber(54, l17);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 3);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78797_d, "F");
+                    mv.visitVarInsn(Opcodes.ILOAD, 4);
+                    mv.visitInsn(Opcodes.I2F);
+                    mv.visitInsn(Opcodes.FADD);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78797_d, "F");
+                    Label l18 = new Label();
+                    mv.visitLabel(l18);
+                    mv.visitLineNumber(55, l18);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 3);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelRenderer, modelRenderer_field_78798_e, "F");
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78798_e, "F");
+                    Label l19 = new Label();
+                    mv.visitLabel(l19);
+                    mv.visitLineNumber(57, l19);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelBiped, modelBiped_field_78095_p, "F");
+                    Label l20 = new Label();
+                    mv.visitLabel(l20);
+                    mv.visitLineNumber(58, l20);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitInsn(Opcodes.FCONST_0);
+                    mv.visitLdcInsn(new Float("0.0625"));
+                    mv.visitVarInsn(Opcodes.ALOAD, 1);
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, modelBiped, modelBiped_func_78087_a, "(FFFFFFL" + entity + ";)V", false);
+                    Label l21 = new Label();
+                    mv.visitLabel(l21);
+                    mv.visitLineNumber(59, l21);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitFieldInsn(Opcodes.GETFIELD, modelBiped, modelBiped_field_78112_f, "L" + modelRenderer + ";");
+                    mv.visitLdcInsn(new Float("0.0625"));
+                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, modelRenderer, modelRenderer_func_78785_a, "(F)V", false);
+                    Label l22 = new Label();
+                    mv.visitLabel(l22);
+                    mv.visitLineNumber(61, l22);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 3);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelBiped, modelBiped_field_78112_f, "L" + modelRenderer + ";");
+                    Label l23 = new Label();
+                    mv.visitLabel(l23);
+                    mv.visitLineNumber(63, l23);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 5);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78800_c, "F");
+                    Label l24 = new Label();
+                    mv.visitLabel(l24);
+                    mv.visitLineNumber(64, l24);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 6);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78797_d, "F");
+                    Label l25 = new Label();
+                    mv.visitLabel(l25);
+                    mv.visitLineNumber(65, l25);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 7);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78798_e, "F");
+                    Label l26 = new Label();
+                    mv.visitLabel(l26);
+                    mv.visitLineNumber(67, l26);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 8);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78795_f, "F");
+                    Label l27 = new Label();
+                    mv.visitLabel(l27);
+                    mv.visitLineNumber(68, l27);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 9);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78796_g, "F");
+                    Label l28 = new Label();
+                    mv.visitLabel(l28);
+                    mv.visitLineNumber(69, l28);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "replacement", "L" + modelRenderer + ";");
+                    mv.visitVarInsn(Opcodes.FLOAD, 10);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, modelRenderer, modelRenderer_field_78808_h, "F");
+                    Label l29 = new Label();
+                    mv.visitLabel(l29);
+                    mv.visitLineNumber(71, l29);
+                    mv.visitIntInsn(Opcodes.SIPUSH, 3042);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glDisable", "(I)V", false);
+                    Label l30 = new Label();
+                    mv.visitLabel(l30);
+                    mv.visitLineNumber(73, l30);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitVarInsn(Opcodes.FLOAD, 2);
+                    mv.visitInsn(Opcodes.FCONST_1);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/lwjgl/opengl/GL11", "glColor4f", "(FFFF)V", false);
+                    mv.visitLabel(l1);
+                    mv.visitLineNumber(75, l1);
+                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    mv.visitInsn(Opcodes.RETURN);
+                    Label l31 = new Label();
+                    mv.visitLabel(l31);
+                    mv.visitLocalVariable("f", "F", null, l3, l1, 2);
+                    mv.visitLocalVariable("arm", "L" + modelRenderer + ";", null, l8, l1, 3);
+                    mv.visitLocalVariable("heightDiff", "I", null, l10, l1, 4);
+                    mv.visitLocalVariable("rotX", "F", null, l11, l1, 5);
+                    mv.visitLocalVariable("rotY", "F", null, l12, l1, 6);
+                    mv.visitLocalVariable("rotZ", "F", null, l13, l1, 7);
+                    mv.visitLocalVariable("angX", "F", null, l14, l1, 8);
+                    mv.visitLocalVariable("angY", "F", null, l15, l1, 9);
+                    mv.visitLocalVariable("angZ", "F", null, l16, l1, 10);
+                    mv.visitLocalVariable("this", "Lmorph/client/render/RenderPlayerHand;", null, l0, l31, 0);
+                    mv.visitLocalVariable("par1EntityPlayer", "L" + entityPlayer + ";", null, l0, l31, 1);
+                    mv.visitMaxs(8, 11);
+                    mv.visitEnd();
+                }
+                {
+                    mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setParent", "(L" + superName + ";)V", null, null);
+                    mv.visitCode();
+                    Label l0 = new Label();
+                    mv.visitLabel(l0);
+                    mv.visitLineNumber(79, l0);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, "morph/client/render/RenderPlayerHand", "parent", "L" + superName + ";");
+                    mv.visitVarInsn(Opcodes.ALOAD, 1);
+                    Label l1 = new Label();
+                    mv.visitJumpInsn(Opcodes.IF_ACMPEQ, l1);
+                    Label l2 = new Label();
+                    mv.visitLabel(l2);
+                    mv.visitLineNumber(81, l2);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitVarInsn(Opcodes.ALOAD, 1);
+                    mv.visitFieldInsn(Opcodes.GETFIELD, superName, super_field_77109_a, "L" + modelBiped + ";");
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, "morph/client/render/RenderPlayerHand", "biped", "L" + modelBiped + ";");
+                    mv.visitLabel(l1);
+                    mv.visitLineNumber(83, l1);
+                    mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+                    mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    mv.visitVarInsn(Opcodes.ALOAD, 1);
+                    mv.visitFieldInsn(Opcodes.PUTFIELD, "morph/client/render/RenderPlayerHand", "parent", "L" + superName + ";");
+                    Label l3 = new Label();
+                    mv.visitLabel(l3);
+                    mv.visitLineNumber(84, l3);
+                    mv.visitInsn(Opcodes.RETURN);
+                    Label l4 = new Label();
+                    mv.visitLabel(l4);
+                    mv.visitLocalVariable("this", "Lmorph/client/render/RenderPlayerHand;", null, l0, l4, 0);
+                    mv.visitLocalVariable("render", "L" + superName + ";", null, l0, l4, 1);
+                    mv.visitMaxs(2, 2);
+                    mv.visitEnd();
+                }
+                cw.visitEnd();
+                return cw.toByteArray();
+            }
+        };
 
         da3dsoulClassTransformer.isBoxInFrustrumFullyTransformer = new Transformer.MethodTransformer(Transformer.NODE_ADD, new ASMString("<cinit>"), "()V") {
             @Override
@@ -171,7 +538,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitVarInsn(ILOAD, 9);
                 node.visitVarInsn(ILOAD, 10);
                 node.visitVarInsn(ILOAD, 11);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitVarInsn(ASTORE, 12);
                 Label l11 = new Label();
                 node.visitLabel(l11);
@@ -199,7 +566,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitLineNumber(307, l14);
                 node.visitFrame(Opcodes.F_APPEND, 1, new Object[]{block}, 0, null);
                 node.visitVarInsn(ALOAD, 12);
-                node.visitFieldInsn(GETSTATIC, initBlocks, new ASMString.ASMObfString("flowing_water", "i").getText(), "L"+new ASMString.ASMObfString("net/minecraft/block/BlockLiquid","alw").getText() + ";");
+                node.visitFieldInsn(GETSTATIC, initBlocks, new ASMString.ASMObfString("flowing_water", "i").getText(), "L" + new ASMString.ASMObfString("net/minecraft/block/BlockLiquid", "alw").getText() + ";");
                 Label l17 = new Label();
                 node.visitJumpInsn(IF_ACMPEQ, l17);
                 node.visitVarInsn(ALOAD, 12);
@@ -248,7 +615,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitVarInsn(ILOAD, 9);
                 node.visitVarInsn(ILOAD, 10);
                 node.visitVarInsn(ILOAD, 11);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitMethodInsn(INVOKEVIRTUAL, block, getRenderType, "()I", false);
                 node.visitIntInsn(BIPUSH, 9);
                 Label l23 = new Label();
@@ -282,7 +649,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitVarInsn(ILOAD, 14);
                 node.visitVarInsn(ILOAD, 15);
                 node.visitVarInsn(ILOAD, 16);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitMethodInsn(INVOKEVIRTUAL, block, getRenderType, "()I", false);
                 node.visitIntInsn(BIPUSH, 9);
                 Label l28 = new Label();
@@ -294,7 +661,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitInsn(ICONST_1);
                 node.visitInsn(ISUB);
                 node.visitVarInsn(ILOAD, 16);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitMethodInsn(INVOKEVIRTUAL, block, getRenderType, "()I", false);
                 node.visitIntInsn(BIPUSH, 9);
                 node.visitJumpInsn(IF_ICMPEQ, l28);
@@ -333,7 +700,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 Label l32 = new Label();
                 node.visitJumpInsn(IF_ICMPEQ, l32);
                 node.visitVarInsn(ALOAD, 12);
-                node.visitFieldInsn(GETSTATIC, initBlocks, new ASMString.ASMObfString("fence_gate","be").getText(), blockType);
+                node.visitFieldInsn(GETSTATIC, initBlocks, new ASMString.ASMObfString("fence_gate", "be").getText(), blockType);
                 node.visitJumpInsn(IF_ACMPEQ, l32);
                 node.visitVarInsn(ILOAD, 13);
                 node.visitIntInsn(BIPUSH, 32);
@@ -366,7 +733,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitLabel(l36);
                 node.visitLineNumber(351, l36);
                 node.visitVarInsn(ALOAD, 14);
-                node.visitFieldInsn(GETSTATIC, material.getText(), new ASMString.ASMObfString("lava","i").getText(), material.getObfASMTypeName());
+                node.visitFieldInsn(GETSTATIC, material.getText(), new ASMString.ASMObfString("lava", "i").getText(), material.getObfASMTypeName());
                 Label l37 = new Label();
                 node.visitJumpInsn(IF_ACMPEQ, l37);
                 Label l38 = new Label();
@@ -378,7 +745,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitLineNumber(356, l37);
                 node.visitFrame(Opcodes.F_APPEND, 1, new Object[]{material.getText()}, 0, null);
                 node.visitVarInsn(ALOAD, 0);
-                node.visitMethodInsn(INVOKEVIRTUAL, entity.getText(), new ASMString.ASMObfString("handleLavaMovement","P").getText(), "()Z", false);
+                node.visitMethodInsn(INVOKEVIRTUAL, entity.getText(), new ASMString.ASMObfString("handleLavaMovement", "P").getText(), "()Z", false);
                 node.visitJumpInsn(IFNE, l30);
                 Label l39 = new Label();
                 node.visitLabel(l39);
@@ -399,7 +766,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitInsn(ICONST_1);
                 node.visitInsn(ISUB);
                 node.visitVarInsn(ILOAD, 11);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitFieldInsn(GETSTATIC, "abo/ABO", "brickNoCrossing", blockType);
                 Label l41 = new Label();
                 node.visitJumpInsn(IF_ACMPEQ, l41);
@@ -410,7 +777,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitInsn(ICONST_2);
                 node.visitInsn(ISUB);
                 node.visitVarInsn(ILOAD, 11);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitFieldInsn(GETSTATIC, "abo/ABO", "brickNoCrossing", blockType);
                 node.visitJumpInsn(IF_ACMPEQ, l41);
                 node.visitVarInsn(ALOAD, 0);
@@ -420,7 +787,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitInsn(ICONST_3);
                 node.visitInsn(ISUB);
                 node.visitVarInsn(ILOAD, 11);
-                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)"+blockType, false);
+                node.visitMethodInsn(INVOKEVIRTUAL, world.getText(), getBlock, "(III)" + blockType, false);
                 node.visitFieldInsn(GETSTATIC, "abo/ABO", "brickNoCrossing", blockType);
                 node.visitJumpInsn(IF_ACMPNE, l40);
                 node.visitLabel(l41);
@@ -472,7 +839,7 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
                 node.visitLocalVariable("p_82565_1_", "I", null, l0, l44, 1);
                 node.visitLocalVariable("p_82565_2_", "I", null, l0, l44, 2);
                 node.visitLocalVariable("p_82565_3_", "I", null, l0, l44, 3);
-                node.visitLocalVariable("p_82565_4_", "L"+pathPoint+";", null, l0, l44, 4);
+                node.visitLocalVariable("p_82565_4_", "L" + pathPoint + ";", null, l0, l44, 4);
                 node.visitLocalVariable("p_82565_5_", "Z", null, l0, l44, 5);
                 node.visitLocalVariable("p_82565_6_", "Z", null, l0, l44, 6);
                 node.visitLocalVariable("p_82565_7_", "Z", null, l0, l44, 7);
@@ -532,10 +899,11 @@ public class da3dsoulClassTransformer implements IClassTransformer, Opcodes {
     }
 
     private enum ClassTransformers {
-        FRUSTRUM(new Transformer.ClassTransformer(da3dsoulClassTransformer.Frustrum, new Transformer[] { da3dsoulClassTransformer.isBoxInFrustrumFullyTransformer, da3dsoulClassTransformer.isBoundingBoxInFrustrumFullyTransformer })),
-        PATHFINDING(new Transformer.ClassTransformer(da3dsoulClassTransformer.PathFinding, new Transformer[] { da3dsoulClassTransformer.pathfinderTransformerDelete, da3dsoulClassTransformer.pathfinderTransformerAdd }));
-        
-        
+        FRUSTRUM(new Transformer.ClassTransformer(da3dsoulClassTransformer.Frustrum, new Transformer[]{da3dsoulClassTransformer.isBoxInFrustrumFullyTransformer, da3dsoulClassTransformer.isBoundingBoxInFrustrumFullyTransformer})),
+        PATHFINDING(new Transformer.ClassTransformer(da3dsoulClassTransformer.PathFinding, new Transformer[]{da3dsoulClassTransformer.pathfinderTransformerDelete, da3dsoulClassTransformer.pathfinderTransformerAdd})),
+        MORPHPLAYERHAND(da3dsoulClassTransformer.MorphPlayerHandTransformer);
+
+
         private Transformer.ClassTransformer transformer;
 
         private ClassTransformers(final Transformer.ClassTransformer transformer) {

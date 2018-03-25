@@ -22,15 +22,19 @@ public class WorldTypeScary extends WorldType {
     public boolean genSurfaceFeatures;
 	
 	public WorldTypeScary() {
-		super("scaryGen");
-		index = 1;
-		heightLevel = 128;
-		oceanLevel = 63;
-		oceanReplacement = Blocks.water;
-		cloudLevel = 128;
-		geostrataGen = false;
-        genSurfaceFeatures = true;
+		this("scaryGen");
 	}
+
+    public WorldTypeScary(String name) {
+        super(name);
+        index = 1;
+        heightLevel = 128;
+        oceanLevel = 63;
+        oceanReplacement = Blocks.water;
+        cloudLevel = 128;
+        geostrataGen = false;
+        genSurfaceFeatures = true;
+    }
 
 	@Override
 	public IChunkProvider getChunkGenerator(World world, String generatorOptions) {

@@ -1,5 +1,10 @@
 # Master language file
 
+additional-buildcraft-objects.boardRobot.stoner=Stoner
+additional-buildcraft-objects.boardRobot.stoner.desc=Mines Stone
+additional-buildcraft-objects.boardRobot.woody=Woody
+additional-buildcraft-objects.boardRobot.woody.desc=Cuts Planks
+
 item.PipeFluidsValve.name=Valve Pipe
 item.PipeFluidsGoldenIron.name=Golden Iron Fluid Pipe
 item.PipeFluidsReinforcedGoldenIron.name=Reinforced Golden Iron Fluid Pipe
@@ -46,9 +51,12 @@ item.MobBottleNoEntityName2.name=The entity's unlocalized name is:
 item.MobBottlePressShift.name=Press shift for more details.
 item.GoldenStaff.name=Yellow Dye on a Stick
 
+item.thermalImplication.name=Thermal Implication
+
 tile.blockLiquidXP.name=Liquid Experience
 
 generator.scaryGen=ScaryGen
+generator.scaryGenBOP=ScaryGen (BOP)
 # Because it pissed me off...
 generator.CandyCraft=Candy Craft
 
