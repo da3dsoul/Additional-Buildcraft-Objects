@@ -62,6 +62,7 @@ import da3dsoul.scaryGen.generate.ChunkProviderScary;
 import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
 import da3dsoul.scaryGen.generate.WorldTypeScaryBOP;
+import da3dsoul.scaryGen.items.ItemAutoCompressor;
 import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
 import da3dsoul.scaryGen.items.ItemThermalImplication;
@@ -110,7 +111,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:BuildCraft|Robotics;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion;after:BiomesOPlenty")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:BuildCraft|Robotics;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion;after:BiomesOPlenty;after:ExtraUtilities")
 public class ABO{
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
@@ -166,6 +167,10 @@ public class ABO{
     // Thermal Foundation
     public static Item thermalImplication;
     // Thermal Foundation
+
+    // Extra Utilities
+    public static Item autoCompressor;
+    // Extra Utilities
 
     public static int actionSwitchOnPipeID = 128;
     public static IActionInternal actionSwitchOnPipe = null;
@@ -314,6 +319,13 @@ public class ABO{
                 ImplicationEventHandler.initialize();
             } else {
                 thermalImplication = null;
+            }
+
+            if (Loader.isModLoaded("ExtraUtilities")) {
+                autoCompressor = new ItemAutoCompressor().init();
+                CompressionEventHandler.initialize();
+            } else {
+                autoCompressor = null;
             }
 
             sandStone = (new BlockSandStone()).setStepSound(Block.soundTypePiston).setHardness(0.8F).setBlockName("sandStone").setBlockTextureName("sandstone");

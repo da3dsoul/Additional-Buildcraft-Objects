@@ -52,6 +52,7 @@ item.MobBottlePressShift.name=Press shift for more details.
 item.GoldenStaff.name=Yellow Dye on a Stick
 
 item.thermalImplication.name=Thermal Implication
+item.autocompressor.name=Auto Compressor
 
 tile.blockLiquidXP.name=Liquid Experience
 

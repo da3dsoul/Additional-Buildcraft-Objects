@@ -19,6 +19,8 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 import java.util.HashMap;
 
+import static abo.InventoryListeningHelper.HandleAddItemToInventory;
+
 public class ImplicationEventHandler {
     public static ImplicationEventHandler instance = new ImplicationEventHandler();
 
@@ -52,28 +54,7 @@ public class ImplicationEventHandler {
                 ItemStack var4 = getPreferredStack(var2);
                 if (var4 == null) return;
                 var1.setResult(Result.DENY);
-                if (!var1.entityPlayer.inventory.addItemStackToInventory(var4)) {
-                    var2.stackSize = var4.stackSize;
-                    var1.item.setEntityItemStack(var2);
-                } else {
-                    var2.stackSize = 0;
-                    if (var2.getItem() == Item.getItemFromBlock(Blocks.log)) {
-                        var1.entityPlayer.triggerAchievement(AchievementList.mineWood);
-                    } else if (var2.getItem() == Item.getItemFromBlock(Blocks.log2)) {
-                        var1.entityPlayer.triggerAchievement(AchievementList.mineWood);
-                    } else if (var2.getItem() == Items.leather) {
-                        var1.entityPlayer.triggerAchievement(AchievementList.killCow);
-                    } else if (var2.getItem() == Items.diamond) {
-                        var1.entityPlayer.triggerAchievement(AchievementList.diamonds);
-                    } else if (var2.getItem() == Items.blaze_rod) {
-                        var1.entityPlayer.triggerAchievement(AchievementList.blazeRod);
-                    }
-
-                    FMLCommonHandler.instance().firePlayerItemPickupEvent(var1.entityPlayer, var1.item);
-                    if (var2.stackSize <= 0) {
-                        var1.item.setDead();
-                    }
-                }
+                HandleAddItemToInventory(var1, var2, var4);
             }
         }
     }
