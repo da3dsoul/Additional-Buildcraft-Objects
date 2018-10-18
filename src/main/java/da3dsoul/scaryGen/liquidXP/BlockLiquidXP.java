@@ -34,25 +34,20 @@ public class BlockLiquidXP extends BlockFluidClassic {
         try {
             LiquidXPMod.fluid.setLuminosity(15);
             ABO.blockLiquidXP = new BlockLiquidXP(LiquidXPMod.fluid);
-            ABO.bucket = new BucketItem();
             LiquidXPMod.mbPerXp = 1;
 
         }catch(Throwable e){
             e.printStackTrace();
             ABO.blockLiquidXP = null;
-            ABO.bucket = null;
         }
     }
 
     public static void init() {
         try {
-            GameRegistry.addSubstitutionAlias("LiquidXP:liquidxp.bucket", GameRegistry.Type.ITEM, ABO.bucket);
             FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(LiquidXPMod.bucket), new ItemStack(Items.bucket));
-            FluidContainerRegistry.registerFluidContainer(new FluidStack(LiquidXPMod.fluid, 1000), new ItemStack(ABO.bucket), new ItemStack(Items.bucket));
         }catch(Throwable e){
             e.printStackTrace();
             ABO.blockLiquidXP = null;
-            ABO.bucket = null;
         }
     }
 

@@ -154,7 +154,7 @@ public class ABO{
 
     // LiquidXP
     public static BlockLiquidXP blockLiquidXP;
-    public static Item bucket;
+    //public static Item bucket;
     public static boolean spawnLakes = true;
     public static boolean respawnLakes = false;
     public static boolean spawnOrbs = true;
@@ -657,7 +657,11 @@ public class ABO{
                 if (ABO.blockLiquidXP != null) {
                     if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
                         bucketEventCanceled = true;
+                    } else if(BlockLiquidXP.tryToPlaceFromBucket(event.entityPlayer, event.x, event.y, event.z, event.face))
+                    {
+                        bucketEventCanceled = true;
                     }
+
                 }
                 if (event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() == Items.dye && event.entityPlayer.inventory.getCurrentItem().getItemDamage() == 15) {
                     Block var5 = event.world.getBlock(event.x, event.y, event.z);
