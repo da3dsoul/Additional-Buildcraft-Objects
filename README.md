@@ -4,9 +4,9 @@
 
    Minecraft Forum: http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2310397-additional-buildcraft-objects-a-plugin-for
 
-   Download Links:   https://github.com/da3dsoul/Additional-Buildcraft-Objects/releases
+   Download Links: https://github.com/da3dsoul/Additional-Buildcraft-Objects/releases
 
-   Please report any bugs to GitHUB: https://github.com/da3dsoul/Additional-Buildcraft-Objects
+   Please report any bugs to GitHub: https://github.com/da3dsoul/Additional-Buildcraft-Objects
 
 For recipes: I made some pictures, but it's best to use NEI.
 
@@ -14,18 +14,21 @@ For recipes: I made some pictures, but it's best to use NEI.
 
 This is originally by Flow86, but I have at this point rewritten the entire mod.
 
-My license is: unless you are Flow86, don't say it is yours. Other than that, I don't care. If I see it, I'd like to at least see a shoutout in at least 4pt font. If you download it, make sure you trust the source.
-If you post an error, the first response if given at all will be to first re-download from me.
+My license is: unless you are Flow86 or you have made major contributions, don't say it is yours. Other than that, I don't care. If I see it, I'd like to at least see a shoutout in at least 4pt font. If you download it, make sure you trust the source.
+If you post an error and you didn't get it here, the first response if given at all will be to first re-download from me. Assuming this condition is met, I usually respond and fix bugs in a timely manner.
+
+## JProfiler 
+JProfiler's creator, ej-technologies, has been kind and provided me with an open-source license to help make everything I do for these little projects better. Shout out to them! Their stuff is expensive, but repeatedly saving 4 hours of a programmer's time pays for it in no time.
+Here's an obligatory but much deserved link: [JProfiler Overview](https://www.ej-technologies.com/products/jprofiler/overview.html)
 
 
 ## Items
 
 #### Windmills
 
-* Recipe: 
+* Recipe:
 
-      ![StoneTransportPipe Gravel](recipes/windmill.png)
-      
+![StoneTransportPipe Gravel](recipes/windmill.png)
       
 * Placement rules:
 Must be placed on 2 fence posts (or nether fence).
@@ -39,8 +42,6 @@ Windmills gain two types of boosts: Biome and Height.
 **Plains Rules:**
 If a windmill is placed in a biome with low height variation (flat), it
 will follow the Plains rule set.
-
-**Bonuses:
 
 * Biome:
 Windmills gain a bonus for simply being placed in the plains section,
@@ -68,8 +69,8 @@ with rain.
 
 ### Ender Storage
 Simply an Ender Chest for Buildcraft. Adding an insertion pipe to an
-ender chest allows putting items in. Right-clicking on the insertion
-pipe when connected opens the bc Ender Chest for easy of use and
+ender chest allows putting items in it. Right-clicking on the insertion
+pipe when connected opens the BC Ender Chest for ease of use and
 debugging purposes, for that "where'd all my items go?" moment.
 
 * Insertion:
@@ -80,9 +81,8 @@ to them now.
 
 * Ender Extraction Pipe
    * Recipe:
-
-      ![StoneTransportPipe Gravel](recipes/EnderExtraction.png)
-      *The Pipe is an Extraction Pipe
+   ![StoneTransportPipe Gravel](recipes/EnderExtraction.png)
+      \*The Pipe is an Extraction Pipe
 * Usage:
 Stole/borrowed the gui from the emerald pipe in buildcraft, along with
 all the logic and everything but the item extraction, which only pulls
@@ -99,7 +99,7 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
    the stack has a remainder, the moving item will be reversed.
 
 #### Round Robin Transport Pipe
-   will change output per item(stack)
+   Each itemstack moving through the pipe will output to each connected pipe in order. Use with a division pipe to ensure equal distribution.
 
    * Recipe:
 
@@ -107,9 +107,7 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 
 
 #### Insertion Transport Pipe
-   Insertion Pipes given the choice between putting a item in the pipe in to an
-   inventory (A chest or a furnace) and passing it along to another pipe, the
-   Insertion Pipe will always try to add the item to the inventory.
+   Insertion Pipes will always try to add an item to an attached inventory. The items will continue through the pipes if they fail to be inserted.
 
    This pipe is very useful for feedback loops as it forces the item to go in
    to the last machine if it can.
@@ -152,8 +150,8 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 
 #### Compactor Transport Pipe
    Combines items(tacks) to larger itemstacks (currently to itemstacks >= 16 items)
-   <br>
-   can be toggled/switched by ABO-Actions and Redstone
+
+   can be toggled/switched with gates and Redstone
 
    * Recipe:
 
@@ -164,7 +162,7 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 #### Valve Pipe
    acts like a (golden) wooden pipe (without need of wooden engine)
    <br>
-   can be toggled/switched by ABO-Actions and Redstone
+   can be toggled/switched by gates and Redstone
    
    **can empty a full tank with enough (=full) pressure for two golden pipes in seconds!**
    
@@ -179,7 +177,7 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 
 
 #### Golden Iron Fluid Pipe
-   acts like a iron pipe with speed of a golden pipe
+   acts like an iron pipe with speed of a golden pipe
 
    * Recipe:
 
@@ -198,8 +196,8 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 
 #### Kinesis Switch Pipe
    acts as lever for power pipes
-   <br>
-   can be toggled/switched by ABO-Actions and Redstone
+   
+   can be toggled/switched by gates and Redstone
 
    * Recipe:
 
@@ -225,7 +223,7 @@ Power it with an engine, it'll extract just like an emerald but connects to an e
 #### Switch On Pipe
    activates the pipe as long as the action is active
    (On/Off via Signal)
-   <br>
+   
    a pipe toggled "on" will be set to off if switch-on is deactivated 
    
 #### Toggle On Pipe
@@ -251,6 +249,8 @@ MC 1.7.2+
   - Made Insertion Pipe insert into ender chests for a global level ender chest
   - Added Division Pipe
   - Added Mob Bottles and Yellow Dye on a Stick...which don't exist (from a different mod [DA3DSOUL Server] stuck in 1.8.1 beta I have been trying to update forever).
+  - Added lots of other things that also don't exist, not because I'm too lazy to document.
+  - ASM fixes for random incompatibilities caused by certain mods not playing nice with each other. These are harmless and don't affect gameplay. I just don't like it when my game crashes.
   
 **Flow86:**
 
