@@ -1,27 +1,18 @@
 package da3dsoul.AutoCompressor;
 
 import abo.ABO;
-import cofh.core.util.oredict.OreDictionaryArbiter;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
-import java.util.ArrayList;
-
 public class CompressionEventHandler {
     public static CompressionEventHandler instance = new CompressionEventHandler();
-
-    private final boolean DEBUG = false;
-
 
     public CompressionEventHandler() {
     }
@@ -331,19 +322,6 @@ public class CompressionEventHandler {
         return -1;
     }
 
-    private boolean isCobble(ItemStack itemStack)
-    {
-        ArrayList<String> ores = OreDictionaryArbiter.getAllOreNames(itemStack);
-        return ores != null && ores.contains("cobblestone");
-    }
-
-    private boolean isBlock(ItemStack itemStack, Block block)
-    {
-        Item item = itemStack.getItem();
-        if (!(item instanceof ItemBlock)) return false;
-        return ((ItemBlock)item).field_150939_a == block;
-    }
-
     private ItemStack[] cloneInventory(ItemStack[] inventory)
     {
         if (inventory == null) return null;
@@ -361,6 +339,7 @@ public class CompressionEventHandler {
 
     private void log(String text)
     {
+        boolean DEBUG = false;
         if (!DEBUG) return;
         ABO.aboLog.error(text);
     }
