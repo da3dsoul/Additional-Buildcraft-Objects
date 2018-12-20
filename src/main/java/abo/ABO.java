@@ -32,7 +32,6 @@ import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
-import com.google.common.eventbus.EventBus;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -46,12 +45,9 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.relauncher.IFMLCallHook;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import da3dsoul.ShapeGen.ShapeGen;
-import da3dsoul.reference.Metadata;
 import da3dsoul.scaryGen.SaveHandler.EnderInventorySaveHandler;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.blocks.BlockNoCrossing;
@@ -146,7 +142,7 @@ public class ABO{
     public static Item bottle = null;
     public static Item goldenstaff = null;
     public static HashMap<Integer, ShapeGen> shapeGens = new HashMap<Integer, ShapeGen>();
-    public static boolean useMoBottle;
+    public static boolean useMobBottle;
     public static boolean useYellowDye;
 
     public static boolean geostrataInstalled = false;
@@ -223,7 +219,7 @@ public class ABO{
 
             aboConfiguration.load();
 
-            useMoBottle = aboConfiguration.get("Misc", "AllowMobBottles", true).getBoolean(true);
+            useMobBottle = aboConfiguration.get("Misc", "AllowMobBottles", true).getBoolean(true);
             useYellowDye = aboConfiguration.get("Misc", "AllowYellowDye", true).getBoolean(true);
 
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
@@ -361,7 +357,7 @@ public class ABO{
 
             bottle = new ItemBottle();
             GameRegistry.registerItem(bottle, "MobBottle");
-            if(useMoBottle ) {
+            if(useMobBottle) {
                 addFullRecipe(new ItemStack(bottle, 3, 0),
                         new Object[]{" B ", "A A", " A ", 'A', Blocks.glass, 'B', Blocks.planks});
 

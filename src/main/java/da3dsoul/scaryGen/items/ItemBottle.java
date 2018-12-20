@@ -31,7 +31,7 @@ public class ItemBottle extends ItemGlassBottle {
 	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
-        if(!ABO.useMoBottle) return itemstack;
+        if(!ABO.useMobBottle) return itemstack;
 
 		MovingObjectPosition movingobjectposition = getMovingObjectPositionFromPlayer(world, entityplayer, false);
 
@@ -47,13 +47,13 @@ public class ItemBottle extends ItemGlassBottle {
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer par2EntityPlayer, World world, int i, int j, int k,
 			int l, float par8, float par9, float par10) {
-        if(!ABO.useMoBottle) return false;
+        if(!ABO.useMobBottle) return false;
 		return tryPlace(itemstack, world, i, j, k, l);
 	}
 
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if(!ABO.useMoBottle) return false;
+        if(!ABO.useMobBottle) return false;
         try {
             ItemStack item;
             if (stack.stackSize > 1) {
