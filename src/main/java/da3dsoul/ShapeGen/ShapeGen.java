@@ -54,8 +54,8 @@ public class ShapeGen {
 
     public ShapeGen(World world) {
         server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        blocks = Collections.synchronizedMap(new LinkedHashMap());
-        blocksToAdd = new LinkedHashMap();
+        blocks = Collections.synchronizedMap(new LinkedHashMap<String, BlockIdentity>());
+        blocksToAdd = new LinkedHashMap<String, BlockIdentity>();
         this.world = world;
         shapeGenID = world.provider.dimensionId;
         readFromNBT();
@@ -137,12 +137,8 @@ public class ShapeGen {
     }
 
     public void addBlock(int a[], Block blockID) {
-        if (a.length < 3) {
-            return;
-        } else {
-            addBlock(a[0], a[1], a[2], blockID);
-            return;
-        }
+        if (a.length < 3) return;
+        addBlock(a[0], a[1], a[2], blockID);
     }
 
     public void addBlockWithRandomMeta(int i, int j, int k, Block id, int startMeta, int endMeta) {
@@ -209,7 +205,7 @@ public class ShapeGen {
         addBlock(i, j, k, id, l);
     }
 
-    public synchronized void addBlocks(Map list) {
+    public synchronized void addBlocks(Map<String, BlockIdentity> list) {
         if (updatingAnywhere) {
             blocksToAdd.putAll(list);
             return;
@@ -220,11 +216,11 @@ public class ShapeGen {
         }
     }
 
-    public void addBlocksAtStart(Map list) {
+    public void addBlocksAtStart(Map<String, BlockIdentity> list) {
         addBlocks(list);
     }
 
-    public void removeBlocksUpdate(Map list) {
+    public void removeBlocksUpdate(Map<String, BlockIdentity> list) {
         synchronized (blocks) {
             blocks.remove(list);
         }
@@ -2155,8 +2151,8 @@ public class ShapeGen {
 
     private static MinecraftServer server;
     private boolean updatingAnywhere = false;
-    private Map<String, BlockIdentity> blocks;
-    private Map<String, BlockIdentity> blocksToAdd;
+    private final Map<String, BlockIdentity> blocks;
+    private final Map<String, BlockIdentity> blocksToAdd;
     private final byte otherCoordPairs[] =
             {
                     2, 0, 0, 1, 2, 1

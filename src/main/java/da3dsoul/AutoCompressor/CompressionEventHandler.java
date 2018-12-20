@@ -1,15 +1,13 @@
-package abo;
+package da3dsoul.AutoCompressor;
 
+import abo.ABO;
 import cofh.core.util.oredict.OreDictionaryArbiter;
-import com.rwtema.extrautils.ExtraUtils;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -18,10 +16,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.logging.LogManager;
-
-import static abo.InventoryListeningHelper.HandleAddItemToInventory;
 
 public class CompressionEventHandler {
     public static CompressionEventHandler instance = new CompressionEventHandler();
@@ -35,69 +29,6 @@ public class CompressionEventHandler {
     public static void initialize() {
         MinecraftForge.EVENT_BUS.register(instance);
     }
-    private enum SearchType{
-        COBBLESTONE,
-        COMP_COBBLE,
-        DOUBLE_COBBLE,
-        TRIPLE_COBBLE,
-        DIRT,
-        COMP_DIRT,
-        SAND,
-        COMP_SAND,
-        GRAVEL,
-        COMP_GRAVEL,
-        REDSTONE,
-        LAPIS
-    }
-
-    private static HashMap<SearchType, ItemStack> typeMap = new HashMap<SearchType, ItemStack>();
-    private static HashMap<SearchType, SearchType> nextTypeMap = new HashMap<SearchType, SearchType>();
-    private static ItemStack CompressedCobble = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 0);
-    private static ItemStack DoubleCompressedCobble = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 1);
-    private static ItemStack TripleCompressedCobble = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 2);
-    private static ItemStack QuadrupleCompressedCobble = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 3);
-
-    private static ItemStack CompressedDirt = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 8);
-    private static ItemStack DoubleCompressedDirt = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 9);
-
-    private static ItemStack CompressedSand = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 14);
-    private static ItemStack DoubleCompressedSand = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 15);
-
-    private static ItemStack CompressedGravel = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 12);
-    private static ItemStack DoubleCompressedGravel = new ItemStack(ExtraUtils.cobblestoneCompr, 1, 13);
-
-    private static ItemStack RedstoneDust = new ItemStack(Items.redstone, 1, 0);
-    private static ItemStack RedstoneBlock = new ItemStack(Blocks.redstone_block, 1, 0);
-    private static ItemStack LapisLazuli = new ItemStack(Items.dye, 1, 4);
-    private static ItemStack LapisBlock = new ItemStack(Blocks.lapis_block, 1, 0);
-
-    static {
-        // 0 cobble, 8 dirt, 12 gravel, 14 sand
-        typeMap.put(SearchType.COBBLESTONE, CompressedCobble);
-        typeMap.put(SearchType.COMP_COBBLE, DoubleCompressedCobble);
-        typeMap.put(SearchType.DOUBLE_COBBLE, TripleCompressedCobble);
-        typeMap.put(SearchType.TRIPLE_COBBLE, QuadrupleCompressedCobble);
-        typeMap.put(SearchType.DIRT, CompressedDirt);
-        typeMap.put(SearchType.COMP_DIRT, DoubleCompressedDirt);
-        typeMap.put(SearchType.SAND, CompressedSand);
-        typeMap.put(SearchType.COMP_SAND, DoubleCompressedSand);
-        typeMap.put(SearchType.GRAVEL, CompressedGravel);
-        typeMap.put(SearchType.COMP_GRAVEL, DoubleCompressedGravel);
-        typeMap.put(SearchType.REDSTONE, RedstoneBlock);
-        typeMap.put(SearchType.LAPIS, LapisBlock);
-
-        addNextType(SearchType.COBBLESTONE, SearchType.COMP_COBBLE);
-        addNextType(SearchType.COMP_COBBLE, SearchType.DOUBLE_COBBLE);
-        addNextType(SearchType.DOUBLE_COBBLE, SearchType.TRIPLE_COBBLE);
-        addNextType(SearchType.DIRT, SearchType.COMP_DIRT);
-        addNextType(SearchType.SAND, SearchType.COMP_SAND);
-        addNextType(SearchType.GRAVEL, SearchType.COMP_GRAVEL);
-    }
-
-    private static void addNextType(SearchType type, SearchType nextType)
-    {
-        nextTypeMap.put(type, nextType);
-    }
 
     @SubscribeEvent(
             priority = EventPriority.HIGHEST
@@ -110,7 +41,7 @@ public class CompressionEventHandler {
             if (var1.entityPlayer.worldObj.getTotalWorldTime() - var3.getLong("da3dsoul.compressionUpdate") <= 20L) {
                 boolean changed = false;
                 ItemStack[] inventory = var1.entityPlayer.inventory.mainInventory;
-                for (SearchType type : SearchType.values()) {
+                for (ICompressionStack type : CompressionStacks.BaseStacks) {
                     ItemStack[] temp = processAddItem(type, var2, inventory);
                     if (temp != null) {
                         log("type: '" + type.toString() + "' stack: '" + var2.getDisplayName() + "' - Using new inventory");
@@ -126,7 +57,7 @@ public class CompressionEventHandler {
         }
     }
 
-    private ItemStack[] processAddItem(SearchType type, ItemStack stack, ItemStack[] previousInventory)
+    private ItemStack[] processAddItem(ICompressionStack type, ItemStack stack, ItemStack[] previousInventory)
     {
         ItemStack[] inventory;
         if (previousInventory != null)
@@ -136,7 +67,7 @@ public class CompressionEventHandler {
             return null;
         }
 
-        if (isItemOfType(stack, type))
+        if (type.isItemStackOfType(stack))
         {
             log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Type matched");
             if (hasRoomForItemStack(inventory, stack)) {
@@ -199,17 +130,17 @@ public class CompressionEventHandler {
         return null;
     }
 
-    private boolean recurse(SearchType thisType, ItemStack[] inventory, ItemStack stack)
-    {
-        for (SearchType type : SearchType.values()) {
-            if (type.ordinal() <= thisType.ordinal()) continue;
-            if(!recursivelyCompact(type, inventory, stack)) return false;
-        }
-        return true;
-    }
+    /*
+    - Calculate how much we have total
+    - Calculate how many free slots we have after removing them
+    - Calculate how many we can fit of the highest tiers
+    - Determine if we can fit the higher stacks into the lower tiers
 
-    private boolean recursivelyCompact(SearchType type, ItemStack[] inventory, ItemStack stack)
+     */
+
+    private boolean recursivelyCompact(ICompressionStack type, ItemStack[] inventory, ItemStack stack)
     {
+        if (type == null || type.getNextTier() == null) return true;
         int total = getTotalNumberOfItemInInventory(type, inventory);
         // only compress it if it'll save space
         if (total >= stack.getMaxStackSize()) {
@@ -228,7 +159,8 @@ public class CompressionEventHandler {
             oldStack.stackSize = left;
             addItemToInventory(inventory, oldStack);
 
-            ItemStack newStack = typeMap.get(type).copy();
+            ICompressionStack nextTier = type.getNextTier();
+            ItemStack newStack = nextTier.getIdentityItemStack();
             newStack.stackSize = extraPasses;
             int count = 0;
             while (newStack.stackSize >= newStack.getMaxStackSize()) {
@@ -248,7 +180,7 @@ public class CompressionEventHandler {
             }
             log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There is " + left + " blocks/items left");
             log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Adding " + count + " stacks of '" + newStack.getDisplayName() + "' and a " + newStack.stackSize + " stack");
-            if (!recurse(type, inventory, newStack)) return false;
+            return recursivelyCompact(type.getNextTier(), inventory, newStack);
         }
         return true;
     }
@@ -273,29 +205,29 @@ public class CompressionEventHandler {
 
     }
 
-    private int getTotalNumberOfItemInInventory(SearchType type, ItemStack[] inventory)
+    private int getTotalNumberOfItemInInventory(ICompressionStack type, ItemStack[] inventory)
     {
         int count = 0;
 
         for (ItemStack itemStack : inventory) {
             if (itemStack == null) continue;
-            if (!isItemOfType(itemStack, type)) continue;
+            if (!type.isItemStackOfType(itemStack)) continue;
 
             count += itemStack.stackSize;
         }
         return count;
     }
 
-    private int getSpaceForItemInInventory(SearchType type, ItemStack[] inventory)
+    private int getSpaceForItemInInventory(ICompressionStack type, ItemStack[] inventory)
     {
         int count = 0;
 
         for (ItemStack itemStack : inventory) {
             if (itemStack == null) {
-                count += itemStack.getMaxStackSize();
+                count += type.getIdentityItemStack().getMaxStackSize();
                 continue;
             }
-            if (!isItemOfType(itemStack, type)) continue;
+            if (!type.isItemStackOfType(itemStack)) continue;
 
             count += itemStack.getMaxStackSize() - itemStack.stackSize;
         }
@@ -318,13 +250,13 @@ public class CompressionEventHandler {
         return count;
     }
 
-    private void removeItem(ItemStack[] inventory, SearchType type, int number)
+    private void removeItem(ItemStack[] inventory, ICompressionStack type, int number)
     {
         int count = number;
         for (int i = 0; i < inventory.length; i++) {
             ItemStack itemStack = inventory[i];
             if (itemStack == null) continue;
-            if (!isItemOfType(itemStack, type)) continue;
+            if (!type.isItemStackOfType(itemStack)) continue;
             if (itemStack.stackSize > count) {
                 itemStack.stackSize -= count;
                 return;
@@ -397,26 +329,6 @@ public class CompressionEventHandler {
             if (inventory[i] == null || inventory[i].stackSize == 0) return i;
 
         return -1;
-    }
-
-    private boolean isItemOfType(ItemStack stack, SearchType type)
-    {
-        switch (type)
-        {
-            case COBBLESTONE: return isCobble(stack);
-            case COMP_COBBLE: return stack.isItemEqual(CompressedCobble);
-            case DOUBLE_COBBLE: return stack.isItemEqual(DoubleCompressedCobble);
-            case TRIPLE_COBBLE: return stack.isItemEqual(TripleCompressedCobble);
-            case DIRT: return isBlock(stack, Blocks.dirt);
-            case COMP_DIRT: return stack.isItemEqual(CompressedDirt);
-            case SAND: return isBlock(stack, Blocks.sand);
-            case COMP_SAND: return stack.isItemEqual(CompressedSand);
-            case GRAVEL: return isBlock(stack, Blocks.gravel);
-            case COMP_GRAVEL: return stack.isItemEqual(CompressedGravel);
-            case REDSTONE: return stack.isItemEqual(RedstoneDust);
-            case LAPIS: return stack.isItemEqual(LapisLazuli);
-        }
-        return false;
     }
 
     private boolean isCobble(ItemStack itemStack)

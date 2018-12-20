@@ -1,19 +1,14 @@
-package abo;
+package da3dsoul;
 
 import cofh.core.util.oredict.OreDictionaryArbiter;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.thermalfoundation.block.BlockOre;
 import cofh.thermalfoundation.util.LexiconManager;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.AchievementList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
