@@ -310,14 +310,14 @@ public class ABO{
             }
 
             if (Loader.isModLoaded("ThermalFoundation")) {
-                thermalImplication = new ItemThermalImplication().init();
+                thermalImplication = new ItemThermalImplication();
                 ImplicationEventHandler.initialize();
             } else {
                 thermalImplication = null;
             }
 
             if (Loader.isModLoaded("ExtraUtilities")) {
-                autoCompressor = new ItemAutoCompressor().init();
+                autoCompressor = new ItemAutoCompressor();
                 CompressionEventHandler.initialize();
             } else {
                 autoCompressor = null;

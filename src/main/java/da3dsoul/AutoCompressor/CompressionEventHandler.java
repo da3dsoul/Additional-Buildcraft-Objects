@@ -11,6 +11,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
+import java.util.ArrayList;
+
 public class CompressionEventHandler {
     public static CompressionEventHandler instance = new CompressionEventHandler();
 
@@ -35,8 +37,8 @@ public class CompressionEventHandler {
                 for (ICompressionStack type : CompressionStacks.BaseStacks) {
                     ItemStack[] temp = processAddItem(type, var2, inventory);
                     if (temp != null) {
-                        log("type: '" + type.toString() + "' stack: '" + var2.getDisplayName() + "' - Using new inventory");
-                        log("type: '" + type.toString() + "' stack: '" + var2.getDisplayName() + "' - incoming stack has a size of " + var2.stackSize);
+                        log("type: '" + type.getClass().getSimpleName() + "' stack: '" + var2.getDisplayName() + "' - Using new inventory");
+                        log("type: '" + type.getClass().getSimpleName() + "' stack: '" + var2.getDisplayName() + "' - incoming stack has a size of " + var2.stackSize);
                         changed = true;
                         inventory = temp;
                     }
@@ -58,63 +60,52 @@ public class CompressionEventHandler {
             return null;
         }
 
-        if (type.isItemStackOfType(stack))
+        if (type.isItemStackOfTypeSet(stack))
         {
-            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Type matched");
+            log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Type matched");
             if (hasRoomForItemStack(inventory, stack)) {
-                log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There is room. Adding");
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There is room. Adding");
                 // it has room for the whole stack, so add it and crush
-                addItemToInventory(inventory, stack);
-
-                // backup the inventory just in case there's no room
+                // always make backups
                 ItemStack[] backupInventory = cloneInventory(inventory);
 
-                if (!recursivelyCompact(type, inventory, stack)) {
-                    log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - No room to compress. Reverting");
-                    return backupInventory;
+                if (compact(type, inventory, stack)) {
+                    stack.stackSize = 0;
+                    return inventory;
                 }
-                return inventory;
+
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - No room to compress. Reverting");
+                addItemToInventory(backupInventory, stack);
+                return backupInventory;
             } else {
-                log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There is not enough space for whole stack");
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There is not enough space for whole stack");
                 // there's not room for the whole stack, so add what we can, crush it, and try again
                 int left = getSpaceForItemInInventory(type, inventory);
-                log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There are " + left + " spaces available");
-                log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There are " + stack.stackSize + " items to fill it");
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There are " + left + " spaces available");
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There are " + stack.stackSize + " items to fill it");
                 left = Math.min(left, stack.stackSize);
                 if (left <= 0) return null;
 
                 ItemStack supplement = stack.copy();
                 supplement.stackSize = left;
-                addItemToInventory(inventory, supplement);
                 stack.stackSize -= left;
 
                 // backup the inventory just in case there's no room
                 ItemStack[] backupInventory = cloneInventory(inventory);
 
-                log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Starting");
-                if (!recursivelyCompact(type, inventory, stack)) {
-                    log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - There is no space to compact. Reverting");
-                    log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Finished");
-                    return backupInventory;
-                } else {
-                    log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Finished");
-                    if (stack.stackSize > 0 && hasRoomForItemStack(inventory, stack)) {
-                        log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Compacted. There is now room for more");
-                        log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Adding " + stack.stackSize);
-                        addItemToInventory(inventory, stack);
-
-                        backupInventory = cloneInventory(inventory);
-
-                        if (!recursivelyCompact(type, inventory, stack)) {
-                            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 2 - There is no space to compact. Reverting");
-                            return backupInventory;
-                        }
-                        log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 2 - Finished Compacting. Continuing");
-                    } else {
-                        if (stack.stackSize > 0)
-                            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 2 - Finished Compacting. There are " + stack.stackSize + " blocks/items that couldn't fit");
-                    }
+                log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - Starting");
+                if (compact(type, inventory, stack)) {
+                    if (!hasRoomForItemStack(inventory, stack) && stack.stackSize > 0)
+                        log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 2 - Finished Compacting. There are " + stack.stackSize + " blocks/items that couldn't fit");
                     return inventory;
+                } else {
+                    log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Compact Recursion 1 - There is no space to compact. Reverting");
+                    ItemStack tempStack = supplement.copy();
+                    tempStack.stackSize = 0;
+                    inventory = cloneInventory(backupInventory);
+                    if (compact(type, inventory, supplement)) return inventory;
+                    addItemToInventory(backupInventory, supplement);
+                    return backupInventory;
                 }
             }
         }
@@ -122,89 +113,164 @@ public class CompressionEventHandler {
     }
 
     /*
-    - Calculate how much we have total
-    - Calculate how many free slots we have after removing them
+    - Calculate how much we have total of the base item
     - Calculate how many we can fit of the highest tiers
     - Determine if we can fit the higher stacks into the lower tiers
-
+    - Calculate how many free slots we have after removing them
+    - Make sure they fit
+    - Actually add them
      */
 
-    private boolean recursivelyCompact(ICompressionStack type, ItemStack[] inventory, ItemStack stack)
+    private boolean compact(ICompressionStack type, ItemStack[] inventory, ItemStack stack)
     {
         if (type == null || type.getNextTier() == null) return true;
-        int total = getTotalNumberOfItemInInventory(type, inventory);
+        int total = getTotalNumberOfTypeInInventory(type, inventory);
+
+        int newTotal = total + type.getTotalStackSizeOfType(stack);
         // only compress it if it'll save space
-        if (total >= stack.getMaxStackSize()) {
-            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There is " + total + " blocks/items");
-            int extraPasses = (int) Math.floor(total / 9D);
-            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Removing " + extraPasses * 9 + " blocks/items");
-            if (extraPasses > 0)
-                removeItem(inventory, type, extraPasses * 9);
+        if (newTotal >= stack.getMaxStackSize()) {
+            log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There is " + total + " blocks/items");
+            log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - There will be " + newTotal + " blocks/items");
 
-            int left = total % 9;
-            // remove what's left, we'll add it back later, this helps to keep it organized
-            removeItem(inventory, type, left);
+            ArrayList<ItemStack> distribution = new ArrayList<ItemStack>();
 
-            // there will always be room for this, so no need to check
-            ItemStack oldStack = stack.copy();
-            oldStack.stackSize = left;
-            addItemToInventory(inventory, oldStack);
+            // Build the distribution tree
 
-            ICompressionStack nextTier = type.getNextTier();
-            ItemStack newStack = nextTier.getIdentityItemStack();
-            newStack.stackSize = extraPasses;
-            int count = 0;
-            while (newStack.stackSize >= newStack.getMaxStackSize()) {
-                ItemStack otherStack = newStack.copy();
-                otherStack.stackSize = newStack.getMaxStackSize();
-                newStack.stackSize -= newStack.getMaxStackSize();
-                if (!hasRoomForItemStack(inventory, otherStack)) {
-                    return false;
+            // Determine how many of the highest tier we can make
+            ICompressionStack currentTier = type.getHighestTier();
+            log("The highest tier of " + type.getClass().getSimpleName() + " is " + currentTier.getClass().getSimpleName());
+            newTotal = addFullStacksToDistribution(currentTier, distribution, newTotal);
+            log("newTotal is " + newTotal + " after processing the highest tier");
+            // This should run at least once, since there are at least two tiers
+            while (currentTier != null) {
+                int numberToFormTier = currentTier.stackSizeOfBaseToForm();
+                if (newTotal < numberToFormTier) {
+                    log("Tier: " + currentTier.getClass().getSimpleName() + " can't be made, skipping");
+                    currentTier = currentTier.getPreviousTier();
+                    continue;
                 }
-                addItemToInventory(inventory, otherStack);
-                count++;
+                log("Can form " + (int)Math.floor((double)newTotal / numberToFormTier) + " " + currentTier.getClass().getSimpleName());
+                if (canTierMergeDown(currentTier, newTotal)) {
+                    log("Tier: " + currentTier.getClass().getSimpleName() + " can merge with a smaller tier");
+                    // We will use this to add back the leftovers from the full stacks
+                    // since they can't all fit into a smaller tier
+                    ICompressionStack previousTier = currentTier.getPreviousTier();
+                    newTotal = addPartialStacksToDistribution(previousTier, distribution, newTotal);
+                    log("newTotal is " + newTotal + " after adding the partial stacks of " + previousTier.getClass().getSimpleName());
+                    currentTier = currentTier.getPreviousTier();
+                    continue;
+                }
+                // We skip the full stack stuff here, since if we have enough to take multiple stacks
+                // of smaller tiers, we'll want to compress it
+
+                // we might have a new newTotal from the above, we'll try to add some of this tier
+                // but there's a chance we only have the smaller tiers left
+                newTotal = addPartialStacksToDistribution(currentTier, distribution, newTotal);
+                log("newTotal is " + newTotal + " after adding the partial stacks of " + currentTier.getClass().getSimpleName());
+
+                currentTier = currentTier.getPreviousTier();
             }
 
-            if (newStack.stackSize > 0) {
-                if (!hasRoomForItemStack(inventory, newStack)) return false;
-                addItemToInventory(inventory, newStack);
+            // We should have a full optimized distribution tree now
+            for (ItemStack logStack : distribution) {
+                if (logStack.stackSize == logStack.getMaxStackSize())
+                    log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Adding full stack");
+                else
+                    log("type: '" + type.getClass().getSimpleName() + "' stack: '" + stack.getDisplayName() + "' - Adding " + logStack.stackSize + " blocks/items");
             }
-            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - There is " + left + " blocks/items left");
-            log("type: '" + type.toString() + "' stack: '" + stack.getDisplayName() + "' - Adding " + count + " stacks of '" + newStack.getDisplayName() + "' and a " + newStack.stackSize + " stack");
-            return recursivelyCompact(type.getNextTier(), inventory, newStack);
+
+            // remove all items of the same type
+            removeAllItemsOfTypeSet(inventory, type);
+
+            // make sure it fits
+            int emptySlots = getNumberOfEmptySlotsInInventory(inventory);
+            if (emptySlots < distribution.size()) return false;
+
+            // actually add the stuff
+            for (ItemStack stackToAdd : distribution) {
+                addItemToInventory(inventory, stackToAdd);
+            }
+
+            // Done!
+        } else {
+            addItemToInventory(inventory, stack);
         }
         return true;
     }
 
-    private void updateInventory(ItemStack[] inventory, EntityItemPickupEvent var1, ItemStack stack)
-    {
-        for (int i = 0; i < inventory.length; i++) {
-            ItemStack temp = var1.entityPlayer.inventory.getStackInSlot(i);
-            if (!ItemStack.areItemStacksEqual(temp, inventory[i]))
-                var1.entityPlayer.inventory.setInventorySlotContents(i, inventory[i]);
+    private int addFullStacksToDistribution(ICompressionStack type, ArrayList<ItemStack> distribution, int newTotal) {
+        int numberToFormTier = type.stackSizeOfBaseToForm();
+        if (newTotal >= numberToFormTier) {
+            // The total number of highest tier items we can make
+            int numberOfItems = (int) Math.floor((double) newTotal / numberToFormTier);
+            // how many we will have left after adding these
+            newTotal -= numberOfItems * numberToFormTier;
+
+            // determine if we have more than one stack of it
+            int maxStack = type.getIdentityItemStack().getMaxStackSize();
+            if (numberOfItems >= maxStack) {
+                while (numberOfItems >= maxStack) {
+                    ItemStack stack1 = type.getIdentityItemStack();
+                    stack1.stackSize = maxStack;
+                    // we can only merge this into the smaller tiers if it's not a full stack, so add it now
+                    distribution.add(stack1);
+                    numberOfItems -= maxStack;
+                }
+            }
+            // add back the rest to see if they can fit into a smaller tier
+            newTotal += numberOfItems * numberToFormTier;
         }
-
-        var1.setResult(Result.DENY);
-        var1.item.setEntityItemStack(stack);
-
-        FMLCommonHandler.instance().firePlayerItemPickupEvent(var1.entityPlayer, var1.item);
-
-        if (stack.stackSize <= 0)
-        {
-            var1.item.setDead();
-        }
-
+        log("Can't form highest tier. Skipping.");
+        return newTotal;
     }
 
-    private int getTotalNumberOfItemInInventory(ICompressionStack type, ItemStack[] inventory)
+    private boolean canTierMergeDown(ICompressionStack type, int newTotal) {
+        ICompressionStack prev = type.getPreviousTier();
+        if (prev == null) return false;
+        int numberToFormTier = prev.stackSizeOfBaseToForm();
+        // It will need to be greater to take multiple stacks
+        if (newTotal > numberToFormTier) {
+            // The total number of highest tier items we can make
+            int numberOfItems = (int) Math.floor((double) newTotal / numberToFormTier);
+
+            // determine if we can use only one stack
+            int maxStack = prev.getIdentityItemStack().getMaxStackSize();
+            return numberOfItems <= maxStack;
+        }
+        return false;
+    }
+
+    private int addPartialStacksToDistribution(ICompressionStack type, ArrayList<ItemStack> distribution, int newTotal) {
+        int numberToFormTier = type.stackSizeOfBaseToForm();
+
+        // The total number of highest tier items we can make
+        int numberOfItems = (int) Math.floor((double) newTotal / numberToFormTier);
+
+        // how many we will have left after adding these
+        newTotal -= numberOfItems * numberToFormTier;
+        log("Can form " + (int)Math.floor((double)newTotal / numberToFormTier) + " " + type.getClass().getSimpleName());
+        // We don't need to check the rest again, since we add the full stacks first
+        ItemStack stack1 = type.getIdentityItemStack();
+        stack1.stackSize = numberOfItems;
+        distribution.add(stack1);
+        return newTotal;
+    }
+
+    private int getTotalNumberOfTypeInInventory(ICompressionStack type, ItemStack[] inventory)
     {
         int count = 0;
 
-        for (ItemStack itemStack : inventory) {
-            if (itemStack == null) continue;
-            if (!type.isItemStackOfType(itemStack)) continue;
+        for (int i = 0; i < inventory.length; i++) {
+            ItemStack itemStack = inventory[i];
+            int size = type.getTotalStackSizeOfType(itemStack);
+            count += size;
 
-            count += itemStack.stackSize;
+            if (type == CompressionStacks.Cobblestone) {
+                ICompressionStack stackType = CompressionStacks.getTypeFromSet(CompressionStacks.Cobblestone, itemStack);
+                if (stackType == null) continue;
+                log("Slot " + i + " has " + size + " " + stackType);
+                log("The count is now " + count + " cobblestone");
+            }
         }
         return count;
     }
@@ -241,22 +307,24 @@ public class CompressionEventHandler {
         return count;
     }
 
-    private void removeItem(ItemStack[] inventory, ICompressionStack type, int number)
+    private int getNumberOfEmptySlotsInInventory(ItemStack[] inventory)
     {
-        int count = number;
+        int count = 0;
+        for (ItemStack itemStack : inventory) {
+            if (itemStack != null) continue;
+            count++;
+        }
+        return count;
+    }
+
+    private void removeAllItemsOfTypeSet(ItemStack[] inventory, ICompressionStack type)
+    {
         for (int i = 0; i < inventory.length; i++) {
             ItemStack itemStack = inventory[i];
             if (itemStack == null) continue;
-            if (!type.isItemStackOfType(itemStack)) continue;
-            if (itemStack.stackSize > count) {
-                itemStack.stackSize -= count;
-                return;
-            }
+            if (!type.isItemStackOfTypeSet(itemStack)) continue;
 
-            count -= itemStack.stackSize;
             inventory[i] = null;
-
-            if (count == 0) return;
         }
     }
 
@@ -266,7 +334,7 @@ public class CompressionEventHandler {
 
         return space >= stack.stackSize;
     }
-    
+
     // this is only called when there is space, so we don't need to check it
     private void addItemToInventory(ItemStack[] inventory, ItemStack stack)
     {
@@ -278,31 +346,31 @@ public class CompressionEventHandler {
         }
         while (stack.stackSize > 0 && stack.stackSize < i);
     }
-    
+
     private int storePartialItemStack(ItemStack[] inventory, ItemStack stack)
     {
         Item item = stack.getItem();
-        int i = stack.stackSize;
-        int j = storeItemStack(inventory, stack);
+        int stackSize = stack.stackSize;
+        int index = storeItemStack(inventory, stack);
 
-        if (j < 0) j = getFirstEmptyStack(inventory);
+        if (index < 0) index = getFirstEmptyStack(inventory);
 
-        if (j < 0) return i;
+        if (index < 0) return stackSize;
 
-        if (inventory[j] == null) inventory[j] = new ItemStack(item, 0, stack.getItemDamage());
+        if (inventory[index] == null) inventory[index] = new ItemStack(item, 0, stack.getItemDamage());
 
-        int k = i;
+        int tempStackSize = stackSize;
 
-        if (i > inventory[j].getMaxStackSize() - inventory[j].stackSize)
-            k = inventory[j].getMaxStackSize() - inventory[j].stackSize;
+        if (stackSize > inventory[index].getMaxStackSize() - inventory[index].stackSize)
+            tempStackSize = inventory[index].getMaxStackSize() - inventory[index].stackSize;
 
-        if (k > 64 - inventory[j].stackSize) k = 64 - inventory[j].stackSize;
+        if (tempStackSize > 64 - inventory[index].stackSize) tempStackSize = 64 - inventory[index].stackSize;
 
-        if (k == 0) return i;
+        if (tempStackSize == 0) return stackSize;
 
-        i -= k;
-        inventory[j].stackSize += k;
-        return i;
+        stackSize -= tempStackSize;
+        inventory[index].stackSize += tempStackSize;
+        return stackSize;
     }
 
     private int storeItemStack(ItemStack[] inventory, ItemStack stack)
@@ -322,6 +390,26 @@ public class CompressionEventHandler {
         return -1;
     }
 
+    private void updateInventory(ItemStack[] inventory, EntityItemPickupEvent var1, ItemStack stack)
+    {
+        for (int i = 0; i < inventory.length; i++) {
+            ItemStack temp = var1.entityPlayer.inventory.getStackInSlot(i);
+            if (!ItemStack.areItemStacksEqual(temp, inventory[i]))
+                var1.entityPlayer.inventory.setInventorySlotContents(i, inventory[i]);
+        }
+
+        var1.setResult(Result.DENY);
+        var1.item.setEntityItemStack(stack);
+
+        FMLCommonHandler.instance().firePlayerItemPickupEvent(var1.entityPlayer, var1.item);
+
+        if (stack.stackSize <= 0)
+        {
+            var1.item.setDead();
+        }
+
+    }
+
     private ItemStack[] cloneInventory(ItemStack[] inventory)
     {
         if (inventory == null) return null;
@@ -339,7 +427,7 @@ public class CompressionEventHandler {
 
     private void log(String text)
     {
-        boolean DEBUG = false;
+        boolean DEBUG = true;
         if (!DEBUG) return;
         ABO.aboLog.error(text);
     }

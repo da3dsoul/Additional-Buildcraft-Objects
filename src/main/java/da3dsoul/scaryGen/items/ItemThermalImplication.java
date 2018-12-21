@@ -6,6 +6,7 @@ import baubles.api.IBauble;
 import cofh.lib.util.helpers.StringHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.item.TFItems;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -22,6 +23,7 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 
+@Optional.Interface(iface = "IBauble", modid = "Baubles")
 public class ItemThermalImplication extends Item implements IBauble {
     public String modName = "thermalfoundation";
     public final String itemName;
@@ -31,6 +33,7 @@ public class ItemThermalImplication extends Item implements IBauble {
         this.setMaxStackSize(1);
         this.setCreativeTab(ThermalFoundation.tabCommon);
         setUnlocalizedName("thermalImplication");
+        init();
     }
 
     public ItemThermalImplication init()

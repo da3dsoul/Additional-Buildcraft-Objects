@@ -34,6 +34,27 @@ public class CompressionStacks {
     public static final ICompressionStack Lapis = new LapisStack();
     public static final ICompressionStack LapisBlock = new LapisBlockStack();
 
+    public static ICompressionStack getTypeFromSet(ICompressionStack type, ItemStack stack)
+    {
+        if (!type.isItemStackOfTypeSet(stack)) return null;
+
+        return getItemStackType(type, stack, false);
+    }
+
+    private static ICompressionStack getItemStackType(ICompressionStack type, ItemStack stack, boolean fromBottom) {
+        if (stack == null) return null;
+
+        if (type.isItemStackOfType(stack)) return type;
+
+        if (!fromBottom && type.getPreviousTier() != null)
+            return getItemStackType(type.getPreviousTier(), stack, false);
+
+        if (type.getNextTier() != null)
+            return getItemStackType(type.getNextTier(), stack, true);
+
+        return null;
+    }
+
     public static abstract class BaseCompressedStack implements ICompressionStack {
         public BaseCompressedStack() {
             BaseStacks.add(this);
@@ -51,18 +72,57 @@ public class CompressionStacks {
         }
 
         @Override
-        public abstract ICompressionStack getNextTier();
-
-        @Override
-        public int stackSizeToNextTier() {
-            return 9;
+        public int stackSizeOfBaseToForm() {
+            return 1;
         }
 
         @Override
-        public boolean isItemStackOfType(ItemStack stack)
-        {
+        public abstract ICompressionStack getNextTier();
+
+        @Override
+        public ICompressionStack getHighestTier() {
+            ICompressionStack tier = this;
+            while (tier.getNextTier() != null) tier = tier.getNextTier();
+            return tier;
+        }
+
+        @Override
+        public boolean isItemStackOfType(ItemStack stack) {
             if (stack == null) return false;
             return stack.isItemEqual(getIdentityItemStack());
+        }
+
+        @Override
+        public boolean isItemStackOfTypeSet(ItemStack stack) {
+            return isItemStackOfTypeSet(stack, true);
+        }
+
+        @Override
+        public boolean isItemStackOfTypeSet(ItemStack stack, boolean fromBottom) {
+            if (stack == null) return false;
+
+            if (isItemStackOfType(stack)) return true;
+
+            if (getNextTier() != null)
+                return getNextTier().isItemStackOfTypeSet(stack, true);
+
+            return false;
+        }
+
+        @Override
+        public int getTotalStackSizeOfType(ItemStack stack) {
+            return getTotalStackSizeOfType(stack, true);
+        }
+
+        @Override
+        public int getTotalStackSizeOfType(ItemStack stack, boolean fromBottom) {
+            if (stack == null) return 0;
+            if (isItemStackOfType(stack)) return stackSizeOfBaseToForm() * stack.stackSize;
+
+            if (getNextTier() != null)
+                return getNextTier().getTotalStackSizeOfType(stack, true);
+
+            return 0;
         }
     }
 
@@ -82,15 +142,54 @@ public class CompressionStacks {
         public abstract ICompressionStack getNextTier();
 
         @Override
-        public int stackSizeToNextTier() {
-            return 9;
+        public ICompressionStack getHighestTier() {
+            ICompressionStack tier = this;
+            while (tier.getNextTier() != null) tier = tier.getNextTier();
+            return tier;
         }
 
         @Override
-        public boolean isItemStackOfType(ItemStack stack)
-        {
+        public boolean isItemStackOfType(ItemStack stack) {
             if (stack == null) return false;
             return stack.isItemEqual(getIdentityItemStack());
+        }
+
+        @Override
+        public boolean isItemStackOfTypeSet(ItemStack stack) {
+            return isItemStackOfTypeSet(stack, false);
+        }
+
+        public boolean isItemStackOfTypeSet(ItemStack stack, boolean fromBottom) {
+            if (stack == null) return false;
+
+            if (isItemStackOfType(stack)) return true;
+            if (!fromBottom && getPreviousTier() != null)
+                return getPreviousTier().isItemStackOfTypeSet(stack);
+
+            if (getNextTier() != null)
+                return getNextTier().isItemStackOfTypeSet(stack, true);
+
+            return false;
+        }
+
+        @Override
+        public int getTotalStackSizeOfType(ItemStack stack) {
+            return getTotalStackSizeOfType(stack, false);
+        }
+
+        public int getTotalStackSizeOfType(ItemStack stack, boolean fromBottom) {
+            if (stack == null) return 0;
+
+            if (isItemStackOfType(stack))
+                return stack.stackSize * stackSizeOfBaseToForm();
+
+            if (!fromBottom && getPreviousTier() != null)
+                return getPreviousTier().getTotalStackSizeOfType(stack);
+
+            if (getNextTier() != null)
+                return getNextTier().getTotalStackSizeOfType(stack, true);
+
+            return 0;
         }
     }
 
@@ -116,8 +215,7 @@ public class CompressionStacks {
             return isCobble(stack);
         }
 
-        private boolean isCobble(ItemStack itemStack)
-        {
+        private boolean isCobble(ItemStack itemStack) {
             ArrayList<String> ores = OreDictionaryArbiter.getAllOreNames(itemStack);
             return ores != null && ores.contains("cobblestone");
         }
@@ -138,20 +236,36 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.DoubleCompressedCobblestone;
         }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
+        }
     }
 
     public static class DoubleCompressedCobblestoneStack extends Base9CompressedStack {
         @Override
-        public ItemStack getIdentityItemStack() { return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 1); }
+        public ItemStack getIdentityItemStack() {
+            return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 1);
+        }
 
         @Override
-        public ICompressionStack getPreviousTier() { return CompressionStacks.CompressedCobblestone; }
+        public ICompressionStack getPreviousTier() {
+            return CompressionStacks.CompressedCobblestone;
+        }
 
         @Override
-        public ICompressionStack getNextTier() { return CompressionStacks.TripleCompressedCobblestone; }
+        public ICompressionStack getNextTier() {
+            return CompressionStacks.TripleCompressedCobblestone;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 81;
+        }
     }
 
-    public static class TripleCompressedCobblestoneStack extends Base9CompressedStack{
+    public static class TripleCompressedCobblestoneStack extends Base9CompressedStack {
         @Override
         public ItemStack getIdentityItemStack() {
             return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 2);
@@ -163,10 +277,17 @@ public class CompressionStacks {
         }
 
         @Override
-        public ICompressionStack getNextTier() { return CompressionStacks.QuadrupleCompressedCobblestone; }
+        public ICompressionStack getNextTier() {
+            return CompressionStacks.QuadrupleCompressedCobblestone;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 729;
+        }
     }
 
-    public static class QuadrupleCompressedCobblestoneStack extends Base9CompressedStack{
+    public static class QuadrupleCompressedCobblestoneStack extends Base9CompressedStack {
         @Override
         public ItemStack getIdentityItemStack() {
             return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 3);
@@ -178,7 +299,14 @@ public class CompressionStacks {
         }
 
         @Override
-        public ICompressionStack getNextTier() { return null; }
+        public ICompressionStack getNextTier() {
+            return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 6561;
+        }
     }
 
     // DIRT
@@ -214,6 +342,11 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.DoubleCompressedDirt;
         }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
+        }
     }
 
     public static class DoubleCompressedDirtStack extends Base9CompressedStack {
@@ -223,10 +356,19 @@ public class CompressionStacks {
         }
 
         @Override
-        public ICompressionStack getPreviousTier() { return CompressionStacks.CompressedDirt; }
+        public ICompressionStack getPreviousTier() {
+            return CompressionStacks.CompressedDirt;
+        }
 
         @Override
-        public ICompressionStack getNextTier() { return null; }
+        public ICompressionStack getNextTier() {
+            return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 81;
+        }
     }
 
     // GRAVEL
@@ -262,17 +404,33 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.DoubleCompressedGravel;
         }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
+        }
     }
 
     public static class DoubleCompressedGravelStack extends Base9CompressedStack {
         @Override
-        public ItemStack getIdentityItemStack() { return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 13); }
+        public ItemStack getIdentityItemStack() {
+            return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 13);
+        }
 
         @Override
-        public ICompressionStack getPreviousTier() { return CompressionStacks.CompressedGravel; }
+        public ICompressionStack getPreviousTier() {
+            return CompressionStacks.CompressedGravel;
+        }
 
         @Override
-        public ICompressionStack getNextTier() { return null; }
+        public ICompressionStack getNextTier() {
+            return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 81;
+        }
     }
 
     // SAND
@@ -308,17 +466,33 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.DoubleCompressedSand;
         }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
+        }
     }
 
     public static class DoubleCompressedSandStack extends Base9CompressedStack {
         @Override
-        public ItemStack getIdentityItemStack() { return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 15); }
+        public ItemStack getIdentityItemStack() {
+            return new ItemStack(ExtraUtils.cobblestoneCompr, 1, 15);
+        }
 
         @Override
-        public ICompressionStack getPreviousTier() { return CompressionStacks.CompressedSand; }
+        public ICompressionStack getPreviousTier() {
+            return CompressionStacks.CompressedSand;
+        }
 
         @Override
-        public ICompressionStack getNextTier() { return null; }
+        public ICompressionStack getNextTier() {
+            return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 81;
+        }
     }
 
     // REDSTONE
@@ -337,11 +511,6 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.RedstoneBlock;
         }
-
-        @Override
-        public boolean isItemStackOfType(ItemStack stack) {
-            return false;
-        }
     }
 
     public static class RedstoneBlockStack extends Base9CompressedStack {
@@ -358,6 +527,11 @@ public class CompressionStacks {
         @Override
         public ICompressionStack getNextTier() {
             return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
         }
     }
 
@@ -377,11 +551,6 @@ public class CompressionStacks {
         public ICompressionStack getNextTier() {
             return CompressionStacks.LapisBlock;
         }
-
-        @Override
-        public boolean isItemStackOfType(ItemStack stack) {
-            return false;
-        }
     }
 
     public static class LapisBlockStack extends Base9CompressedStack {
@@ -398,6 +567,11 @@ public class CompressionStacks {
         @Override
         public ICompressionStack getNextTier() {
             return null;
+        }
+
+        @Override
+        public int stackSizeOfBaseToForm() {
+            return 9;
         }
     }
 }

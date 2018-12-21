@@ -6,6 +6,7 @@ import baubles.api.IBauble;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.item.TFItems;
 import com.rwtema.extrautils.ExtraUtils;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 
+@Optional.Interface(iface = "IBauble", modid = "Baubles")
 public class ItemAutoCompressor extends Item implements IBauble {
     public final String itemName;
 
@@ -29,6 +31,7 @@ public class ItemAutoCompressor extends Item implements IBauble {
         this.setMaxStackSize(1);
         this.setCreativeTab(ExtraUtils.creativeTabExtraUtils);
         setUnlocalizedName("autocompressor");
+        init();
     }
 
     public ItemAutoCompressor init()
