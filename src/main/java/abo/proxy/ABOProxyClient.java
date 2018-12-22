@@ -14,9 +14,6 @@ import buildcraft.core.render.RenderingEntityBlocks;
 import buildcraft.core.render.RenderingEntityBlocks.EntityRenderIndex;
 import buildcraft.transport.TransportProxyClient;
 import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import da3dsoul.scaryGen.entity.EntityItemBat;
-import da3dsoul.scaryGen.render.RenderBat;
 
 public class ABOProxyClient extends ABOProxy {
 	@Override
@@ -55,6 +52,5 @@ public class ABOProxyClient extends ABOProxy {
 	
 	public void registerEntities()
 	{
-		RenderingRegistry.registerEntityRenderingHandler(EntityItemBat.class, new RenderBat());
 	}
 }

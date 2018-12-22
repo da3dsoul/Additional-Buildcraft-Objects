@@ -1,9 +1,8 @@
-package da3dsoul.scaryGen.liquidXP;
+package da3dsoul.scaryGen.ModInteraction.LiquidXP;
 
 import abo.ABO;
 import buildcraft.api.core.BlockIndex;
 import buildcraft.core.lib.utils.BlockUtils;
-import cpw.mods.fml.common.registry.GameRegistry;
 import mods.immibis.lxp.LiquidXPMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

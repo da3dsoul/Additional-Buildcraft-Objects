@@ -1,4 +1,4 @@
-package da3dsoul.scaryGen.generate;
+package da3dsoul.scaryGen.ModInteraction.BiomesOPlenty;
 
 import biomesoplenty.common.world.WorldChunkManagerBOP;
 import biomesoplenty.common.world.WorldProviderSurfaceBOP;

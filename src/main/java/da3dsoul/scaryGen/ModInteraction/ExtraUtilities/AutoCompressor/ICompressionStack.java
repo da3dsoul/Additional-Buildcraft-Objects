@@ -1,4 +1,4 @@
-package da3dsoul.AutoCompressor;
+package da3dsoul.scaryGen.ModInteraction.ExtraUtilities.AutoCompressor;
 
 import net.minecraft.item.ItemStack;
 

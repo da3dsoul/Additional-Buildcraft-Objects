@@ -1,10 +1,8 @@
-package da3dsoul.scaryGen.items;
+package da3dsoul.scaryGen.ModInteraction.ExtraUtilities;
 
 import abo.ABO;
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import cofh.thermalfoundation.ThermalFoundation;
-import cofh.thermalfoundation.item.TFItems;
 import com.rwtema.extrautils.ExtraUtils;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -14,15 +12,12 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-
-@Optional.Interface(iface = "IBauble", modid = "Baubles")
+@Optional.Interface(iface = "baubles.api.IBauble", modid = "Baubles")
 public class ItemAutoCompressor extends Item implements IBauble {
     public final String itemName;
 

@@ -1,4 +1,4 @@
-package da3dsoul.scaryGen.liquidXP;
+package da3dsoul.scaryGen.ModInteraction.LiquidXP;
 
 import java.util.Random;
 

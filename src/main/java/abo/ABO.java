@@ -30,7 +30,9 @@ import buildcraft.transport.ItemPipe;
 import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportFluids;
 import buildcraft.transport.stripes.StripesHandlerRightClick;
-import cpw.mods.fml.common.*;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.*;
@@ -42,12 +44,13 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import da3dsoul.AutoCompressor.CompressionEventHandler;
-import da3dsoul.ImplicationEventHandler;
 import da3dsoul.ShapeGen.ShapeGen;
+import da3dsoul.scaryGen.ModInteraction.BiomesOPlenty.BiomesOPlentyProxy;
+import da3dsoul.scaryGen.ModInteraction.CoFH.CoFHProxy;
+import da3dsoul.scaryGen.ModInteraction.ExtraUtilities.ExtraUtilitiesProxy;
+import da3dsoul.scaryGen.ModInteraction.LiquidXP.LiquidXPProxy;
 import da3dsoul.scaryGen.SaveHandler.EnderInventorySaveHandler;
 import da3dsoul.scaryGen.blocks.BlockLargeButton;
 import da3dsoul.scaryGen.blocks.BlockNoCrossing;
@@ -55,15 +58,9 @@ import da3dsoul.scaryGen.blocks.BlockSandStone;
 import da3dsoul.scaryGen.blocks.ItemSandStone;
 import da3dsoul.scaryGen.generate.BiomeStoneGen;
 import da3dsoul.scaryGen.generate.ChunkProviderScary;
-import da3dsoul.scaryGen.generate.GeostrataGen.Ore.COFH.COFHOverride;
 import da3dsoul.scaryGen.generate.WorldTypeScary;
-import da3dsoul.scaryGen.generate.WorldTypeScaryBOP;
-import da3dsoul.scaryGen.items.ItemAutoCompressor;
 import da3dsoul.scaryGen.items.ItemBottle;
 import da3dsoul.scaryGen.items.ItemGoldenStaff;
-import da3dsoul.scaryGen.items.ItemThermalImplication;
-import da3dsoul.scaryGen.liquidXP.BlockLiquidXP;
-import da3dsoul.scaryGen.liquidXP.WorldGenXPLake;
 import da3dsoul.scaryGen.projectile.EntityThrownBottle;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
@@ -96,7 +93,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
-import net.minecraftforge.event.terraingen.TerrainGen;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
@@ -104,9 +100,12 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Random;
 
-@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:BuildCraft|Robotics;after:LiquidXP;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion;after:BiomesOPlenty;after:ExtraUtilities")
+@Mod(modid = "Additional-Buildcraft-Objects", name = "Additional-Buildcraft-Objects", version = "${version}", acceptedMinecraftVersions = "[1.7.2,1.8)", dependencies = "required-after:Forge@[10.13.2.1208,);required-after:BuildCraft|Transport;required-after:BuildCraft|Energy;required-after:BuildCraft|Silicon;required-after:BuildCraft|Factory;required-after:BuildCraft|Builders;after:BuildCraft|Robotics;after:LiquidXPProxy;after:GeoStrata;after:CoFHCore;after:ThermalFoundation;after:ThermalExpansion;after:BiomesOPlenty;after:ExtraUtilities")
 public class ABO{
     public static Configuration aboConfiguration;
     public static Logger aboLog = LogManager
@@ -147,8 +146,8 @@ public class ABO{
     public static boolean geostrataInstalled = false;
     public static boolean cofhInstalled = false;
 
-    // LiquidXP
-    public static BlockLiquidXP blockLiquidXP;
+    // LiquidXPProxy
+    public static Block blockLiquidXP;
     //public static Item bucket;
     public static boolean spawnLakes = true;
     public static boolean respawnLakes = false;
@@ -157,7 +156,7 @@ public class ABO{
     public static int orbLifetime = 50;
     public static int orbSize = 5;
     public static DamageSource experience = (new DamageSource("experience")).setDamageBypassesArmor().setMagicDamage().setDamageIsAbsolute();
-    // LiquidXP
+    // LiquidXPProxy
 
     // Thermal Foundation
     public static Item thermalImplication;
@@ -208,11 +207,6 @@ public class ABO{
         geostrataInstalled = Loader.isModLoaded("GeoStrata");
         cofhInstalled = Loader.isModLoaded("CoFHCore");
 
-        if(ABO.geostrataInstalled && ABO.cofhInstalled) {
-            ABO.aboLog.info("COFH is Loaded");
-            COFHOverride.overrideCOFHWordGen(0);
-        }
-
         try {
             initFluidCapacities();
 
@@ -224,12 +218,12 @@ public class ABO{
             windmillAnimations = aboConfiguration.get("Windmills", "WindmillAnimations", true).getBoolean(true);
             windmillAnimDist = aboConfiguration.get("Windmills", "WindmillAnimationDistance", 64).getInt();
 
-            spawnLakes = aboConfiguration.get("LiquidXP", "SpawnExperienceLakes", spawnLakes).getBoolean();
-            respawnLakes = aboConfiguration.get("LiquidXP", "RespawnExperienceLakes", respawnLakes).getBoolean();
-            spawnOrbs = aboConfiguration.get("LiquidXP", "SpawnExperienceOrbs", spawnOrbs).getBoolean();
-            orbSpawnChance = aboConfiguration.get("LiquidXP", "ExperienceOrbSpawnChance", orbSpawnChance).getInt();
-            orbLifetime = aboConfiguration.get("LiquidXP", "ExperienceOrbLifetime", orbLifetime).getInt();
-            orbSize = aboConfiguration.get("LiquidXP", "ExperienceOrbSize", orbSize).getInt();
+            spawnLakes = aboConfiguration.get("LiquidXPProxy", "SpawnExperienceLakes", spawnLakes).getBoolean();
+            respawnLakes = aboConfiguration.get("LiquidXPProxy", "RespawnExperienceLakes", respawnLakes).getBoolean();
+            spawnOrbs = aboConfiguration.get("LiquidXPProxy", "SpawnExperienceOrbs", spawnOrbs).getBoolean();
+            orbSpawnChance = aboConfiguration.get("LiquidXPProxy", "ExperienceOrbSpawnChance", orbSpawnChance).getInt();
+            orbLifetime = aboConfiguration.get("LiquidXPProxy", "ExperienceOrbLifetime", orbLifetime).getInt();
+            orbSize = aboConfiguration.get("LiquidXPProxy", "ExperienceOrbSize", orbSize).getInt();
 
             windmillScalar = aboConfiguration.get("Windmills", "WindmillEnergyScalar", 1.0).getDouble();
             waterwheelScalar = aboConfiguration.get("Windmills", "WaterwheelEnergyScalar", 1.0).getDouble();
@@ -302,25 +296,16 @@ public class ABO{
 
             acceleratorBlock = new BlockAccelerator().setBlockName("blockAccelerator");
 
-            if (Loader.isModLoaded("LiquidXP")) {
-                BlockLiquidXP.preinit();
-                GameRegistry.registerBlock(blockLiquidXP, "blockLiquidXP").setBlockName("blockLiquidXP");
-            } else {
-                blockLiquidXP = null;
+            if (Loader.isModLoaded("LiquidXPProxy")) {
+                LiquidXPProxy.preinit();
             }
 
             if (Loader.isModLoaded("ThermalFoundation")) {
-                thermalImplication = new ItemThermalImplication();
-                ImplicationEventHandler.initialize();
-            } else {
-                thermalImplication = null;
+                CoFHProxy.preinit();
             }
 
             if (Loader.isModLoaded("ExtraUtilities")) {
-                autoCompressor = new ItemAutoCompressor();
-                CompressionEventHandler.initialize();
-            } else {
-                autoCompressor = null;
+                ExtraUtilitiesProxy.preinit();
             }
 
             sandStone = (new BlockSandStone()).setStepSound(Block.soundTypePiston).setHardness(0.8F).setBlockName("sandStone").setBlockTextureName("sandstone");
@@ -408,12 +393,10 @@ public class ABO{
             addFullRecipe(new ItemStack(blockLargeButtonStone, 1, 0),
                     new Object[]{"AA", "AA", Character.valueOf('A'), Blocks.stone_button});
 
-            LanguageRegistry.instance().addStringLocalization("entity.Additional-Buildcraft-Objects.ItemBat.name",
-                    "Item Bat");
 
             new WorldTypeScary();
 
-            if (Loader.isModLoaded("BiomesOPlenty")) new WorldTypeScaryBOP();
+            if (Loader.isModLoaded("BiomesOPlenty")) BiomesOPlentyProxy.preinit();
 
             // end scaryGen
 
@@ -459,7 +442,7 @@ public class ABO{
         loadRecipes();
 
         if (blockLiquidXP != null) {
-            BlockLiquidXP.init();
+            LiquidXPProxy.init();
         }
 
         ABOProxy.proxy.registerTileEntities();
@@ -576,71 +559,19 @@ public class ABO{
     @SubscribeEvent
     public void populate(PopulateChunkEvent.Populate event) {
         if (ABO.blockLiquidXP == null) return;
-        if(event.hasVillageGenerated) return;
-        if(event.type != PopulateChunkEvent.Populate.EventType.LAKE) return;
-        if (!spawnLakes) return;
-        if (!respawnLakes) return;
-        if (event.rand.nextInt(16) == 0
-                && TerrainGen.populate(event.chunkProvider, event.world, event.rand, event.chunkX, event.chunkZ, event.hasVillageGenerated, PopulateChunkEvent.Populate.EventType.LAKE)) {
-            int k1 = event.chunkX + event.rand.nextInt(16) + 8;
-            int l1 = 45 + event.rand.nextInt(211);
-            int i2 = event.chunkZ + event.rand.nextInt(16) + 8;
-            if (event.world.getWorldInfo().getVanillaDimension() != -1) {
-                new WorldGenXPLake().generate(event.world, event.rand, k1, l1, i2);
-            }
-        }
+        LiquidXPProxy.populate(event);
     }
 
     @SubscribeEvent
     public void decorate(DecorateBiomeEvent.Decorate event) {
         if (ABO.blockLiquidXP == null) return;
-        if (!spawnLakes) return;
-        if (respawnLakes) return;
-        if (event.type != DecorateBiomeEvent.Decorate.EventType.LAKE) return;
-        if (event.rand.nextInt(16) == 0
-                && TerrainGen.decorate(event.world, event.rand, event.chunkX, event.chunkZ, event.type)) {
-            int k1 = event.chunkX + event.rand.nextInt(16) + 8;
-            int l1 = 45 + event.rand.nextInt(211);
-            int i2 = event.chunkZ + event.rand.nextInt(16) + 8;
-            if (event.world.getWorldInfo().getVanillaDimension() != -1) {
-                new WorldGenXPLake().generate(event.world, event.rand, k1, l1, i2);
-            }
-        }
+        LiquidXPProxy.decorate(event);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerUpdate(LivingEvent.LivingUpdateEvent event) {
         if (ABO.blockLiquidXP != null) {
-            if (event.entityLiving instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) event.entityLiving;
-
-                int L = player.experienceLevel;
-                int x = (int) Math.floor(player.posX);
-                int y = (int) Math.floor(player.posY);
-                int z = (int) Math.floor(player.posZ);
-                if (y < 256 && y > 0) {
-                    if (blockLiquidXP.isInXP(player)) {
-                        int quanta = blockLiquidXP.getGreatestQuantaValue(player);
-                        if (player.ticksExisted % 20 == 0) {
-                            if (!player.capabilities.isCreativeMode) {
-                                int targetLevel = blockLiquidXP.getLevelTarget(player.worldObj, x, y, z, quanta);
-                                if (L < targetLevel) {
-                                    player.attackEntityFrom(experience, targetLevel - L);
-                                }
-                                player.addExhaustion(1.0F);
-                            }
-                        }
-                        if (player.isDead) return;
-                        if (player.worldObj.rand.nextInt(100) == 0) {
-                            if (blockLiquidXP.useXP(player.worldObj, x, y, z)) {
-                                player.addExperience(1000);
-                                if (!player.worldObj.isRemote)
-                                    player.worldObj.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.orb", 0.1F, 0.5F * ((player.worldObj.rand.nextFloat() - player.worldObj.rand.nextFloat()) * 0.7F + 1.8F));
-                            }
-                        }
-                    }
-                }
-            }
+            LiquidXPProxy.playerUpdate(event);
         }
     }
 
@@ -650,16 +581,9 @@ public class ABO{
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             if (event.entityLiving instanceof EntityPlayer) {
                 if (ABO.blockLiquidXP != null) {
-                    if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
-                        bucketEventCanceled = true;
-                    } else if(BlockLiquidXP.tryToPlaceFromBucket(event.entityPlayer, event.x, event.y, event.z, event.face))
-                    {
-                        bucketEventCanceled = true;
-                    }
-
+                    bucketEventCanceled = LiquidXPProxy.rightClick_Block(event, bucketEventCanceled);
                 }
                 if (event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() == Items.dye && event.entityPlayer.inventory.getCurrentItem().getItemDamage() == 15) {
-                    Block var5 = event.world.getBlock(event.x, event.y, event.z);
                     World world = event.world;
                     boolean success = false;
 
@@ -682,7 +606,7 @@ public class ABO{
             }
         }
         if (event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR) {
-            if (event.entityPlayer instanceof EntityPlayer && (event.entityPlayer.getCommandSenderName().equalsIgnoreCase("da3dsoul") || event.entityPlayer.getCommandSenderName().equalsIgnoreCase("balmung42")) && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
+            if (event.entityPlayer != null && (event.entityPlayer.getCommandSenderName().equalsIgnoreCase("da3dsoul") || event.entityPlayer.getCommandSenderName().equalsIgnoreCase("balmung42")) && event.entityPlayer.inventory.getCurrentItem() != null && event.entityPlayer.inventory.getCurrentItem().getItem() instanceof ItemDye) {
                 ItemStack itemstack = event.entityPlayer.getCurrentEquippedItem();
 
                 int range = 150;
@@ -754,9 +678,7 @@ public class ABO{
             }
 
             if (blockLiquidXP != null) {
-                if (BlockLiquidXP.onTryToUseBottle((EntityPlayer) event.entityLiving, event.x, event.y, event.z, event.face)) {
-                    bucketEventCanceled = true;
-                }
+                bucketEventCanceled = LiquidXPProxy.rightClick_Air(event, bucketEventCanceled);
             }
             if (bucketEventCanceled) {
                 event.setCanceled(true);
@@ -768,9 +690,6 @@ public class ABO{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onTextureStitchPre(TextureStitchEvent.Pre event) {
-        if (ABO.blockLiquidXP != null) {
-            BlockLiquidXP.initAprilFools(event);
-        }
     }
 
     @EventHandler
