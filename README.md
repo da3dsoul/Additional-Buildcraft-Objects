@@ -2,7 +2,7 @@
 
    ![Additional Buildcraft Objects](http://ma.ra-doersch.de/abo-logo.png "Additional Buildcraft Objects")
 
-   Minecraft Forum: http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2310397-additional-buildcraft-objects-a-plugin-for
+   Minecraft Forum: https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/2310397-additional-buildcraft-objects-a-plugin-for
 
    Download Links: https://github.com/da3dsoul/Additional-Buildcraft-Objects/releases
 
